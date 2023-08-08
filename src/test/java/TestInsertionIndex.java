@@ -1,9 +1,11 @@
 import com.google.common.base.Stopwatch;
 import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
+import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animation.data.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.core.impl.api.animation.*;
+import org.zeith.hammeranims.core.impl.api.geometry.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -32,23 +34,39 @@ public class TestInsertionIndex
 	public static void main(String[] args)
 	{
 		AnimationDecoder.init();
+		GeometryDecoder.init();
 		
-		AnimationContainerImpl container = new AnimationContainerImpl()
+		AnimationContainerImpl aCtr = new AnimationContainerImpl()
 		{
 			@Override
 			public ResourceLocation getRegistryKey()
 			{
-				return HammerAnimations.id("test");
+				return HammerAnimations.id("billy");
 			}
 		};
 		
-		container.reload(TestInsertionIndex::read);
+		GeometryContainerImpl gCtr = new GeometryContainerImpl()
+		{
+			@Override
+			public ResourceLocation getRegistryKey()
+			{
+				return HammerAnimations.id("billy");
+			}
+		};
 		
+		aCtr.reload(TestInsertionIndex::read);
+		gCtr.reload(TestInsertionIndex::read);
+		
+//		testAnim(aCtr);
+	}
+	
+	public static void testAnim(IAnimationContainer aCtr)
+	{
 		String animation = "animation.model.breath";
 		String boneName = "chest";
 		int frames = 25;
 		
-		IAnimationData anim = container.getAnimations().get(animation).getData();
+		IAnimationData anim = aCtr.getAnimations().get(animation).getData();
 		
 		BoneAnimation boneAnimation = anim.getBoneAnimations().get(boneName);
 		

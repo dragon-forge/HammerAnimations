@@ -1,7 +1,8 @@
 package org.zeith.hammeranims.api.animation;
 
 import net.minecraft.util.ResourceLocation;
-import org.zeith.hammeranims.api.HammerModelsApi;
+import org.zeith.hammeranims.HammerAnimations;
+import org.zeith.hammeranims.api.HammerAnimationsApi;
 
 import java.util.*;
 
@@ -9,6 +10,13 @@ public final class AnimationLocation
 {
 	public final ResourceLocation container;
 	public final String key;
+	
+	public AnimationLocation(String path)
+	{
+		String[] split = path.split("!", 2);
+		this.container = new ResourceLocation(split[0]);
+		this.key = split[1];
+	}
 	
 	public AnimationLocation(ResourceLocation container, String key)
 	{
@@ -18,7 +26,7 @@ public final class AnimationLocation
 	
 	public Optional<Animation> resolve()
 	{
-		return Optional.ofNullable(HammerModelsApi.animations().getValue(container))
+		return Optional.ofNullable(HammerAnimationsApi.animations().getValue(container))
 				.map(c -> c.getAnimations().get(key));
 	}
 	
@@ -40,6 +48,11 @@ public final class AnimationLocation
 	@Override
 	public String toString()
 	{
-		return container.toString() + '#' + key;
+		return container.toString() + '!' + key;
+	}
+	
+	public void warn(String message)
+	{
+		HammerAnimations.LOG.warn("[" + this + "]: {}", message);
 	}
 }

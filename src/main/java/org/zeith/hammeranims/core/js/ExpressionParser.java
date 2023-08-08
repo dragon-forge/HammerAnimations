@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.js;
 
+import com.zeitheron.hammercore.utils.base.Cast;
 import com.zeitheron.hammercore.utils.math.*;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
@@ -15,8 +16,7 @@ public class ExpressionParser
 	{
 		final String expr0 = expression.toLowerCase(Locale.ROOT).replace("math.", "");
 		
-		ScriptEngine js = new ScriptEngineManager(null).getEngineByName("Nashorn");
-		if(js == null) js = new ScriptEngineManager().getEngineByName("Nashorn");
+		ScriptEngine js = new ScriptEngineManager().getEngineByName("Nashorn");
 		if(js != null) try
 		{
 			js.put("Java", null); // Prevent exploiting Java types.
@@ -24,8 +24,8 @@ public class ExpressionParser
 			js.put("math", MATH);
 			
 			String fun = "function get(query) {\n\treturn " + expression + ";\n}";
-			final ScriptObjectMirror eval = (ScriptObjectMirror) js.eval(fun);
-			InterpolatedDouble id0 = eval.to(InterpolatedDouble.class);
+			
+			InterpolatedDouble id0 = ((ScriptObjectMirror) js.eval(fun)).to(InterpolatedDouble.class);
 			
 			return query ->
 			{

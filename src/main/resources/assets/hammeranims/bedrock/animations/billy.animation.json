@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.model.walk": {
+		"walk": {
 			"loop": true,
 			"animation_length": 2,
 			"bones": {
@@ -86,65 +86,12 @@
 				}
 			}
 		},
-		"animation.model.breath": {
+		"breathe": {
 			"loop": true,
 			"animation_length": 1.25,
 			"bones": {
 				"chest": {
 					"scale": "1 + math.sin(query.anim_time / 1.25 * 360) * 0.01 + 0.01"
-				}
-			}
-		},
-		"test1": {
-			"loop": true,
-			"animation_length": 1,
-			"bones": {
-				"chest": {
-					"scale": "Math.sin(query.anim_time * 360)"
-				}
-			}
-		},
-		"test2": {
-			"loop": true,
-			"animation_length": 1,
-			"bones": {
-				"chest": {
-					"scale": "1.25"
-				}
-			}
-		},
-		"test3": {
-			"loop": true,
-			"animation_length": 1,
-			"bones": {
-				"chest": {
-					"scale": 1.25
-				}
-			}
-		},
-		"test4": {
-			"loop": true,
-			"animation_length": 1,
-			"bones": {
-				"chest": {
-					"scale": {
-                      "0.0": {
-                        "post": [0, 0, 0],
-                        "lerp_mode": "catmullrom"
-                      },
-                      "0.5": [46.5, 0, 0],
-                      "1.0": {
-                        "pre": [0, 0, 0],
-                        "post": [0, 0, 0],
-                        "lerp_mode": "catmullrom"
-                      },
-                      "1.5": [-46.5, 0, 0],
-                      "2.0": {
-                        "pre": [0, 0, 0],
-                        "post": [0, 0, 0],
-                        "lerp_mode": "catmullrom"
-                      }
-                    }
 				}
 			}
 		}

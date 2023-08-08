@@ -2,7 +2,7 @@ package org.zeith.hammeranims.api.utils;
 
 import net.minecraft.util.ResourceLocation;
 
-import java.util.Optional;
+import java.util.*;
 
 @FunctionalInterface
 public interface IResourceProvider
@@ -12,5 +12,19 @@ public interface IResourceProvider
 	default Optional<String> readAsString(ResourceLocation path)
 	{
 		return read(path).map(String::new);
+	}
+	
+	static IResourceProvider or(List<IResourceProvider> resources)
+	{
+		return path ->
+		{
+			Optional<byte[]> read = Optional.empty();
+			for(IResourceProvider resource : resources)
+			{
+				read = resource.read(path);
+				if(read.isPresent()) return read;
+			}
+			return read;
+		};
 	}
 }

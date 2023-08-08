@@ -4,7 +4,7 @@ import com.zeitheron.hammercore.lib.zlib.json.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.HammerModelsApi;
+import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.animation.event.*;
@@ -30,7 +30,7 @@ public class AnimationContainerImpl
 		this.suffix = ".animation.json";
 	}
 	
-	public static Optional<IReadAnimationHolder> defaultReadAnimation(IAnimationContainer container, Optional<String> text)
+	public static Optional<IReadAnimationHolder> defaultReadAnimation(IResourceProvider resources, IAnimationContainer container, Optional<String> text)
 	{
 		return text.map(JSONTokener::new)
 				.flatMap(JSONTokener::nextValueOBJ)
@@ -47,16 +47,16 @@ public class AnimationContainerImpl
 						
 						for(String animKey : animations.keySet())
 						{
-							DecodeAnimationEvent evt = new DecodeAnimationEvent(container, json, fmt, animKey, animations.get(animKey));
+							DecodeAnimationEvent evt = new DecodeAnimationEvent(resources, container, json, fmt, animKey, animations.get(animKey));
 							AnimationDecoder.decodeAnimation(evt);
-							if(!evt.isCanceled()) HammerModelsApi.EVENT_BUS.post(evt);
+							if(!evt.isCanceled()) HammerAnimationsApi.EVENT_BUS.post(evt);
 							holder.put(animKey, evt.getDecoded());
 						}
 						
 						return holder;
 					} catch(Exception e)
 					{
-						HammerAnimations.LOG.error("Failed to load model " + key + ", skipping.", e);
+						HammerAnimations.LOG.error("Failed to load animation " + key + ", skipping.", e);
 						return null;
 					}
 				});
@@ -72,9 +72,9 @@ public class AnimationContainerImpl
 		);
 		
 		AnimationContainerParseEvent event = new AnimationContainerParseEvent(resources, path, this);
-		HammerModelsApi.EVENT_BUS.post(event);
+		HammerAnimationsApi.EVENT_BUS.post(event);
 		
-		animations = Optional.ofNullable(event.getOverrideOrDefault(() -> defaultReadAnimation(this, resources.readAsString(path)).orElseGet(() ->
+		animations = Optional.ofNullable(event.getOverrideOrDefault(() -> defaultReadAnimation(resources, this, resources.readAsString(path)).orElseGet(() ->
 		{
 			HammerAnimations.LOG.warn("Unable to load animation {} from file {}", key, path);
 			return null;

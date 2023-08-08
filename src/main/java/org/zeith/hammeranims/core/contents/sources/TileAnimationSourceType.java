@@ -1,11 +1,13 @@
-package org.zeith.hammeranims.core.contents;
+package org.zeith.hammeranims.core.contents.sources;
 
 import com.zeitheron.hammercore.utils.base.Cast;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.*;
-import org.zeith.hammeranims.core.init.AnimationSourceTypesHM;
+import org.zeith.hammeranims.core.init.DefaultsHA;
+import org.zeith.hammeranims.core.utils.InstanceHelpers;
 
 public class TileAnimationSourceType
 		extends AnimationSourceType
@@ -14,6 +16,11 @@ public class TileAnimationSourceType
 	public TileSourceType readSource(NBTTagCompound tag)
 	{
 		return new TileSourceType(tag);
+	}
+	
+	public AnimationSource of(TileEntity tile)
+	{
+		return new TileSourceType(tile.getPos());
 	}
 	
 	public static class TileSourceType
@@ -34,7 +41,7 @@ public class TileAnimationSourceType
 		@Override
 		public NBTTagCompound writeSource()
 		{
-			NBTTagCompound tag = new NBTTagCompound();
+			NBTTagCompound tag = InstanceHelpers.newNBTCompound();
 			tag.setInteger("x", pos.getX());
 			tag.setInteger("y", pos.getY());
 			tag.setInteger("z", pos.getZ());
@@ -44,7 +51,7 @@ public class TileAnimationSourceType
 		@Override
 		public AnimationSourceType getType()
 		{
-			return AnimationSourceTypesHM.TILE_TYPE;
+			return DefaultsHA.TILE_TYPE;
 		}
 		
 		@Override

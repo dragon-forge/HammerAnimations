@@ -1,23 +1,20 @@
 package org.zeith.hammeranims;
 
 import com.zeitheron.hammercore.HammerCore;
-import com.zeitheron.hammercore.utils.base.Cast;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.event.*;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.*;
-import org.zeith.hammeranims.api.animation.IAnimationContainer;
-import org.zeith.hammeranims.api.HammerModelsApi;
-import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
-import org.zeith.hammeranims.core.proxy.CommonProxy;
 import org.zeith.hammeranims.api.annotations.*;
+import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
+import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
+import org.zeith.hammeranims.core.proxy.CommonProxy;
+import org.zeith.hammeranims.core.utils.reg.*;
 
-import java.lang.reflect.*;
+import java.lang.annotation.Annotation;
+import java.util.function.BiConsumer;
 
 @Mod(modid = HammerAnimations.MOD_ID, name = HammerAnimations.MOD_NAME, version = "@VERSION@", certificateFingerprint = "@FINGERPRINT@", dependencies = "required-after:hammercore", updateJSON = "https://api.modrinth.com/updates/C7cTlgwS/forge_updates.json")
 public class HammerAnimations
@@ -26,7 +23,7 @@ public class HammerAnimations
 	public static final String MOD_ID = "hammeranims";
 	public static final String MOD_NAME = "HammerAnimations";
 	
-	public static final Logger LOG = LogManager.getLogger();
+	public static final Logger LOG = LogManager.getLogger(MOD_NAME);
 	
 	@SidedProxy(serverSide = ROOT_PACKAGE + ".core.proxy.ServerProxy",
 			clientSide = ROOT_PACKAGE + ".core.proxy.ClientProxy")
@@ -35,6 +32,7 @@ public class HammerAnimations
 	public HammerAnimations()
 	{
 		AnimationDecoder.init();
+		GeometryDecoder.init();
 	}
 	
 	@Mod.EventHandler
@@ -51,22 +49,22 @@ public class HammerAnimations
 	public void construct(FMLConstructionEvent e)
 	{
 		LOG.info("{} is constructing.", MOD_NAME);
+		MinecraftForge.EVENT_BUS.register(PROXY);
 		PROXY.construct();
 		
-		for(ASMDataTable.ASMData data : e.getASMHarvestedData().getAll(RegisterAnimations.class.getCanonicalName()))
-		{
-			ModContainer mod = data.getCandidate().getContainedMods().stream().findFirst().orElse(null);
-			if(mod == null)
-			{
-				LOG.warn("Skipping @RegisterAnimations-annotated class " + data.getClassName() +
-						" since it does not belong to any mod.");
-				continue;
-			}
-			
-			registerAnimations(data.getClassName(), mod);
-			LOG.info("Applied @RegisterAnimations to " + data.getClassName() + ", which belongs to " + mod.getModId() +
-					" (" + mod.getName() + ")");
-		}
+		ASMDataTable asm = e.getASMHarvestedData();
+		
+		scan(asm, RegisterAnimations.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new AnimationRegistrar(n, mod)));
+		scan(asm, RegisterGeometries.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new GeometryRegistrar(n, mod)));
+		scan(asm, RegisterTimeFunctions.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new TimeFunctionRegistrar(n, mod)));
+		scan(asm, RegisterAnimationSourceTypes.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new AnimationSourceTypesRegistrar(n, mod)));
+		scan(asm, RegisterAnimations.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new AnimationActionsRegistrar(n, mod)));
+	}
+	
+	@Mod.EventHandler
+	public void preInit(FMLPreInitializationEvent e)
+	{
+//		SimpleRegistration.registerFieldBlocksFrom(ContainersHA.class, MOD_ID, CreativeTabs.MISC);
 	}
 	
 	@Mod.EventHandler
@@ -75,9 +73,10 @@ public class HammerAnimations
 		PROXY.init();
 	}
 	
-	private void registerAnimations(String className, ModContainer container)
+	@Mod.EventHandler
+	public void startServer(FMLServerAboutToStartEvent e)
 	{
-		MinecraftForge.EVENT_BUS.register(new ModelRegistrar(className, container));
+		PROXY.serverAboutToStart(e.getServer());
 	}
 	
 	public static ResourceLocation id(String path)
@@ -85,60 +84,19 @@ public class HammerAnimations
 		return new ResourceLocation(MOD_ID, path);
 	}
 	
-	public static class ModelRegistrar
+	private void scan(ASMDataTable table, Class<? extends Annotation> type, BiConsumer<String, ModContainer> handler)
 	{
-		final String className;
-		final ModContainer container;
-		
-		public ModelRegistrar(String className, ModContainer container)
+		for(ASMDataTable.ASMData data : table.getAll(type.getCanonicalName()))
 		{
-			this.className = className;
-			this.container = container;
-		}
-		
-		@SubscribeEvent
-		public void performRegister(RegistryEvent.Register<IAnimationContainer> evt)
-		{
-			IForgeRegistry<IAnimationContainer> reg = evt.getRegistry();
-			
-			if(reg == HammerModelsApi.animations())
+			ModContainer mod = data.getCandidate().getContainedMods().stream().findFirst().orElse(null);
+			if(mod == null)
 			{
-				evt.setModContainer(container);
-				
-				try
-				{
-					for(Field f : Class.forName(className).getDeclaredFields())
-					{
-						if(!IAnimationContainer.class.isAssignableFrom(f.getType())
-								|| !Modifier.isStatic(f.getModifiers()))
-							continue;
-						
-						AnimKey key = f.getAnnotation(AnimKey.class);
-						if(key == null)
-						{
-							LOG.warn("Found animation field without @AnimKey: " + f);
-							continue;
-						}
-						
-						f.setAccessible(true);
-						IAnimationContainer ctr = Cast.cast(f.get(null), IAnimationContainer.class);
-						if(ctr == null)
-						{
-							LOG.warn("Found NULL animation container field: " + f);
-							continue;
-						}
-						
-						ResourceLocation regKey = new ResourceLocation(container.getModId(), key.value());
-						
-						reg.register(ctr.setRegistryName(regKey)); // This varies between versions...
-						
-						LOG.debug("Registered animation from " + f);
-					}
-				} catch(Exception e)
-				{
-					LOG.error("Failed to register animations from class " + className, e);
-				}
+				LOG.warn("Skipping @{}-annotated class {} since it does not belong to any mod.", type.getSimpleName(), data.getClassName());
+				continue;
 			}
+			
+			handler.accept(data.getClassName(), mod);
+			LOG.info("Applied @{} to {}, which belongs to {} ({})", type.getSimpleName(), data.getClassName(), mod.getModId(), mod.getName());
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.api.animation;
 
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
+import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 
 public class Animation
 {
@@ -26,6 +27,11 @@ public class Animation
 	public AnimationLocation getLocation()
 	{
 		return location;
+	}
+	
+	public ConfiguredAnimation configure()
+	{
+		return new ConfiguredAnimation(this);
 	}
 	
 	@Override

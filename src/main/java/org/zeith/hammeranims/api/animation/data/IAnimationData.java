@@ -12,4 +12,9 @@ public interface IAnimationData
 	Duration getLength();
 	
 	Map<String, BoneAnimation> getBoneAnimations();
+	
+	default double getLengthSeconds()
+	{
+		return getLength().toMillis() / 1000D;
+	}
 }

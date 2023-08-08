@@ -1,0 +1,11 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "null": {
+      "loop": false,
+      "animation_length": 0.001,
+      "bones": {
+      }
+    }
+  }
+}

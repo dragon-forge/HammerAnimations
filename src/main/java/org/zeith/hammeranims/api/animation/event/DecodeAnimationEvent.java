@@ -4,6 +4,7 @@ import com.zeitheron.hammercore.lib.zlib.json.*;
 import com.zeitheron.hammercore.utils.base.Cast;
 import net.minecraftforge.fml.common.eventhandler.*;
 import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.utils.IResourceProvider;
 
 import java.util.*;
 
@@ -11,6 +12,7 @@ import java.util.*;
 public class DecodeAnimationEvent
 		extends Event
 {
+	public final IResourceProvider resources;
 	public final IAnimationContainer container;
 	public final JSONObject rootJson;
 	public final String formatVersion;
@@ -20,8 +22,9 @@ public class DecodeAnimationEvent
 	
 	protected Animation decoded;
 	
-	public DecodeAnimationEvent(IAnimationContainer container, JSONObject rootJson, String formatVersion, String key, Object json)
+	public DecodeAnimationEvent(IResourceProvider resources, IAnimationContainer container, JSONObject rootJson, String formatVersion, String key, Object json)
 	{
+		this.resources = resources;
 		this.container = container;
 		this.rootJson = rootJson;
 		this.formatVersion = formatVersion;

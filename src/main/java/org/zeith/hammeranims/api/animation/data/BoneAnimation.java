@@ -1,8 +1,11 @@
 package org.zeith.hammeranims.api.animation.data;
 
 import com.zeitheron.hammercore.lib.zlib.json.JSONObject;
+import com.zeitheron.hammercore.utils.java.functions.Function3;
 import net.minecraft.util.math.Vec3d;
+import org.zeith.hammeranims.api.animation.AnimationLocation;
 import org.zeith.hammeranims.api.animation.interp.*;
+import org.zeith.hammeranims.api.geometry.model.GeometryTransforms;
 
 import javax.annotation.*;
 
@@ -17,6 +20,28 @@ public class BoneAnimation
 		this.rotation = rotation != null ? rotation : Vec3Animation.ZERO;
 		this.position = position != null ? position : Vec3Animation.ZERO;
 		this.scale = scale != null ? scale : Vec3Animation.ONE;
+	}
+	
+	public GeometryTransforms get(Query query)
+	{
+		return new GeometryTransforms(
+				getTranslation(query),
+				getRotation(query),
+				getScale(query)
+		);
+	}
+	
+	public GeometryTransforms apply(Query query, BlendMode blending, float weight, GeometryTransforms transforms)
+	{
+		if(transforms == null) transforms = GeometryTransforms.createDefault();
+		
+		Function3<Vec3d, Vec3d, Float, Vec3d> tf = blending.additiveTransform;
+		transforms.translation = tf.apply(transforms.translation, getTranslation(query), weight);
+		transforms.rotation = tf.apply(transforms.rotation, getRotation(query), weight);
+		
+		transforms.scale = blending.multiplicativeTransform.apply(transforms.scale, getScale(query), weight);
+		
+		return transforms;
 	}
 	
 	public Vec3d getTranslation(Query query)
@@ -34,8 +59,12 @@ public class BoneAnimation
 		return rotation.get(query);
 	}
 	
-	public static BoneAnimation parse(JSONObject bone)
+	public static BoneAnimation parse(AnimationLocation anim, JSONObject bone)
 	{
+		if(bone.has("relative_to"))
+			anim.warn(
+					"Warning: Detected unsupported feature: relative_to (" + bone.opt("relative_to") + ")! Ignoring.");
+		
 		Vec3Animation rotation = Vec3Animation.parse(bone.opt("rotation"));
 		Vec3Animation position = Vec3Animation.parse(bone.opt("position"));
 		Vec3Animation scale = Vec3Animation.parse(bone.opt("scale"));

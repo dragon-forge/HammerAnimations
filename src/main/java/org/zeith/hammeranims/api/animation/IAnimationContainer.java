@@ -3,7 +3,7 @@ package org.zeith.hammeranims.api.animation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
-import org.zeith.hammeranims.api.HammerModelsApi;
+import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationContainerImpl;
 import org.zeith.hammeranims.api.annotations.*;
@@ -13,7 +13,7 @@ import org.zeith.hammeranims.api.annotations.*;
  * <p>
  * Animation containers may be registered in a simple way:
  * - Annotate your class with all animations with @{@link RegisterAnimations}
- * - Declare static final IAnimationContainer constants, annotate each one with @{@link AnimKey}
+ * - Declare static final IAnimationContainer constants, annotate each one with @{@link Key}
  * - Assign all these constants with {@link IAnimationContainer#create()} values.
  * - Optionally perform static import for {@link IAnimationContainer#create()}.
  */
@@ -59,12 +59,12 @@ public interface IAnimationContainer
 	
 	/**
 	 * Gets the registry key associated with this animation container.
-	 * This key can be used to identify and retrieve the container from registries.
+	 * This key can be used to identify and retrieve the container from registry.
 	 *
 	 * @return The {@link ResourceLocation} registry key.
 	 */
 	default ResourceLocation getRegistryKey()
 	{
-		return HammerModelsApi.animations().getKey(this);
+		return HammerAnimationsApi.animations().getKey(this);
 	}
 }
