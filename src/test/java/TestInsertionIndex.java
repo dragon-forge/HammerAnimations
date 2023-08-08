@@ -1,10 +1,9 @@
 import com.google.common.base.Stopwatch;
 import net.minecraft.util.ResourceLocation;
-import org.zeith.hammer.models.HammerModels;
-import org.zeith.hammer.models.api.animation.Animation;
-import org.zeith.hammer.models.api.animation.data.*;
-import org.zeith.hammer.models.api.animation.interp.Query;
-import org.zeith.hammer.models.core.impl.api.animation.*;
+import org.zeith.hammeranims.HammerAnimations;
+import org.zeith.hammeranims.api.animation.data.*;
+import org.zeith.hammeranims.api.animation.interp.Query;
+import org.zeith.hammeranims.core.impl.api.animation.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -39,7 +38,7 @@ public class TestInsertionIndex
 			@Override
 			public ResourceLocation getRegistryKey()
 			{
-				return HammerModels.id("test");
+				return HammerAnimations.id("test");
 			}
 		};
 		

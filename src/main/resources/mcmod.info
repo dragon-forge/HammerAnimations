@@ -1,8 +1,8 @@
 [
 	{
-	  "modid": "hammermodels",
-	  "name": "Hammer Models",
-	  "description": "Bedrock model loading API",
+	  "modid": "hammeranims",
+	  "name": "HammerAnimations",
+	  "description": "Bedrock model and animation API",
 	  "version": "${version}",
 	  "mcversion": "${mcversion}",
 	  "authorList": ["Zeitheron"]

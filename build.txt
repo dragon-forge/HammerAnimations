@@ -1,7 +1,7 @@
 #Project info
 author=Zeitheron
 start_git_commit=?
-git_commit=https://github.com/dragon-forge/HammerModels/commit/{{hash}}
+git_commit=https://github.com/dragon-forge/HammerAnimations/commit/{{hash}}
 
 #Runtime info
 forge_version=14.23.5.2847
@@ -12,9 +12,9 @@ jei_version=4.16.1.302
 # viveapi_version=12.1.1
 
 #Mod info
-mod_id=hammermodels
-mod_id_fancy=HammerModels
-mod_name=Hammer Models
+mod_id=hammeranims
+mod_id_fancy=HammerAnimations
+mod_name=HammerAnimations
 mod_version=12.2.1
 cf_project=899883
 release_type=release
