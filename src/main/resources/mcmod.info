@@ -1,8 +1,8 @@
 [
 	{
-	  "modid": "",
-	  "name": "",
-	  "description": "",
+	  "modid": "hammermodels",
+	  "name": "Hammer Models",
+	  "description": "Bedrock model loading API",
 	  "version": "${version}",
 	  "mcversion": "${mcversion}",
 	  "authorList": ["Zeitheron"]
