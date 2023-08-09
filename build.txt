@@ -1,6 +1,6 @@
 #Project info
 author=Zeitheron
-start_git_commit=?
+start_git_commit=7c27035d2be7bd36b67b1739551ef2ff99bf126a
 git_commit=https://github.com/dragon-forge/HammerAnimations/commit/{{hash}}
 
 #Runtime info
