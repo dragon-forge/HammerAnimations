@@ -1,10 +1,15 @@
 [
-	{
-	  "modid": "hammeranims",
-	  "name": "HammerAnimations",
-	  "description": "Bedrock model and animation API",
-	  "version": "${version}",
-	  "mcversion": "${mcversion}",
-	  "authorList": ["Zeitheron"]
-	}
+  {
+    "modid": "hammeranims",
+    "name": "HammerAnimations",
+    "description": "Library mod for Minecraft: Java Edition. Brings Bedrock model and animation as a compact and easy-to-use API layer with hotswapping.\nTo perform hot-reload, run \"/hammeranims reload\"",
+    "credits": "Mojang (creation of model & animation standard)",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "authorList": [
+      "Zeitheron"
+    ],
+    "logoFile": "assets/hammeranims/textures/logo.png",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/hammer-animations"
+  }
 ]
