@@ -2,7 +2,6 @@ package org.zeith.hammeranims.core.client.model;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraftforge.api.distmarker.*;
-import org.joml.*;
 import org.zeith.hammeranims.api.geometry.model.RenderData;
 
 public class TexturedQuadF

@@ -37,7 +37,7 @@ public class AnimationSystem
 		if(!owner.getAnimatedObjectWorld().isClientSide) // if on server
 			Network.sendToTracking(
 					new PacketSyncAnimationSystem(this),
-					owner.getAnimatedObjectWorld().getChunkAt(BlockPos.containing(owner.getAnimatedObjectPosition()))
+					owner.getAnimatedObjectWorld().getChunkAt(new BlockPos(owner.getAnimatedObjectPosition()))
 			);
 	}
 	

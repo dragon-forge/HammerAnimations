@@ -1,16 +1,16 @@
 package org.zeith.hammeranims.core.client.model;
 
 import com.google.common.collect.Lists;
-import com.mojang.math.Axis;
-import net.minecraft.core.Direction;
+import com.mojang.math.Matrix4f;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.*;
-import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.interp.BlendMode;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
+import org.zeith.hammeranims.mixins.Matrix4fAccessor;
+import org.zeith.hammerlib.util.java.Cast;
 
 import java.util.*;
 
@@ -177,9 +177,15 @@ public class GeometricModelImpl
 		var pose = data.pose;
 		pose.pushPose();
 		pose.scale(0.0625f, 0.0625f, 0.0625f);
-		pose.mulPoseMatrix(new Matrix4f().identity().m00(-1));
+		
+		Matrix4f mat = new Matrix4f();
+		mat.setIdentity();
+		Cast.cast(mat, Matrix4fAccessor.class).setM00(-1);
+		pose.mulPoseMatrix(mat);
+		
 		for(ModelBoneF bone : rootBones)
 			bone.render(data);
+		
 		pose.popPose();
 	}
 	

@@ -1,17 +1,20 @@
 modLoader="javafml"
-loaderVersion="${forge_version_range}"
-issueTrackerURL="${issue_tracker_url}"
-license="${mod_license}"
+loaderVersion="[43,)"
+issueTrackerURL="https://github.com/dragon-forge/HammerAnimations/issues"
+license="All Rights Reserved"
 [[mods]]
-modId="${mod_id}"
-version="${mod_version}"
-displayName="${mod_name}"
-updateJSONURL="https://api.modrinth.com/updates/${modrinth_project}/forge_updates.json"
-displayURL="https://modrinth.com/mod/${modrinth_project}"
-logoFile="assets/${mod_id}/textures/logo.png"
-credits="${mod_credits}"
-authors="${mod_authors}"
-description='''${mod_description}'''
+modId="hammeranims"
+version="${file.jarVersion}"
+displayName="HammerAnimations"
+updateJSONURL="https://api.modrinth.com/updates/C7cTlgwS/forge_updates.json"
+displayURL="https://modrinth.com/mod/C7cTlgwS"
+logoFile="logo.png"
+credits="Mojang (creation of model & animation standard)"
+authors="Zeitheron"
+description='''
+Library mod for Minecraft: Java Edition. Brings Bedrock model and animation as a compact and easy-to-use API layer with hotswapping.
+To perform hot-reload, run "/hammeranims reload"
+'''
 
 # Display Test controls the display for your mod in the server connection screen
 # MATCH_VERSION means that your mod will cause a red X if the versions on client and server differ. This is the default behaviour and should be what you choose if you have server and client elements to your mod.
@@ -21,21 +24,21 @@ description='''${mod_description}'''
 # IMPORTANT NOTE: this is NOT an instruction as to which environments (CLIENT or DEDICATED SERVER) your mod loads on. Your mod should load (and maybe do nothing!) whereever it finds itself.
 displayTest="MATCH_VERSION"
 
-[[dependencies.${mod_id}]]
+[[dependencies.hammeranims]]
     modId="forge"
     mandatory=true
-    versionRange="${forge_version_range}"
+    versionRange="[43.2,)"
     ordering="NONE" # NONE/BEFORE/AFTER
     side="BOTH"
-[[dependencies.${mod_id}]]
+[[dependencies.hammeranims]]
     modId="minecraft"
     mandatory=true
-    versionRange="${minecraft_version_range}"
+    versionRange="[1.19.2,1.20)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.${mod_id}]]
+[[dependencies.hammeranims]]
     modId="hammerlib"
     mandatory=true
-    versionRange="[${hl_version},)"
+    versionRange="[19.3.60,)"
     ordering="NONE"
     side="BOTH"

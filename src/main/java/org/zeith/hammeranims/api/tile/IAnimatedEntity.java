@@ -21,7 +21,7 @@ public interface IAnimatedEntity
 	default Level getAnimatedObjectWorld()
 	{
 		Entity tile = Cast.cast(this);
-		return tile.level();
+		return tile.getLevel();
 	}
 	
 	@Override

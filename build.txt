@@ -1,10 +1,9 @@
 # Mod Info
-mod_version=20.1.1
+mod_version=19.2.1
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
-hl_version=20.1.12
-jei_version=15.2.0.22
+hl_version=19.3.62
 
 # Persistent mod info
 mod_id=hammeranims
@@ -18,17 +17,17 @@ issue_tracker_url=https://github.com/dragon-forge/HammerAnimations/issues
 
 # Mappings
 mappings_channel=parchment
-mappings_version=2023.06.26-1.20.1
+mappings_version=2022.08.14-1.19.2
 
 # Maven Info
 maven_group=org.zeith.hammeranims
 maven_url=file:///SERVER//Maven
 
 # MC Info
-mc_version=1.20.1
+mc_version=1.19.2
 mc_range=[1.20.1,1.21)
-forge_version=47.1.58
-forge_range=[47,)
+forge_version=43.2.21
+forge_range=[43,)
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
 
 # Misc Info

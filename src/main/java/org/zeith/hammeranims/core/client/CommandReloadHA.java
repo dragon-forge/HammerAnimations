@@ -6,7 +6,6 @@ import net.minecraft.commands.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.core.proxy.ClientProxy;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
-import org.zeith.hammerlib.util.java.Cast;
 
 public class CommandReloadHA
 {
@@ -16,8 +15,7 @@ public class CommandReloadHA
 				.then(Commands.literal("reload")
 						.executes(cs ->
 						{
-							cs.getSource()
-									.sendSuccess(Cast.constant(InstanceHelpers.componentText("Reloading models and animations.")), false);
+							cs.getSource().sendSuccess(InstanceHelpers.componentText("Reloading models and animations."), true);
 							ClientProxy.performReload();
 							return Command.SINGLE_SUCCESS;
 						}));

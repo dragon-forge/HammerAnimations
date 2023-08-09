@@ -10,14 +10,16 @@ buildscript {
         }
     }
     dependencies {
-        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.+"
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
         classpath 'org.spongepowered:mixingradle:0.7.+'
     }
 }
 
 plugins {
     id "com.modrinth.minotaur" version "2.+"
-    id 'net.neoforged.gradle' version '[6.0.13, 6.2)'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'net.minecraftforge.gradle' version '5.1.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
@@ -38,9 +40,7 @@ configFile.withReader {
 
 version = config.mod_version
 group = config.maven_group
-base {
-    archivesName = "${config.archive_name}-${config.mc_version}"
-}
+archivesBaseName = "${config.archive_name}-${config.mc_version}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -52,32 +52,13 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 minecraft {
     mappings channel: config.mappings_channel, version: config.mappings_version
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    copyIdeResources = true
     runs {
         client {
             workingDirectory project.file('run/client')
             property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', config.mod_id
-            def args = new ArrayList()
-
-            args.add "--mixin"
-            args.add "mixins.${config.mod_id}.json"
-
-            args.add "-Dmixin.env.disableRefMap=true"
-
-            if (hasConfig("mc_user") && !config.mc_user.isEmpty()) {
-                def userId = config.mc_user.split(',', 2)
-                args.add "--username"
-                args.add userId[0]
-
-                args.add "--uuid"
-                if (userId.length > 1) args.add userId[1]
-                else args.add "00000000000000000000000000000001" // this is a default
-            }
-
-            setArgs(args)
+            setArgs(Arrays.asList("--mixin mixins.${config.mod_id}.json --username ${config.mc_user.split(',')[0]} --uuid ${config.mc_user.split(',')[1]}".split(' ')))
             mods {
-                "${mod_id}" {
+                examplemod {
                     source sourceSets.main
                 }
             }
@@ -86,46 +67,9 @@ minecraft {
         server {
             workingDirectory project.file('run/server')
             property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', config.mod_id
-            def args = new ArrayList()
-            args.add "--mixin"
-            args.add "mixins.${config.mod_id}.json"
-            args.add "-Dmixin.env.disableRefMap=true"
-            setArgs(args)
+            setArgs(Arrays.asList("--mixin mixins.${config.mod_id}.json -Dmixin.env.disableRefMap=true".split(' ')))
             mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        gameTestServer {
-            workingDirectory project.file('run/server')
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', config.mod_id
-            def args = new ArrayList()
-            args.add "--mixin"
-            args.add "mixins.${config.mod_id}.json"
-            args.add "-Dmixin.env.disableRefMap=true"
-            setArgs(args)
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run/client')
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', config.mod_id
-            def args = new ArrayList()
-            args.add "--mixin"
-            args.add "mixins.${config.mod_id}.json"
-            args.add "-Dmixin.env.disableRefMap=true"
-            setArgs(args)
-            mods {
-                "${mod_id}" {
+                examplemod {
                     source sourceSets.main
                 }
             }
@@ -133,16 +77,10 @@ minecraft {
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-
 repositories {
     maven {
         name = "Zeitheron Maven"
         url = "https://maven.zeith.org/"
-    }
-    maven {
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/" // location of the maven that hosts JEI files since January 2023
     }
     flatDir { dirs "libraries/${config.mc_version}/all" }
     flatDir { dirs "libraries/${config.mc_version}/classpathOnly" }
@@ -151,17 +89,9 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.neoforged:forge:${config.mc_version}-${config.forge_version}"
+    minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
-    if (hasConfig("hl_version") && !config.hl_version.isEmpty()) {
-        implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
-    }
-
-    if (hasConfig("jei_version") && !config.jei_version.isEmpty()) {
-        compileOnly fg.deobf("mezz.jei:jei-${config.mc_version}-common-api:${config.jei_version}")
-        compileOnly fg.deobf("mezz.jei:jei-${config.mc_version}-forge-api:${config.jei_version}")
-        runtimeOnly fg.deobf("mezz.jei:jei-${config.mc_version}-forge:${config.jei_version}")
-    }
+	implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
 
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
@@ -189,7 +119,7 @@ dependencies {
             def modartifact = file.name.substring(0, splitPos)
             def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
             dependencies {
-                compileOnly fg.deobf(project.dependencies.create("_classpath:$modartifact:$modversion") {
+                compileClasspath fg.deobf(project.dependencies.create("_classpath:$modartifact:$modversion") {
                     transitive = false
                 })
             }
@@ -203,7 +133,7 @@ dependencies {
             def modartifact = file.name.substring(0, splitPos)
             def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
             dependencies {
-                runtimeOnly fg.deobf(project.dependencies.create("_runtime:$modartifact:$modversion") {
+                runtimeClasspath fg.deobf(project.dependencies.create("_runtime:$modartifact:$modversion") {
                     transitive = false
                 })
             }
@@ -219,41 +149,25 @@ dependencies {
             def modreference = "lib:$modartifact:$modversion"
 
             dependencies {
-                implementation project.dependencies.create(modreference) {
+                def dep = project.dependencies.create(modreference) {
                     transitive = false
                 }
+                implementation dep
+                shadow dep
             }
         }
     } else libDir.mkdir();
 }
 
-def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
-def replaceProperties = [
-        minecraft_version: config.mc_version, minecraft_version_range: config.mc_range,
-        forge_version    : "${config.mc_version}-${config.forge_version}", forge_version_range: config.forge_range,
-        mod_id           : config.mod_id, mod_name: config.mod_name, mod_license: config.mod_license, mod_version: config.mod_version,
-        mod_authors      : config.mod_authors, mod_description: config.mod_description,
-        hl_version       : config.hl_version, modrinth_project: config.modrinth_project,
-        issue_tracker_url: config.issue_tracker_url, mod_credits: config.mod_credits
-]
-processResources {
-    inputs.properties replaceProperties
-    replaceProperties.put 'project', project
-
-    filesMatching(resourceTargets) {
-        expand replaceProperties
-    }
-}
-
 jar {
     manifest {
         attributes([
-                "Specification-Title"     : config.mod_id,
+                "Specification-Title"     : "${config.mod_id}",
                 "Specification-Vendor"    : "Zeitheron",
                 "Specification-Version"   : "1",
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : archiveVersion,
-                "Implementation-Vendor"   : config.mod_authors,
+                "Implementation-Vendor"   : "Zeitheron",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                 "MixinConfigs"            : "mixins.${config.mod_id}.json"
         ])
@@ -261,24 +175,34 @@ jar {
 }
 
 task deobfJar(type: Jar) {
-    archiveClassifier = 'deobf'
+    classifier = 'deobf'
     from sourceSets.main.output
     manifest {
-        attributes(["Specification-Title"     : config.mod_id,
+        attributes(["Specification-Title"     : "${config.mod_id}",
                     "Specification-Vendor"    : "Zeitheron",
                     "Specification-Version"   : "1",
                     "Implementation-Title"    : project.name,
                     "Implementation-Version"  : archiveVersion,
-                    "Implementation-Vendor"   : config.mod_authors,
+                    "Implementation-Vendor"   : "Zeitheron",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                     "MixinConfigs"            : "mixins.${config.mod_id}.json"
         ])
     }
 }
 
+shadowJar {
+    classifier ''
+    configurations = [project.configurations.shadow]
+}
+
+reobf {
+    shadowJar {}
+}
+shadowJar.finalizedBy('reobfShadowJar')
+
 task srcJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allJava
-    archiveClassifier = 'sources'
+    classifier = 'sources'
 }
 
 artifacts {
@@ -288,14 +212,13 @@ artifacts {
 
 modrinth {
     token = System.env.MODRINTH_TOKEN != null ? System.env.MODRINTH_TOKEN : "NONE"
-    projectId = config.modrinth_project
-    versionNumber = config.mod_version
-    versionType = config.release_type
+    projectId = config.modrinth_project as String
+    versionNumber = config.mod_version as String
+    versionType = config.release_type as String
     uploadFile = jar
-    gameVersions = [config.mc_version]
-    loaders = ['Forge', 'NeoForge']
+    gameVersions = [config.mc_version as String]
     dependencies {
-        def mods = config.required_mods.split(";")
+        def mods = (config.required_mods as String).split(";")
         if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
             for (final def one in mods) {
                 if (one.isBlank()) continue
@@ -308,7 +231,7 @@ modrinth {
                     required.project one.trim()
             }
 
-        mods = config.optional_mods.split(";")
+        mods = (config.optional_mods as String).split(";")
         if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
             for (final def one in mods) {
                 if (one.isBlank()) continue
@@ -321,7 +244,7 @@ modrinth {
                     optional.project one.trim()
             }
 
-        mods = config.incompatible_mods.split(";")
+        mods = (config.incompatible_mods as String).split(";")
         if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
             for (final def one in mods) {
                 if (one.isBlank()) continue
@@ -334,7 +257,7 @@ modrinth {
                     incompatible.project one.trim()
             }
 
-        mods = config.embedded_mods.split(";")
+        mods = (config.embedded_mods as String).split(";")
         if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
             for (final def one in mods) {
                 if (one.isBlank()) continue
@@ -350,91 +273,69 @@ modrinth {
 }
 
 curseforge {
-    apiKey = System.env.CURSEFORGE_TOKEN != null ? System.env.CURSEFORGE_TOKEN : "NONE"
+    apiKey = System.env.CURSEFORGE_API_KEY != null ? System.env.CURSEFORGE_API_KEY : "NONE"
     project {
-        id = config.cf_project
+        id = config.cf_project as String
         changelogType = 'html'
         changelog = ""
-        releaseType = config.release_type
-        addGameVersion config.mc_version
+        releaseType = config.release_type as String
+        addGameVersion config.mc_version as String
         addGameVersion "Forge"
-        addGameVersion "NeoForge"
         mainArtifact(jar) {
             displayName = "[${config.mc_version}] ${config.mod_name} - ${config.mod_version}"
         }
-
-        def reqDeps = new ArrayList()
-        def optDeps = new ArrayList()
-        def incompat = new ArrayList()
-        def embLibs = new ArrayList()
-
-        def mods = config.required_mods.split(";")
-        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
-            for (final def one in mods) {
-                if (one.isBlank()) continue
-                if (one.startsWith("@")) {
-                    def pars = one.substring(1).split(":", 2)
-                    if (pars[0].equalsIgnoreCase("c")) {
-                        reqDeps.add pars[1].trim()
-                    }
-                } else
-                    reqDeps.add one.trim()
-            }
-
-        mods = config.optional_mods.split(";")
-        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
-            for (final def one in mods) {
-                if (one.isBlank()) continue
-                if (one.startsWith("@")) {
-                    def pars = one.substring(1).split(":", 2)
-                    if (pars[0].equalsIgnoreCase("c")) {
-                        optDeps.add pars[1].trim()
-                    }
-                } else
-                    optDeps.add one.trim()
-            }
-
-        mods = config.incompatible_mods.split(";")
-        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
-            for (final def one in mods) {
-                if (one.isBlank()) continue
-                if (one.startsWith("@")) {
-                    def pars = one.substring(1).split(":", 2)
-                    if (pars[0].equalsIgnoreCase("c")) {
-                        incompat.add pars[1].trim()
-                    }
-                } else
-                    incompat.add one.trim()
-            }
-
-        mods = config.embedded_mods.split(";")
-        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
-            for (final def one in mods) {
-                if (one.isBlank()) continue
-                if (one.startsWith("@")) {
-                    def pars = one.substring(1).split(":", 2)
-                    if (pars[0].equalsIgnoreCase("c")) {
-                        embLibs.add pars[1].trim()
-                    }
-                } else
-                    embLibs.add one.trim()
-            }
-
-        if (reqDeps.size() > 0 || optDeps.size() > 0 || incompat.size() > 0 || embLibs.size() > 0) {
-            relations {
-                reqDeps.each { dep ->
-                    requiredDependency dep
+        relations {
+            def mods = (config.required_mods as String).split(";")
+            if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+                for (final def one in mods) {
+                    if (one.isBlank()) continue
+                    if (one.startsWith("@")) {
+                        def pars = one.substring(1).split(":", 2)
+                        if (pars[0].equalsIgnoreCase("c")) {
+                            requiredDependency pars[1].trim()
+                        }
+                    } else
+                        requiredDependency one.trim()
                 }
-                optDeps.each { dep ->
-                    optionalDependency dep
+
+            mods = (config.optional_mods as String).split(";")
+            if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+                for (final def one in mods) {
+                    if (one.isBlank()) continue
+                    if (one.startsWith("@")) {
+                        def pars = one.substring(1).split(":", 2)
+                        if (pars[0].equalsIgnoreCase("c")) {
+                            optionalDependency pars[1].trim()
+                        }
+                    } else
+                        optionalDependency one.trim()
                 }
-                incompat.each { dep ->
-                    incompatible dep
+
+            mods = (config.incompatible_mods as String).split(";")
+            if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+                for (final def one in mods) {
+                    if (one.isBlank()) continue
+                    if (one.startsWith("@")) {
+                        def pars = one.substring(1).split(":", 2)
+                        if (pars[0].equalsIgnoreCase("c")) {
+                            incompatible pars[1].trim()
+                        }
+                    } else
+                        incompatible one.trim()
                 }
-                embLibs.each { dep ->
-                    embeddedLibrary dep
+
+            mods = (config.embedded_mods as String).split(";")
+            if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+                for (final def one in mods) {
+                    if (one.isBlank()) continue
+                    if (one.startsWith("@")) {
+                        def pars = one.substring(1).split(":", 2)
+                        if (pars[0].equalsIgnoreCase("c")) {
+                            embeddedLibrary pars[1].trim()
+                        }
+                    } else
+                        embeddedLibrary one.trim()
                 }
-            }
         }
     }
 }
@@ -474,10 +375,8 @@ tasks.register('buildAndUploadMod') {
 }
 
 afterEvaluate {
-    if (!config.maven_url.isEmpty()) {
-        tasks["curseforge${config.cf_project}"].dependsOn.add(publish)
-        tasks["modrinth"].dependsOn.add(publish)
-    }
+    tasks["curseforge${config.cf_project}"].dependsOn.add(publish)
+    tasks["modrinth"].dependsOn.add(publish)
 }
 
 publishing {
@@ -493,51 +392,16 @@ publishing {
             pom.withXml {
                 def dependenciesNode = asNode().appendNode('dependencies')
 
-                if (!config.hl_version.isEmpty()) {
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', "org.zeith.hammerlib")
-                    dependencyNode.appendNode('artifactId', "HammerLib-${config.mc_version}")
-                    dependencyNode.appendNode('version', config.hl_version)
-                }
+                def dependencyNode = dependenciesNode.appendNode('dependency')
+                dependencyNode.appendNode('groupId', "org.zeith.hammerlib")
+                dependencyNode.appendNode('artifactId', "HammerLib-${config.mc_version}")
+                dependencyNode.appendNode('version', config.hl_version)
             }
         }
     }
     repositories {
         maven {
-            url config.maven_url
+            url "file:///SERVER//Maven"
         }
     }
 }
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-}
-
-import java.nio.file.Files
-
-def incrementBuild = {
-    if (!hasConfig("build_candidate") || !Boolean.parseBoolean(config.build_candidate)) {
-        def buildTxt = configFile.toPath()
-        List<String> lines = Files.readAllLines buildTxt
-        lines.replaceAll { String ln ->
-            if (ln.startsWith("mod_version")) {
-                def version = ln.split("=")[1]
-                def dot = version.lastIndexOf('.') + 1
-                def newVersion = version.substring(0, dot)
-                def lastOne = Integer.parseInt(version.substring(dot)) + 1
-                return "mod_version=" + newVersion + lastOne
-            }
-            return ln
-        }
-        Files.write buildTxt, lines, java.nio.file.StandardOpenOption.CREATE
-    } else println "Build candidate enabled, we are not increasing build number after this."
-}
-
-tasks.register("incrementBuildVersionProperty") {
-    group "upload"
-    doLast incrementBuild
-}
-
-// This piece of garbage will ensure that the build number is updated after build is executed.
-tasks.build.doLast incrementBuild
-tasks.buildAndUploadMod.doLast incrementBuild

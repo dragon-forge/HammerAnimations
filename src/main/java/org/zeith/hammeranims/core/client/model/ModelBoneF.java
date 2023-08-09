@@ -1,8 +1,8 @@
 package org.zeith.hammeranims.core.client.model;
 
 import com.google.common.collect.Lists;
+import com.mojang.math.Quaternion;
 import net.minecraftforge.api.distmarker.*;
-import org.joml.Quaternionf;
 import org.zeith.hammeranims.api.geometry.model.RenderData;
 
 import java.util.List;
@@ -144,7 +144,9 @@ public class ModelBoneF
 					
 					// Apply rotation
 					if(this.rotateAngleX != 0.0F || this.rotateAngleY != 0.0F || this.rotateAngleZ != 0.0F)
-						pose.mulPose(new Quaternionf().rotateXYZ(rotateAngleX, rotateAngleY, rotateAngleZ));
+					{
+						pose.mulPose(new Quaternion(rotateAngleX, rotateAngleY, rotateAngleZ, false));
+					}
 					
 					if(!isThisBoneInvisible) for(ModelCubeF box : this.cubeList) box.render(data, vertices);
 					
