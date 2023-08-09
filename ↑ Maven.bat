@@ -1,2 +1,2 @@
-java -jar gradle/FGMavenGen.jar -src build/libs -mvn D:\Code\Minecraft\Maven -group org.zeith.tcrv -artifact TerrariaCraftRecipeViewer-1.12.2 -version.props build.txt -version.props.name mod_version
+java -jar gradle/FGMavenGen.jar -src build/libs -mvn \\SERVER\Maven -group org.zeith.hammeranims -artifact HammerAnimations-1.12.2 -version.props build.txt -version.props.name mod_version
 pause
