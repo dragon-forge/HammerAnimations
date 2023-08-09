@@ -8,6 +8,7 @@ import org.zeith.api.registry.RegistryMapping;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animsys.*;
+import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
@@ -55,7 +56,8 @@ public class HammerAnimationsApi
 		);
 		
 		ANIMATION_ACTIONS = e.create(new RegistryBuilder<AnimationAction>()
-						.setName(HammerAnimations.id("animation_actions")),
+						.setName(HammerAnimations.id("animation_actions"))
+						.setDefaultKey(HammerAnimations.id("empty")),
 				reg -> RegistryMapping.report(AnimationAction.class, reg, false)
 		);
 		

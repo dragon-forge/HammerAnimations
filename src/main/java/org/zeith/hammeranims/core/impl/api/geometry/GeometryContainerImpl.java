@@ -42,7 +42,7 @@ public class GeometryContainerImpl
 						String fmt = json.getString("format_version");
 						
 						DecodeGeometryEvent evt = new DecodeGeometryEvent(resources, container, json, fmt, geometry);
-						GeometryDecoder.decodeGeometry(evt);
+//						GeometryDecoder.decodeGeometry(evt);
 						HammerAnimationsApi.EVENT_BUS.post(evt);
 						
 						return evt.getDecoded();

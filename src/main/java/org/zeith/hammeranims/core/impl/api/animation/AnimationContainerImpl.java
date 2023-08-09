@@ -46,7 +46,7 @@ public class AnimationContainerImpl
 						for(String animKey : animations.keySet())
 						{
 							DecodeAnimationEvent evt = new DecodeAnimationEvent(resources, container, json, fmt, animKey, animations.get(animKey));
-							AnimationDecoder.decodeAnimation(evt);
+//							AnimationDecoder.decodeAnimation(evt);
 							if(!evt.isCanceled()) HammerAnimationsApi.EVENT_BUS.post(evt);
 							holder.put(animKey, evt.getDecoded());
 						}

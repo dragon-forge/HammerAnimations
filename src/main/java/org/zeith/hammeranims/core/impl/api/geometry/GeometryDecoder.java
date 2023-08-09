@@ -5,7 +5,6 @@ import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.event.DecodeGeometryEvent;
 import org.zeith.hammeranims.core.client.model.CubeUVs;
-import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.utils.EnumFacing;
 import org.zeith.hammerlib.util.shaded.json.*;
 
@@ -13,7 +12,7 @@ public class GeometryDecoder
 {
 	static
 	{
-		HammerAnimationsApi.EVENT_BUS.addListener(AnimationDecoder::decodeAnimation);
+		HammerAnimationsApi.EVENT_BUS.addListener(GeometryDecoder::decodeGeometry);
 	}
 	
 	public static void init()

@@ -27,7 +27,6 @@ public class CommonProxy
 {
 	public void construct()
 	{
-		MinecraftForge.EVENT_BUS.addListener(this::reloadResources);
 	}
 	
 	public IGeometricModel createGeometryData(GeometryDataImpl data)
@@ -38,24 +37,6 @@ public class CommonProxy
 	public Level getClientWorld()
 	{
 		return null;
-	}
-	
-	public void reloadResources(AddReloadListenerEvent e)
-	{
-		e.addListener(new SimplePreparableReloadListener<Void>()
-		{
-			@Override
-			protected Void prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler)
-			{
-				return null;
-			}
-			
-			@Override
-			protected void apply(Void pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler)
-			{
-				reloadRegistries(wrapClassLoaderResources(), false);
-			}
-		});
 	}
 	
 	protected void reloadRegistries(IResourceProvider provider, boolean clientSide)
@@ -81,24 +62,6 @@ public class CommonProxy
 				HammerAnimations.MOD_NAME,
 				sw.stop().elapsed(TimeUnit.MILLISECONDS)
 		);
-	}
-	
-	public static IResourceProvider wrapClassLoaderResources()
-	{
-		IResourceProvider aux = IResourceProvider.or(HammerAnimationsApi.getAuxiliaryResourceProviders());
-		return path ->
-		{
-			try(InputStream res = HammerLib.class.getResourceAsStream(
-					"/assets/" + path.getNamespace() + "/" + path.getPath()
-			))
-			{
-				if(res == null) return Optional.empty();
-				return Optional.of(res.readAllBytes());
-			} catch(IOException ignored)
-			{
-			}
-			return aux.read(path);
-		};
 	}
 	
 	public static IResourceProvider wrapVanillaResources(ResourceManager manager)

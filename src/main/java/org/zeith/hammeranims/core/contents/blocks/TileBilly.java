@@ -4,9 +4,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
+import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.tile.IAnimatedTile;
+import org.zeith.hammeranims.core.init.*;
 import org.zeith.hammerlib.api.io.NBTSerializable;
 import org.zeith.hammerlib.tiles.TileSyncableTickable;
 
@@ -38,13 +40,23 @@ public class TileBilly
 		int power = level.getBestNeighborSignal(worldPosition);
 		
 		if(power > 0)
-			animations.startAnimationAt(CommonLayerNames.LEGS, org.zeith.hammeranims.core.init.ContainersHA.BILLY_WALK.configure()
-					.speed(power / 15F));
-		else
-			animations.startAnimationAt(CommonLayerNames.LEGS, ConfiguredAnimation.noAnimation()
-					.transitionTime(1F));
+			animations.startAnimationAt(CommonLayerNames.LEGS, ContainersHA.BILLY_WALK.configure()
+					.speed(power / 15F)
+					.loopMode(LoopMode.ONCE)
+					.next(ContainersHA.BILLY_WALK.configure()
+							.speed(2F)
+							.loopMode(LoopMode.ONCE)
+							.next(DefaultsHA.NULL_ANIM.configure())
+							.onFinish(ContainersHA.HELLO_WORLD_ACTION.defaultInstance()
+									.withMessage("YOLO")
+							)
+					)
+			);
+//		else
+//			animations.startAnimationAt(CommonLayerNames.LEGS, ConfiguredAnimation.noAnimation()
+//					.transitionTime(1F));
 		
-		animations.startAnimationAt(CommonLayerNames.AMBIENT, org.zeith.hammeranims.core.init.ContainersHA.BILLY_BREATHE.configure()
+		animations.startAnimationAt(CommonLayerNames.AMBIENT, ContainersHA.BILLY_BREATHE.configure()
 				.speed(0.5F));
 	}
 	
