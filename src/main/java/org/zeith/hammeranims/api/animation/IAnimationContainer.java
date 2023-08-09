@@ -67,4 +67,9 @@ public interface IAnimationContainer
 	{
 		return HammerAnimationsApi.animations().getKey(this);
 	}
+	
+	default AnimationHolder holder(String sub)
+	{
+		return new AnimationHolder(this, sub);
+	}
 }

@@ -37,7 +37,15 @@
 					]
 				},
 				{
-					"name": "armleft",
+					"name": "bob",
+					"parent": "head",
+					"pivot": [0, 13.5, 0],
+					"cubes": [
+						{"origin": [1, 14.5, 1], "size": [2, 2, 2], "uv": [7, 7]}
+					]
+				},
+				{
+					"name": "right_arm",
 					"parent": "body",
 					"pivot": [-4, 9.5, -1],
 					"cubes": [
@@ -45,7 +53,7 @@
 					]
 				},
 				{
-					"name": "armright",
+					"name": "left_arm",
 					"parent": "body",
 					"pivot": [3, 9.5, -1],
 					"cubes": [
@@ -53,7 +61,15 @@
 					]
 				},
 				{
-					"name": "legleft",
+					"name": "knoife",
+					"parent": "left_arm",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [3, 2, -3], "size": [2, 2, 2], "uv": [18, 19]}
+					]
+				},
+				{
+					"name": "right_leg",
 					"parent": "body",
 					"pivot": [-2, 5.5, 0],
 					"cubes": [
@@ -61,7 +77,7 @@
 					]
 				},
 				{
-					"name": "legright",
+					"name": "left_leg",
 					"parent": "body",
 					"pivot": [1, 5.5, 0],
 					"cubes": [

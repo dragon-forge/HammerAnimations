@@ -54,6 +54,24 @@ public class ModelBoneF
 		model.basePose.register(this);
 	}
 	
+	public void resolveOffsets()
+	{
+		if(parent != null)
+		{
+			offsetX -= parent.offsetX;
+			offsetY -= parent.offsetY;
+			offsetZ -= parent.offsetZ;
+
+			rotationPointX -= parent.rotationPointX;
+			rotationPointY -= parent.rotationPointY;
+			rotationPointZ -= parent.rotationPointZ;
+		}
+		
+		if(childModels != null)
+			for(ModelBoneF c : childModels)
+				c.resolveOffsets();
+	}
+	
 	/**
 	 * Sets the current box's rotation points and rotation angles to another box.
 	 */
@@ -64,9 +82,9 @@ public class ModelBoneF
 		child.parent = this;
 	}
 	
-	public ModelBoneF addBox(float offX, float offY, float offZ, float width, float height, float depth, float textureOffsetX, float textureOffsetY, float inflate, boolean mirrored)
+	public ModelBoneF addBox(float offX, float offY, float offZ, float width, float height, float depth, CubeUVs uv, float inflate, boolean flipFaces)
 	{
-		this.cubeList.add(new ModelCubeF(this, textureOffsetX, textureOffsetY, offX, offY, offZ, width, height, depth, inflate, mirrored));
+		this.cubeList.add(new ModelCubeF(this, uv, offX, offY, offZ, width, height, depth, inflate, flipFaces));
 		return this;
 	}
 	
@@ -130,12 +148,12 @@ public class ModelBoneF
 					}
 					
 					// Apply rotation
-					if(this.rotateAngleZ != 0.0F)
-						GlStateManager.rotate(this.rotateAngleZ * (180F / (float) Math.PI), 0.0F, 0.0F, 1.0F);
-					if(this.rotateAngleY != 0.0F)
-						GlStateManager.rotate(this.rotateAngleY * (180F / (float) Math.PI), 0.0F, 1.0F, 0.0F);
 					if(this.rotateAngleX != 0.0F)
 						GlStateManager.rotate(this.rotateAngleX * (180F / (float) Math.PI), 1.0F, 0.0F, 0.0F);
+					if(this.rotateAngleY != 0.0F)
+						GlStateManager.rotate(this.rotateAngleY * (180F / (float) Math.PI), 0.0F, 1.0F, 0.0F);
+					if(this.rotateAngleZ != 0.0F)
+						GlStateManager.rotate(this.rotateAngleZ * (180F / (float) Math.PI), 0.0F, 0.0F, 1.0F);
 					
 					if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
 					
@@ -155,8 +173,11 @@ public class ModelBoneF
 	{
 		this.displayList = GLAllocation.generateDisplayLists(1);
 		GlStateManager.glNewList(this.displayList, 4864);
+		GlStateManager.pushMatrix();
+//		GlStateManager.scale(-1, 1, 1);
 		BufferBuilder bufferbuilder = Tessellator.getInstance().getBuffer();
 		for(ModelCubeF box : this.cubeList) box.bake(bufferbuilder);
+		GlStateManager.popMatrix();
 		GlStateManager.glEndList();
 		this.compiled = true;
 	}

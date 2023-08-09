@@ -4,14 +4,15 @@ import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.*;
 import net.minecraft.world.World;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.resource.*;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
+import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.client.render.tile.RenderTileBilly;
 import org.zeith.hammeranims.core.contents.blocks.TileBilly;
@@ -29,9 +30,8 @@ public class ClientProxy
 		AnimationDecoder.readBones = true;
 	}
 	
-	protected final List<IGeometricModel> createdModels = new ArrayList<>();
-	
-	protected final List<IGeometricModel> disposeModels = new ArrayList<>();
+	protected static final List<IGeometricModel> createdModels = new ArrayList<>();
+	protected static final List<IGeometricModel> disposeModels = new ArrayList<>();
 	
 	@SubscribeEvent
 	public void clientTick(TickEvent.ClientTickEvent e)
@@ -63,7 +63,9 @@ public class ClientProxy
 	{
 		super.init();
 		
-//		new RenderTileBilly().bindTo(TileBilly.class);
+		ClientCommandHandler.instance.registerCommand(new CommandReloadHA());
+		
+		new RenderTileBilly().bindTo(TileBilly.class);
 		
 		IResourceManager resources = Minecraft.getMinecraft().getResourceManager();
 		
@@ -76,6 +78,13 @@ public class ClientProxy
 				reloadRegistries(wrapVanillaResources(resourceManager));
 			}
 		});
+	}
+	
+	public static void performReload()
+	{
+		disposeModels.addAll(createdModels);
+		createdModels.clear();
+		HammerAnimations.PROXY.reloadRegistries(wrapVanillaResources(Minecraft.getMinecraft().getResourceManager()));
 	}
 	
 	public static IResourceProvider wrapVanillaResources(IResourceManager manager)

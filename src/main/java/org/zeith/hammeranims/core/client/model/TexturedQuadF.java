@@ -21,10 +21,10 @@ public class TexturedQuadF
 	{
 		this(vertices);
 		
-		texcoordU1 = (int) texcoordU1;
-		texcoordV1 = (int) texcoordV1;
-		texcoordU2 = (int) texcoordU2;
-		texcoordV2 = (int) texcoordV2;
+//		texcoordU1 = (int) texcoordU1;
+//		texcoordV1 = (int) texcoordV1;
+//		texcoordU2 = (int) texcoordU2;
+//		texcoordV2 = (int) texcoordV2;
 		
 		float f = 0.0F / textureWidth;
 		float f1 = 0.0F / textureHeight;

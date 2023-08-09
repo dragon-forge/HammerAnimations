@@ -9,6 +9,7 @@ import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.contents.blocks.TileBilly;
+import org.zeith.hammeranims.core.init.ContainersHA;
 
 import javax.annotation.*;
 
@@ -29,7 +30,7 @@ public class RenderTileBilly
 	@SubscribeEvent
 	public void refreshModel(RefreshStaleModelsEvent e)
 	{
-//		model = org.zeith.hammeranims.core.init.ContainersHA.BILLY_GEOM.createModel();
+		model = org.zeith.hammeranims.core.init.ContainersHA.BILLY_GEOM.createModel();
 	}
 	
 	@Override
@@ -38,7 +39,7 @@ public class RenderTileBilly
 		model.applySystem(partialTicks, te.getAnimationSystem());
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + 0.5, y + 1, z + 0.5);
+		GlStateManager.translate(x + 0.5, y + 1.5, z + 0.5);
 		model.renderModel(data);
 		GlStateManager.popMatrix();
 	}

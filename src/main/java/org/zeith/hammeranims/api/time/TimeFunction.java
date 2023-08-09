@@ -24,15 +24,13 @@ public abstract class TimeFunction
 			
 			if(animation.config.reverse)
 			{
-				time = duration - time;
-				
 				switch(mode)
 				{
 					case LOOP:
-						return duration > 0 ? time % duration : 0;
+						return duration > 0 ? duration - (time % duration) : 0;
 					case HOLD_ON_LAST_FRAME:
 					case ONCE:
-						return Math.min(time, duration);
+						return Math.max(duration - time, 0);
 				}
 			}
 			

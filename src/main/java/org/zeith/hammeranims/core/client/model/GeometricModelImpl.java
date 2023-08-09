@@ -32,25 +32,13 @@ public class GeometricModelImpl
 		Map<String, GeometryDataImpl.BoneConfig> bonesBase = data.bonesView;
 		
 		// Setup all bones
-		for(GeometryDataImpl.BoneConfig bone : bonesBase.values())
+		for(GeometryDataImpl.BoneConfig cfg : bonesBase.values())
 		{
-			ModelBoneF b = new ModelBoneF(bone.name);
-			bones.put(bone.name, b);
+			ModelBoneF b = new ModelBoneF(cfg.name);
+			bones.put(cfg.name, b);
 			
-			Vec3d pivot = bone.pivot;
+			Vec3d pivot = cfg.pivot;
 			b.setRotationPoint((float) pivot.x, (float) pivot.y, (float) pivot.z);
-			
-			b.setTextureSize(textureWidth, textureHeight);
-			for(GeometryDataImpl.CubeConfig cube : bone.cubes)
-			{
-				Vec3d cubePos = cube.origin.add(pivot.scale(-1));
-				b.addBox(
-						(float) cubePos.x, (float) cubePos.y, (float) cubePos.z,
-						(float) cube.size.x, (float) cube.size.y, (float) cube.size.z,
-						cube.u, cube.v,
-						cube.inflate, true
-				);
-			}
 		}
 		
 		// Resolve nesting and register bones
@@ -75,6 +63,29 @@ public class GeometricModelImpl
 			}
 			
 			b.register(this);
+		}
+		
+		for(ModelBoneF rt : rootBones)
+			rt.resolveOffsets();
+		
+		// Setup all bones
+		for(GeometryDataImpl.BoneConfig bone : bonesBase.values())
+		{
+			ModelBoneF b = bones.get(bone.name);
+			
+			b.setTextureSize(textureWidth, textureHeight);
+			for(GeometryDataImpl.CubeConfig cube : bone.cubes)
+			{
+				Vec3d cubePos = cube.origin.subtract(bone.pivot);
+				
+				HammerAnimations.LOG.info("Add box into {}: @ {} Origin{} Offset{}", bone.name, cubePos, cube.origin, new Vec3d(b.offsetX, b.offsetY, b.offsetZ));
+				
+				b.addBox(
+						(float) cubePos.x, (float) cubePos.y, (float) cubePos.z,
+						(float) cube.size.x, (float) cube.size.y, (float) cube.size.z,
+						cube.uvs, cube.inflate, cube.flipX
+				);
+			}
 		}
 	}
 	
@@ -138,9 +149,10 @@ public class GeometricModelImpl
 			if(add != null)
 			{
 				translate = add.translation;
-				rotate = add.rotation;
+				rotate = BlendMode.mult(add.rotation, new Vec3d(-1, -1, -1));
 				scale = BlendMode.mult(scale, add.scale);
 			}
+			
 			
 			Vec3d vec = base.translation.add(translate);
 			bone.offsetX = vec.x;
@@ -163,7 +175,7 @@ public class GeometricModelImpl
 	public void renderModel(RenderData data)
 	{
 		UtilsFX.bindTexture(data.texture);
-		GlStateManager.scale(0.0625f, 0.0625f, 0.0625f);
+		GlStateManager.scale(-0.0625f, 0.0625f, 0.0625f);
 		for(ModelBoneF bone : rootBones)
 			bone.render(data);
 	}

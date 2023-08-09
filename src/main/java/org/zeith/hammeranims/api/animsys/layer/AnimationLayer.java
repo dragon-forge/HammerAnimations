@@ -54,6 +54,7 @@ public class AnimationLayer
 						&& cur.transitionTime == animation.transitionTime
 						&& cur.timeFunction == animation.timeFunction
 						&& cur.reverse == animation.reverse
+						&& cur.animation == animation.animation
 				) return false;
 				else break check;
 			}

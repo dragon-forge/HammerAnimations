@@ -7,6 +7,7 @@ import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.core.client.model.CubeUVs;
 
 import java.util.*;
 
@@ -83,17 +84,17 @@ public class GeometryDataImpl
 	{
 		public final Vec3d origin;
 		public final Vec3d size;
-		public final float u;
-		public final float v;
+		public final CubeUVs uvs;
 		public final float inflate;
+		public final boolean flipX;
 		
-		public CubeConfig(Vec3d origin, Vec3d size, float u, float v, float inflate)
+		public CubeConfig(Vec3d origin, Vec3d size, CubeUVs uvs, float inflate, boolean flipX)
 		{
 			this.origin = origin;
 			this.size = size;
-			this.u = u;
-			this.v = v;
+			this.uvs = uvs;
 			this.inflate = inflate;
+			this.flipX = flipX;
 		}
 	}
 }

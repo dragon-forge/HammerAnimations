@@ -23,5 +23,5 @@ public interface DefaultsHA
 	@Key("linear")
 	TimeFunction LINEAR_TIME = new LinearTimeFunction();
 	
-	AnimationHolder NULL_ANIM = new AnimationHolder(NULL_ANIMATION, "null");
+	AnimationHolder NULL_ANIM = NULL_ANIMATION.holder("null");
 }
