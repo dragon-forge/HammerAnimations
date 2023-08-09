@@ -78,7 +78,7 @@ public class GeometricModelImpl
 			{
 				Vec3d cubePos = cube.origin.subtract(bone.pivot);
 				
-				HammerAnimations.LOG.info("Add box into {}: @ {} Origin{} Offset{}", bone.name, cubePos, cube.origin, new Vec3d(b.offsetX, b.offsetY, b.offsetZ));
+//				HammerAnimations.LOG.info("Add box into {}: @ {} Origin{} Offset{}", bone.name, cubePos, cube.origin, new Vec3d(b.offsetX, b.offsetY, b.offsetZ));
 				
 				b.addBox(
 						(float) cubePos.x, (float) cubePos.y, (float) cubePos.z,
