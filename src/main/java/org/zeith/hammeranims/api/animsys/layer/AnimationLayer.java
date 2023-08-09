@@ -1,17 +1,21 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.*;
+import net.minecraft.nbt.*;
+import net.minecraftforge.common.util.Constants;
+import org.zeith.hammeranims.api.animation.AnimationLocation;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.*;
+import org.zeith.hammeranims.api.animsys.actions.*;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
+import org.zeith.hammeranims.api.utils.ICompoundSerializable;
+import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
 
 import javax.annotation.*;
 import java.util.Objects;
 
 public class AnimationLayer
-		implements INBTSerializable<NBTTagCompound>
+		implements ICompoundSerializable
 {
 	public final AnimationSystem system;
 	public final Query query;
@@ -37,6 +41,11 @@ public class AnimationLayer
 	public ActiveAnimation getCurrentAnimation()
 	{
 		return currentAnimation;
+	}
+	
+	public AnimationLocation activeAnimationLocation()
+	{
+		return currentAnimation != null ? currentAnimation.getLocation() : DefaultsHA.NULL_ANIM.get().getLocation();
 	}
 	
 	public boolean startAnimation(@Nonnull ConfiguredAnimation animation)
@@ -116,6 +125,13 @@ public class AnimationLayer
 		
 		if(currentAnimation != null && currentAnimation.isDone(sysTime))
 		{
+			if(!currentAnimation.firedActions)
+			{
+				currentAnimation.firedActions = true;
+				for(AnimationActionInstance action : currentAnimation.config.onFinish)
+					action.execute(this);
+			}
+			
 			if(currentAnimation.config.next != null)
 				startAnimation(currentAnimation.config.next);
 		}

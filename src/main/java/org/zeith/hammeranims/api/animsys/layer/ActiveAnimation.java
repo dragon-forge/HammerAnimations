@@ -1,18 +1,21 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.INBTSerializable;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
+import org.zeith.hammeranims.api.utils.ICompoundSerializable;
+import org.zeith.hammeranims.core.init.DefaultsHA;
 
 public class ActiveAnimation
-		implements INBTSerializable<NBTTagCompound>
+		implements ICompoundSerializable
 {
 	public double startTime;
 	
 	// Properties
 	public ConfiguredAnimation config;
+	
+	public boolean firedActions;
 	
 	public ActiveAnimation(NBTTagCompound tag)
 	{
@@ -30,13 +33,13 @@ public class ActiveAnimation
 		return config.animation == null
 				|| (config.loopMode == LoopMode.ONCE && (
 				(data = config.animation.getData()) == null
-						|| (sysTime - startTime) >= data.getLength().toMillis() / 50D
+						|| (sysTime - startTime) * config.speed >= data.getLengthSeconds()
 		));
 	}
 	
 	public AnimationLocation getLocation()
 	{
-		return config.animation != null ? config.animation.getLocation() : null;
+		return config.animation != null ? config.animation.getLocation() : DefaultsHA.NULL_ANIM.get().getLocation();
 	}
 	
 	@Override
@@ -44,6 +47,7 @@ public class ActiveAnimation
 	{
 		NBTTagCompound tag = config.serializeNBT();
 		tag.setDouble("StartTime", startTime);
+		tag.setBoolean("FiredActions", firedActions);
 		return tag;
 	}
 	
@@ -52,5 +56,6 @@ public class ActiveAnimation
 	{
 		config = new ConfiguredAnimation(tag);
 		this.startTime = tag.getDouble("StartTime");
+		this.firedActions = tag.getBoolean("FiredActions");
 	}
 }

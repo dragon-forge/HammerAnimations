@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
-import org.zeith.hammeranims.api.animsys.AnimationAction;
+import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.annotations.Key;
 
 import java.lang.reflect.*;

@@ -2,13 +2,14 @@ package org.zeith.hammeranims.api.animsys;
 
 import net.minecraft.nbt.*;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.*;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.animsys.actions.*;
 import org.zeith.hammeranims.api.animsys.layer.*;
 import org.zeith.hammeranims.api.time.TimeFunction;
+import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
 
@@ -16,7 +17,7 @@ import java.time.Duration;
 import java.util.*;
 
 public class ConfiguredAnimation
-		implements INBTSerializable<NBTTagCompound>
+		implements ICompoundSerializable
 {
 	public Animation animation;
 	public float weight = 1F; // [0; 1]
@@ -29,7 +30,7 @@ public class ConfiguredAnimation
 	
 	public ConfiguredAnimation next;
 	
-	public final List<AnimationAction> onFinish = new ArrayList<>();
+	public final List<AnimationActionInstance> onFinish = new ArrayList<>();
 	
 	public static ConfiguredAnimation noAnimation()
 	{
@@ -63,6 +64,21 @@ public class ConfiguredAnimation
 	{
 		this.weight = weight;
 		return this;
+	}
+	
+	public ConfiguredAnimation onFinish(AnimationActionInstance action)
+	{
+		if(action == null || action.isEmpty())
+			return this;
+		
+		onFinish.add(action);
+		
+		return this;
+	}
+	
+	public ConfiguredAnimation onFinish(AnimationAction action)
+	{
+		return onFinish(action.defaultInstance());
 	}
 	
 	public ConfiguredAnimation speed(float speed)
@@ -152,8 +168,8 @@ public class ConfiguredAnimation
 		if(!this.onFinish.isEmpty())
 		{
 			NBTTagList onFinish = InstanceHelpers.newNBTList();
-			for(AnimationAction finish : this.onFinish)
-				onFinish.appendTag(InstanceHelpers.newNBTString(finish.getRegistryKey().toString()));
+			for(AnimationActionInstance finish : this.onFinish)
+				onFinish.appendTag(finish.serializeNBT());
 			tag.setTag("OnFinish", onFinish);
 		}
 		
@@ -176,14 +192,12 @@ public class ConfiguredAnimation
 		
 		loopMode = LoopMode.values()[tag.getByte("LoopMode") % LoopMode.VALUE_COUNT];
 		
-		IForgeRegistry<AnimationAction> actionsReg = HammerAnimationsApi.animationActions();
-		
-		NBTTagList onFinish = tag.getTagList("OnFinish", Constants.NBT.TAG_STRING);
+		NBTTagList onFinish = tag.getTagList("OnFinish", Constants.NBT.TAG_COMPOUND);
 		this.onFinish.clear();
 		for(int i = 0; i < onFinish.tagCount(); i++)
 		{
-			AnimationAction a = actionsReg.getValue(new ResourceLocation(onFinish.getStringTagAt(i)));
-			if(a != null) this.onFinish.add(a);
+			AnimationActionInstance a = AnimationActionInstance.of(onFinish.getCompoundTagAt(i));
+			if(a != null && !a.isEmpty()) this.onFinish.add(a);
 		}
 	}
 }

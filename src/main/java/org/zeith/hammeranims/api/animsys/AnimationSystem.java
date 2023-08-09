@@ -2,21 +2,20 @@ package org.zeith.hammeranims.api.animsys;
 
 import com.zeitheron.hammercore.net.HCNet;
 import net.minecraft.nbt.*;
-import net.minecraftforge.common.util.*;
+import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
-import org.zeith.hammeranims.api.animsys.layer.*;
+import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
+import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.net.PacketSyncAnimationSystem;
 
 import javax.annotation.*;
 import java.util.*;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import static org.zeith.hammeranims.core.utils.InstanceHelpers.*;
 
 public class AnimationSystem
-		implements INBTSerializable<NBTTagCompound>
+		implements ICompoundSerializable
 {
 	@Nonnull
 	public final IAnimatedObject owner;

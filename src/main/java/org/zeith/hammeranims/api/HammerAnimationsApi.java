@@ -8,7 +8,7 @@ import net.minecraftforge.registries.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animsys.AnimationSourceType;
-import org.zeith.hammeranims.api.animsys.AnimationAction;
+import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
@@ -57,6 +57,7 @@ public class HammerAnimationsApi
 		ANIMATION_ACTIONS = new RegistryBuilder<AnimationAction>()
 				.setType(AnimationAction.class)
 				.setName(HammerAnimations.id("animation_actions"))
+				.setDefaultKey(HammerAnimations.id("empty"))
 				.create();
 		
 		hasInitialized = true;
