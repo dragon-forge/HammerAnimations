@@ -10,10 +10,10 @@ jei_version=15.2.0.22
 mod_id=hammeranims
 archive_name=HammerAnimations
 mod_name=HammerAnimations
-mod_description=Bedrock model and animation API.
+mod_description=Library mod for Minecraft: Java Edition. Brings Bedrock model and animation as a compact and easy-to-use API layer with hotswapping.\nTo perform hot-reload, run \"/hammeranims reload\"
 mod_authors=Zeitheron
 mod_license=All Rights Reserved
-mod_credits=None
+mod_credits=Mojang (creation of model & animation standard)
 issue_tracker_url=https://github.com/dragon-forge/HammerAnimations/issues
 
 # Mappings
