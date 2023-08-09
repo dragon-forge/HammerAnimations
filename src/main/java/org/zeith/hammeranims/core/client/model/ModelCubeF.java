@@ -1,8 +1,8 @@
 package org.zeith.hammeranims.core.client.model;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraftforge.fml.relauncher.*;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import org.zeith.hammeranims.api.geometry.model.RenderData;
 
 import java.util.List;
 
@@ -82,10 +82,9 @@ public class ModelCubeF
 			}
 	}
 	
-	@SideOnly(Side.CLIENT)
-	public void bake(BufferBuilder renderer)
+	public void render(RenderData data, VertexConsumer renderer)
 	{
 		for(TexturedQuadF q : this.quadList)
-			q.bake(renderer);
+			q.render(data, renderer);
 	}
 }

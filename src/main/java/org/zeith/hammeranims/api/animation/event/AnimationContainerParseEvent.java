@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.animation.event;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.eventhandler.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.eventbus.api.*;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.utils.IResourceProvider;

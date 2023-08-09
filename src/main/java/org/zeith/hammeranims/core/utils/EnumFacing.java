@@ -2,14 +2,14 @@ package org.zeith.hammeranims.core.utils;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Vec3i;
+import net.minecraft.util.StringRepresentable;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
 public enum EnumFacing
-		implements IStringSerializable
+		implements StringRepresentable
 {
 	DOWN(0, 1, -1, "down", AxisDirection.NEGATIVE, Axis.Y, new Vec3i(0, -1, 0)),
 	UP(1, 0, -1, "up", AxisDirection.POSITIVE, Axis.Y, new Vec3i(0, 1, 0)),
@@ -36,13 +36,13 @@ public enum EnumFacing
 	}
 	
 	@Override
-	public String getName()
+	public String getSerializedName()
 	{
 		return name;
 	}
 	
 	public enum Axis
-			implements Predicate<EnumFacing>, IStringSerializable
+			implements Predicate<EnumFacing>, StringRepresentable
 	{
 		X("x", EnumFacing.Plane.HORIZONTAL),
 		Y("y", EnumFacing.Plane.VERTICAL),
@@ -112,7 +112,7 @@ public enum EnumFacing
 		}
 		
 		@Override
-		public String getName()
+		public String getSerializedName()
 		{
 			return this.name;
 		}

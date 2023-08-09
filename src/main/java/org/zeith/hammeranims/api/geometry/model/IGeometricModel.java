@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.geometry.model;
 
-import net.minecraftforge.fml.relauncher.*;
+import net.minecraftforge.api.distmarker.*;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 
 /**
@@ -27,7 +27,7 @@ public interface IGeometricModel
 		}
 		
 		@Override
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		public void renderModel(RenderData data)
 		{
 		}
@@ -64,7 +64,7 @@ public interface IGeometricModel
 	 * @param data
 	 * 		The render data to be passed along.
 	 */
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	void renderModel(RenderData data);
 	
 	/**

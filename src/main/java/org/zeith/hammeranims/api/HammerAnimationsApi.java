@@ -1,63 +1,63 @@
 package org.zeith.hammeranims.api;
 
 import com.google.common.collect.Lists;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.*;
 import net.minecraftforge.registries.*;
+import org.zeith.api.registry.RegistryMapping;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
-import org.zeith.hammeranims.api.animsys.AnimationSourceType;
-import org.zeith.hammeranims.api.animsys.AnimationAction;
+import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 
 import java.util.*;
+import java.util.function.Supplier;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class HammerAnimationsApi
 {
-	public static final EventBus EVENT_BUS = new EventBus();
+	public static final IEventBus EVENT_BUS = BusBuilder.builder().build();
 	
-	private static List<IResourceProvider> AUXILIARY_RESOURCE_PROVIDERS = Lists.newArrayList();
+	private static final List<IResourceProvider> AUXILIARY_RESOURCE_PROVIDERS = Lists.newArrayList();
 	
-	private static IForgeRegistry<IAnimationContainer> ANIMATION_CONTAINERS;
-	private static IForgeRegistry<IGeometryContainer> GEOMETRY_CONTAINERS;
-	private static IForgeRegistry<AnimationSourceType> ANIMATION_SOURCES;
-	private static IForgeRegistry<TimeFunction> TIME_FUNCTIONS;
-	private static IForgeRegistry<AnimationAction> ANIMATION_ACTIONS;
+	private static Supplier<IForgeRegistry<IAnimationContainer>> ANIMATION_CONTAINERS;
+	private static Supplier<IForgeRegistry<IGeometryContainer>> GEOMETRY_CONTAINERS;
+	private static Supplier<IForgeRegistry<AnimationSourceType>> ANIMATION_SOURCES;
+	private static Supplier<IForgeRegistry<TimeFunction>> TIME_FUNCTIONS;
+	private static Supplier<IForgeRegistry<AnimationAction>> ANIMATION_ACTIONS;
 	private static boolean hasInitialized = false;
 	
 	@SubscribeEvent
-	public static void newRegistries(RegistryEvent.NewRegistry e)
+	public static void newRegistries(NewRegistryEvent e)
 	{
-		ANIMATION_CONTAINERS = new RegistryBuilder<IAnimationContainer>()
-				.setType(IAnimationContainer.class)
-				.setName(HammerAnimations.id("animations"))
-				.create();
+		ANIMATION_CONTAINERS = e.create(new RegistryBuilder<IAnimationContainer>()
+						.setName(HammerAnimations.id("animations")),
+				reg -> RegistryMapping.report(IAnimationContainer.class, reg, false)
+		);
 		
-		GEOMETRY_CONTAINERS = new RegistryBuilder<IGeometryContainer>()
-				.setType(IGeometryContainer.class)
-				.setName(HammerAnimations.id("geometry"))
-				.create();
+		GEOMETRY_CONTAINERS = e.create(new RegistryBuilder<IGeometryContainer>()
+						.setName(HammerAnimations.id("geometry")),
+				reg -> RegistryMapping.report(IGeometryContainer.class, reg, false)
+		);
 		
-		ANIMATION_SOURCES = new RegistryBuilder<AnimationSourceType>()
-				.setType(AnimationSourceType.class)
-				.setName(HammerAnimations.id("animation_sources"))
-				.disableSaving()
-				.create();
+		ANIMATION_SOURCES = e.create(new RegistryBuilder<AnimationSourceType>()
+						.setName(HammerAnimations.id("animation_sources"))
+						.disableSaving(),
+				reg -> RegistryMapping.report(AnimationSourceType.class, reg, false)
+		);
 		
-		TIME_FUNCTIONS = new RegistryBuilder<TimeFunction>()
-				.setType(TimeFunction.class)
-				.setName(HammerAnimations.id("time_functions"))
-				.setDefaultKey(HammerAnimations.id("linear"))
-				.create();
+		TIME_FUNCTIONS = e.create(new RegistryBuilder<TimeFunction>()
+						.setName(HammerAnimations.id("time_functions"))
+						.setDefaultKey(HammerAnimations.id("linear")),
+				reg -> RegistryMapping.report(TimeFunction.class, reg, false)
+		);
 		
-		ANIMATION_ACTIONS = new RegistryBuilder<AnimationAction>()
-				.setType(AnimationAction.class)
-				.setName(HammerAnimations.id("animation_actions"))
-				.create();
+		ANIMATION_ACTIONS = e.create(new RegistryBuilder<AnimationAction>()
+						.setName(HammerAnimations.id("animation_actions")),
+				reg -> RegistryMapping.report(AnimationAction.class, reg, false)
+		);
 		
 		hasInitialized = true;
 	}
@@ -79,26 +79,26 @@ public class HammerAnimationsApi
 	
 	public static IForgeRegistry<IAnimationContainer> animations()
 	{
-		return ANIMATION_CONTAINERS;
+		return ANIMATION_CONTAINERS.get();
 	}
 	
 	public static IForgeRegistry<IGeometryContainer> geometries()
 	{
-		return GEOMETRY_CONTAINERS;
+		return GEOMETRY_CONTAINERS.get();
 	}
 	
 	public static IForgeRegistry<AnimationSourceType> animationSources()
 	{
-		return ANIMATION_SOURCES;
+		return ANIMATION_SOURCES.get();
 	}
 	
 	public static IForgeRegistry<TimeFunction> timeFunctions()
 	{
-		return TIME_FUNCTIONS;
+		return TIME_FUNCTIONS.get();
 	}
 	
 	public static IForgeRegistry<AnimationAction> animationActions()
 	{
-		return ANIMATION_ACTIONS;
+		return ANIMATION_ACTIONS.get();
 	}
 }

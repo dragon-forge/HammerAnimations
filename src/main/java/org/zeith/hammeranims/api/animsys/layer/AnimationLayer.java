@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.*;
+import net.minecraft.nbt.*;
+import net.minecraftforge.common.util.INBTSerializable;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
@@ -11,7 +11,7 @@ import javax.annotation.*;
 import java.util.Objects;
 
 public class AnimationLayer
-		implements INBTSerializable<NBTTagCompound>
+		implements INBTSerializable<CompoundTag>
 {
 	public final AnimationSystem system;
 	public final Query query;
@@ -122,26 +122,26 @@ public class AnimationLayer
 	}
 	
 	@Override
-	public NBTTagCompound serializeNBT()
+	public CompoundTag serializeNBT()
 	{
-		NBTTagCompound tag = InstanceHelpers.newNBTCompound();
-		tag.setFloat("Weight", weight);
-		tag.setString("Name", name);
-		tag.setDouble("StartTime", startTime);
-		if(lastAnimation != null) tag.setTag("Last", lastAnimation.serializeNBT());
-		if(currentAnimation != null) tag.setTag("Current", currentAnimation.serializeNBT());
+		var tag = InstanceHelpers.newNBTCompound();
+		tag.putFloat("Weight", weight);
+		tag.putString("Name", name);
+		tag.putDouble("StartTime", startTime);
+		if(lastAnimation != null) tag.put("Last", lastAnimation.serializeNBT());
+		if(currentAnimation != null) tag.put("Current", currentAnimation.serializeNBT());
 		return tag;
 	}
 	
 	@Override
-	public void deserializeNBT(NBTTagCompound tag)
+	public void deserializeNBT(CompoundTag tag)
 	{
 		weight = tag.getFloat("Weight");
 		startTime = tag.getDouble("StartTime");
-		if(tag.hasKey("Last", Constants.NBT.TAG_COMPOUND))
-			lastAnimation = new ActiveAnimation(tag.getCompoundTag("Last"));
-		if(tag.hasKey("Current", Constants.NBT.TAG_COMPOUND))
-			currentAnimation = new ActiveAnimation(tag.getCompoundTag("Current"));
+		if(tag.contains("Last", Tag.TAG_COMPOUND))
+			lastAnimation = new ActiveAnimation(tag.getCompound("Last"));
+		if(tag.contains("Current", Tag.TAG_COMPOUND))
+			currentAnimation = new ActiveAnimation(tag.getCompound("Current"));
 	}
 	
 	public static Builder builder(String name)

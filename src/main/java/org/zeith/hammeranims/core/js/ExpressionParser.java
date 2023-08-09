@@ -1,8 +1,7 @@
 package org.zeith.hammeranims.core.js;
 
-import com.zeitheron.hammercore.utils.base.Cast;
-import com.zeitheron.hammercore.utils.math.*;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import net.minecraft.util.Mth;
+import org.openjdk.nashorn.api.scripting.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 
 import javax.script.*;
@@ -14,10 +13,8 @@ public class ExpressionParser
 	
 	public static InterpolatedDouble parse(String expression)
 	{
-		final String expr0 = expression.toLowerCase(Locale.ROOT).replace("math.", "");
-		
-		ScriptEngine js = new ScriptEngineManager().getEngineByName("Nashorn");
-		if(js != null) try
+		NashornScriptEngine js = (NashornScriptEngine) new NashornScriptEngineFactory().getScriptEngine();
+		try
 		{
 			js.put("Java", null); // Prevent exploiting Java types.
 			js.put("Math", MATH);
@@ -25,7 +22,11 @@ public class ExpressionParser
 			
 			String fun = "function get(query) {\n\treturn " + expression + ";\n}";
 			
-			InterpolatedDouble id0 = ((ScriptObjectMirror) js.eval(fun)).to(InterpolatedDouble.class);
+			var bindings = (ScriptObjectMirror) js.createBindings();
+			js.eval(fun, bindings);
+			var get = (ScriptObjectMirror) bindings.getMember("get");
+			
+			InterpolatedDouble id0 = get.to(InterpolatedDouble.class);
 			
 			return query ->
 			{
@@ -42,17 +43,6 @@ public class ExpressionParser
 		{
 			throw new RuntimeException(e);
 		}
-		
-		return query ->
-		{
-			try
-			{
-				return ExpressionEvaluator.evaluateDouble(expr0.replace("query.anim_time", Double.toString(query.anim_time)));
-			} catch(RuntimeException e)
-			{
-				return 0;
-			}
-		};
 	}
 	
 	private static final Random rng = new Random();
@@ -63,12 +53,12 @@ public class ExpressionParser
 		
 		public double cos(double x)
 		{
-			return MathHelper.cos(x * MathHelper.torad);
+			return Mth.cos((float) (x * Mth.DEG_TO_RAD));
 		}
 		
 		public double sin(double x)
 		{
-			return MathHelper.sin(x * MathHelper.torad);
+			return Mth.sin((float) (x * Mth.DEG_TO_RAD));
 		}
 		
 		public double abs(double x)

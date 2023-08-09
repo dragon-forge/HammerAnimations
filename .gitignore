@@ -16,12 +16,10 @@ out
 # gradle
 build
 .gradle
-*.html
 
 # other
 eclipse
 run
-libs
-libs_src
-*.rar
-*.jks
+
+# Files from Forge MDK
+forge*changelog.txt

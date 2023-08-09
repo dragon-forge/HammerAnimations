@@ -1,19 +1,17 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
-import com.zeitheron.hammercore.lib.zlib.json.*;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
 import org.zeith.hammeranims.api.geometry.event.DecodeGeometryEvent;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
+import org.zeith.hammerlib.util.shaded.json.JSONTokener;
 
 import java.util.Optional;
 
 public class GeometryContainerImpl
-		extends IForgeRegistryEntry.Impl<IGeometryContainer>
 		implements IGeometryContainer
 {
 	protected IGeometryData geometry = IGeometryData.EMPTY(this);
@@ -40,7 +38,7 @@ public class GeometryContainerImpl
 					
 					try
 					{
-						JSONArray geometry = json.getJSONArray("minecraft:geometry");
+						var geometry = json.getJSONArray("minecraft:geometry");
 						String fmt = json.getString("format_version");
 						
 						DecodeGeometryEvent evt = new DecodeGeometryEvent(resources, container, json, fmt, geometry);

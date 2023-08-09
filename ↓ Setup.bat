@@ -1,2 +1,1 @@
-gradlew setupDecompWorkspace idea
-pause
+gradlew clean idea genIntellijRuns

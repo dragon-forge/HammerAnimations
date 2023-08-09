@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.animsys;
 
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public interface IAnimatedObject
 {
@@ -11,7 +11,7 @@ public interface IAnimatedObject
 	
 	AnimationSource getAnimationSource();
 	
-	World getAnimatedObjectWorld();
+	Level getAnimatedObjectWorld();
 	
-	Vec3d getAnimatedObjectPosition();
+	Vec3 getAnimatedObjectPosition();
 }

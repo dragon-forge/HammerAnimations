@@ -1,8 +1,8 @@
 package org.zeith.hammeranims.api.animsys;
 
 import net.minecraft.nbt.*;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
@@ -16,7 +16,7 @@ import java.time.Duration;
 import java.util.*;
 
 public class ConfiguredAnimation
-		implements INBTSerializable<NBTTagCompound>
+		implements INBTSerializable<CompoundTag>
 {
 	public Animation animation;
 	public float weight = 1F; // [0; 1]
@@ -42,7 +42,7 @@ public class ConfiguredAnimation
 		return DefaultsHA.NULL_ANIM.configure();
 	}
 	
-	public ConfiguredAnimation(NBTTagCompound tag)
+	public ConfiguredAnimation(CompoundTag tag)
 	{
 		deserializeNBT(tag);
 	}
@@ -137,31 +137,31 @@ public class ConfiguredAnimation
 	}
 	
 	@Override
-	public NBTTagCompound serializeNBT()
+	public CompoundTag serializeNBT()
 	{
-		NBTTagCompound tag = InstanceHelpers.newNBTCompound();
-		tag.setString("Time", timeFunction.getRegistryKey().toString());
-		tag.setString("Animation", animation.getLocation().toString());
-		tag.setFloat("Weight", weight);
-		tag.setBoolean("Reverse", reverse);
-		tag.setFloat("Speed", speed);
-		tag.setFloat("TransitionTime", transitionTime);
-		if(next != null) tag.setTag("Next", next.serializeNBT());
-		tag.setByte("LoopMode", (byte) (loopMode != null ? loopMode.ordinal() : LoopMode.ONCE.ordinal()));
+		var tag = InstanceHelpers.newNBTCompound();
+		tag.putString("Time", timeFunction.getRegistryKey().toString());
+		tag.putString("Animation", animation.getLocation().toString());
+		tag.putFloat("Weight", weight);
+		tag.putBoolean("Reverse", reverse);
+		tag.putFloat("Speed", speed);
+		tag.putFloat("TransitionTime", transitionTime);
+		if(next != null) tag.put("Next", next.serializeNBT());
+		tag.putByte("LoopMode", (byte) (loopMode != null ? loopMode.ordinal() : LoopMode.ONCE.ordinal()));
 		
 		if(!this.onFinish.isEmpty())
 		{
-			NBTTagList onFinish = InstanceHelpers.newNBTList();
+			var onFinish = InstanceHelpers.newNBTList();
 			for(AnimationAction finish : this.onFinish)
-				onFinish.appendTag(InstanceHelpers.newNBTString(finish.getRegistryKey().toString()));
-			tag.setTag("OnFinish", onFinish);
+				onFinish.add(InstanceHelpers.newNBTString(finish.getRegistryKey().toString()));
+			tag.put("OnFinish", onFinish);
 		}
 		
 		return tag;
 	}
 	
 	@Override
-	public void deserializeNBT(NBTTagCompound tag)
+	public void deserializeNBT(CompoundTag tag)
 	{
 		this.timeFunction = HammerAnimationsApi.timeFunctions().getValue(new ResourceLocation(tag.getString("Time")));
 		if(this.timeFunction == null) this.timeFunction = DefaultsHA.LINEAR_TIME;
@@ -172,17 +172,17 @@ public class ConfiguredAnimation
 		this.speed = tag.getFloat("Speed");
 		this.transitionTime = tag.getFloat("TransitionTime");
 		
-		if(tag.hasKey("Next", Constants.NBT.TAG_COMPOUND)) next = new ConfiguredAnimation(tag.getCompoundTag("Next"));
+		if(tag.contains("Next", Tag.TAG_COMPOUND)) next = new ConfiguredAnimation(tag.getCompound("Next"));
 		
 		loopMode = LoopMode.values()[tag.getByte("LoopMode") % LoopMode.VALUE_COUNT];
 		
 		IForgeRegistry<AnimationAction> actionsReg = HammerAnimationsApi.animationActions();
 		
-		NBTTagList onFinish = tag.getTagList("OnFinish", Constants.NBT.TAG_STRING);
+		var onFinish = tag.getList("OnFinish", Tag.TAG_STRING);
 		this.onFinish.clear();
-		for(int i = 0; i < onFinish.tagCount(); i++)
+		for(int i = 0; i < onFinish.size(); i++)
 		{
-			AnimationAction a = actionsReg.getValue(new ResourceLocation(onFinish.getStringTagAt(i)));
+			AnimationAction a = actionsReg.getValue(new ResourceLocation(onFinish.getString(i)));
 			if(a != null) this.onFinish.add(a);
 		}
 	}

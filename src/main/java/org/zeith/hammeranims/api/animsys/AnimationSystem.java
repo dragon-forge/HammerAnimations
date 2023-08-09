@@ -1,22 +1,21 @@
 package org.zeith.hammeranims.api.animsys;
 
-import com.zeitheron.hammercore.net.HCNet;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
-import net.minecraftforge.common.util.*;
+import net.minecraftforge.common.util.INBTSerializable;
 import org.zeith.hammeranims.api.animation.*;
-import org.zeith.hammeranims.api.animsys.layer.*;
+import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.net.PacketSyncAnimationSystem;
+import org.zeith.hammerlib.net.Network;
 
 import javax.annotation.*;
 import java.util.*;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import static org.zeith.hammeranims.core.utils.InstanceHelpers.*;
 
 public class AnimationSystem
-		implements INBTSerializable<NBTTagCompound>
+		implements INBTSerializable<CompoundTag>
 {
 	@Nonnull
 	public final IAnimatedObject owner;
@@ -35,14 +34,10 @@ public class AnimationSystem
 	
 	public void sync()
 	{
-		if(!owner.getAnimatedObjectWorld().isRemote) // if on server
-			HCNet.INSTANCE.sendToAllAroundTracking(
+		if(!owner.getAnimatedObjectWorld().isClientSide) // if on server
+			Network.sendToTracking(
 					new PacketSyncAnimationSystem(this),
-					HCNet.point(
-							owner.getAnimatedObjectWorld(),
-							owner.getAnimatedObjectPosition(),
-							256
-					)
+					owner.getAnimatedObjectWorld().getChunkAt(BlockPos.containing(owner.getAnimatedObjectPosition()))
 			);
 	}
 	
@@ -97,27 +92,27 @@ public class AnimationSystem
 	}
 	
 	@Override
-	public NBTTagCompound serializeNBT()
+	public CompoundTag serializeNBT()
 	{
-		NBTTagCompound comp = newNBTCompound();
-		comp.setDouble("Time", time);
+		var comp = newNBTCompound();
+		comp.putDouble("Time", time);
 		
-		NBTTagList layers = newNBTList();
-		for(AnimationLayer layer : this.layers) layers.appendTag(layer.serializeNBT());
-		comp.setTag("Layers", layers);
+		var layers = newNBTList();
+		for(AnimationLayer layer : this.layers) layers.add(layer.serializeNBT());
+		comp.put("Layers", layers);
 		
 		return comp;
 	}
 	
 	@Override
-	public void deserializeNBT(NBTTagCompound nbt)
+	public void deserializeNBT(CompoundTag nbt)
 	{
 		time = nbt.getDouble("Time");
 		
-		NBTTagList layers = nbt.getTagList("Layers", Constants.NBT.TAG_COMPOUND);
-		for(int i = 0; i < layers.tagCount(); i++)
+		var layers = nbt.getList("Layers", Tag.TAG_COMPOUND);
+		for(int i = 0; i < layers.size(); i++)
 		{
-			NBTTagCompound tag = layers.getCompoundTagAt(i);
+			var tag = layers.getCompound(i);
 			AnimationLayer l = layerMap.get(tag.getString("Name"));
 			if(l != null) l.deserializeNBT(tag);
 		}

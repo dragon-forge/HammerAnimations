@@ -28,7 +28,7 @@ public class AnimationHolder
 		{
 			if(this == DefaultsHA.NULL_ANIM)
 			{
-				HammerAnimations.LOG.warn("Unable to find default null animation. This is not supposed to happen!");
+				HammerAnimations.LOG.fatal("Unable to find default null animation. This is not supposed to happen!");
 				return null;
 			}
 			return DefaultsHA.NULL_ANIM.get();

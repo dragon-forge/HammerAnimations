@@ -1,5 +1,5 @@
 import com.google.common.base.Stopwatch;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animation.data.*;

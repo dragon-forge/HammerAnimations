@@ -1,25 +1,32 @@
 package org.zeith.hammeranims;
 
-import com.zeitheron.hammercore.HammerCore;
-import com.zeitheron.hammercore.internal.SimpleRegistration;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.*;
-import net.minecraftforge.fml.common.discovery.ASMDataTable;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.*;
 import org.apache.logging.log4j.*;
+import org.zeith.hammeranims.api.HammerAnimationsApi;
+import org.zeith.hammeranims.api.animation.IAnimationContainer;
+import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.annotations.*;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
-import org.zeith.hammeranims.core.init.ContainersHA;
-import org.zeith.hammeranims.core.proxy.CommonProxy;
-import org.zeith.hammeranims.core.utils.reg.*;
+import org.zeith.hammeranims.core.proxy.*;
+import org.zeith.hammeranims.core.utils.BasicRegistrar;
+import org.zeith.hammerlib.event.fml.FMLFingerprintCheckEvent;
+import org.zeith.hammerlib.util.CommonMessages;
+import org.zeith.hammerlib.util.mcf.ScanDataHelper;
 
 import java.lang.annotation.Annotation;
-import java.util.function.BiConsumer;
+import java.util.function.*;
 
-@Mod(modid = HammerAnimations.MOD_ID, name = HammerAnimations.MOD_NAME, version = "@VERSION@", certificateFingerprint = "@FINGERPRINT@", dependencies = "required-after:hammercore", updateJSON = "https://api.modrinth.com/updates/C7cTlgwS/forge_updates.json")
+@Mod(HammerAnimations.MOD_ID)
 public class HammerAnimations
 {
 	public static final String ROOT_PACKAGE = "org.zeith.hammeranims";
@@ -28,58 +35,34 @@ public class HammerAnimations
 	
 	public static final Logger LOG = LogManager.getLogger(MOD_NAME);
 	
-	@SidedProxy(serverSide = ROOT_PACKAGE + ".core.proxy.ServerProxy",
-			clientSide = ROOT_PACKAGE + ".core.proxy.ClientProxy")
-	public static CommonProxy PROXY;
+	public static final CommonProxy PROXY = DistExecutor.unsafeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 	
 	public HammerAnimations()
 	{
+		CommonMessages.printMessageOnIllegalRedistribution(HammerAnimations.class,
+				LOG, "HammerAnimations", "https://www.curseforge.com/minecraft/mc-mods/hammer-animations"
+		);
+		
+		FMLJavaModLoadingContext.get().getModEventBus().register(this);
 		AnimationDecoder.init();
 		GeometryDecoder.init();
-	}
-	
-	@Mod.EventHandler
-	public void certificateViolation(FMLFingerprintViolationEvent e)
-	{
-		LOG.warn("*****************************");
-		LOG.warn("WARNING: Somebody has been tampering with " + HammerAnimations.MOD_NAME + " jar!");
-		LOG.warn("It is highly recommended that you redownload mod from https://www.curseforge.com/projects/@CF_ID@ !");
-		LOG.warn("*****************************");
-		HammerCore.invalidCertificates.put(HammerAnimations.MOD_ID, "https://www.curseforge.com/projects/@CF_ID@");
-	}
-	
-	@Mod.EventHandler
-	public void construct(FMLConstructionEvent e)
-	{
+		
 		LOG.info("{} is constructing.", MOD_NAME);
-		MinecraftForge.EVENT_BUS.register(PROXY);
 		PROXY.construct();
 		
-		ASMDataTable asm = e.getASMHarvestedData();
-		
-		scan(asm, RegisterAnimations.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new AnimationRegistrar(n, mod)));
-		scan(asm, RegisterGeometries.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new GeometryRegistrar(n, mod)));
-		scan(asm, RegisterTimeFunctions.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new TimeFunctionRegistrar(n, mod)));
-		scan(asm, RegisterAnimationSourceTypes.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new AnimationSourceTypesRegistrar(n, mod)));
-		scan(asm, RegisterAnimations.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new AnimationActionsRegistrar(n, mod)));
+		scan(RegisterAnimations.class, (n, mod) -> BasicRegistrar.perform(IAnimationContainer.class, HammerAnimationsApi::animations, n, mod));
+		scan(RegisterGeometries.class, (n, mod) -> BasicRegistrar.perform(IGeometryContainer.class, HammerAnimationsApi::geometries, n, mod));
+		scan(RegisterTimeFunctions.class, (n, mod) -> BasicRegistrar.perform(TimeFunction.class, HammerAnimationsApi::timeFunctions, n, mod));
+		scan(RegisterAnimationSourceTypes.class, (n, mod) -> BasicRegistrar.perform(AnimationSourceType.class, HammerAnimationsApi::animationSources, n, mod));
+		scan(RegisterAnimations.class, (n, mod) -> BasicRegistrar.perform(AnimationAction.class, HammerAnimationsApi::animationActions, n, mod));
 	}
 	
-	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent e)
+	@SubscribeEvent
+	public void checkFingerprint(FMLFingerprintCheckEvent e)
 	{
-		SimpleRegistration.registerFieldBlocksFrom(ContainersHA.class, MOD_ID, CreativeTabs.MISC);
-	}
-	
-	@Mod.EventHandler
-	public void commonSetup(FMLInitializationEvent e)
-	{
-		PROXY.init();
-	}
-	
-	@Mod.EventHandler
-	public void startServer(FMLServerAboutToStartEvent e)
-	{
-		PROXY.serverAboutToStart(e.getServer());
+		CommonMessages.printMessageOnFingerprintViolation(e, "97e852e9b3f01b83574e8315f7e77651c6605f2b455919a7319e9869564f013c",
+				LOG, "HammerAnimations", "https://www.curseforge.com/minecraft/mc-mods/hammer-animations"
+		);
 	}
 	
 	public static ResourceLocation id(String path)
@@ -87,19 +70,19 @@ public class HammerAnimations
 		return new ResourceLocation(MOD_ID, path);
 	}
 	
-	private void scan(ASMDataTable table, Class<? extends Annotation> type, BiConsumer<String, ModContainer> handler)
+	private void scan(Class<? extends Annotation> type, BiConsumer<Supplier<Class<?>>, FMLModContainer> handler)
 	{
-		for(ASMDataTable.ASMData data : table.getAll(type.getCanonicalName()))
+		for(ScanDataHelper.ModAwareAnnotationData data : ScanDataHelper.lookupAnnotatedObjects(type))
 		{
-			ModContainer mod = data.getCandidate().getContainedMods().stream().findFirst().orElse(null);
+			var mod = data.getOwnerMod().orElse(null);
 			if(mod == null)
 			{
-				LOG.warn("Skipping @{}-annotated class {} since it does not belong to any mod.", type.getSimpleName(), data.getClassName());
+				LOG.warn("Skipping @{}-annotated class {} since it does not belong to any mod.", type.getSimpleName(), data.clazz());
 				continue;
 			}
-			
-			handler.accept(data.getClassName(), mod);
-			LOG.info("Applied @{} to {}, which belongs to {} ({})", type.getSimpleName(), data.getClassName(), mod.getModId(), mod.getName());
+			handler.accept(data::getOwnerClass, mod);
+			LOG.info("Applied @{} to {}, which belongs to {} ({})", type.getSimpleName(), data.clazz(), mod.getModId(), mod.getModInfo()
+					.getDisplayName());
 		}
 	}
 }

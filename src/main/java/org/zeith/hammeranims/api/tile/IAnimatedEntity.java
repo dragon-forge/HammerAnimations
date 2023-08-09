@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.api.tile;
 
-import com.zeitheron.hammercore.utils.base.Cast;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.core.contents.sources.EntityAnimationSourceType;
+import org.zeith.hammerlib.util.java.Cast;
 
 public interface IAnimatedEntity
 		extends IAnimatedObject
@@ -14,20 +14,20 @@ public interface IAnimatedEntity
 	default AnimationSource getAnimationSource()
 	{
 		Entity tile = Cast.cast(this);
-		return new EntityAnimationSourceType.EntitySourceType(tile.getEntityId());
+		return new EntityAnimationSourceType.EntitySourceType(tile.getId());
 	}
 	
 	@Override
-	default World getAnimatedObjectWorld()
+	default Level getAnimatedObjectWorld()
 	{
 		Entity tile = Cast.cast(this);
-		return tile.world;
+		return tile.level();
 	}
 	
 	@Override
-	default Vec3d getAnimatedObjectPosition()
+	default Vec3 getAnimatedObjectPosition()
 	{
 		Entity tile = Cast.cast(this);
-		return new Vec3d(tile.posX, tile.posY, tile.posZ);
+		return tile.position();
 	}
 }

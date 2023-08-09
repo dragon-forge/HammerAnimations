@@ -1,7 +1,6 @@
 package org.zeith.hammeranims.api.animation;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
@@ -18,7 +17,6 @@ import org.zeith.hammeranims.api.annotations.*;
  * - Optionally perform static import for {@link IAnimationContainer#create()}.
  */
 public interface IAnimationContainer
-		extends IForgeRegistryEntry<IAnimationContainer>
 {
 	/**
 	 * Reloads the animation container using the provided resource provider.

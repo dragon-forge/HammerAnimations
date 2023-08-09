@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.api.animation.data;
 
-import com.zeitheron.hammercore.lib.zlib.json.JSONObject;
-import com.zeitheron.hammercore.utils.java.functions.Function3;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 import org.zeith.hammeranims.api.animation.AnimationLocation;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.geometry.model.GeometryTransforms;
+import org.zeith.hammerlib.util.java.functions.Function3;
+import org.zeith.hammerlib.util.shaded.json.JSONObject;
 
 import javax.annotation.*;
 
@@ -35,7 +35,7 @@ public class BoneAnimation
 	{
 		if(transforms == null) transforms = GeometryTransforms.createDefault();
 		
-		Function3<Vec3d, Vec3d, Float, Vec3d> tf = blending.additiveTransform;
+		Function3<Vec3, Vec3, Float, Vec3> tf = blending.additiveTransform;
 		transforms.translation = tf.apply(transforms.translation, getTranslation(query), weight);
 		transforms.rotation = tf.apply(transforms.rotation, getRotation(query), weight);
 		
@@ -44,17 +44,17 @@ public class BoneAnimation
 		return transforms;
 	}
 	
-	public Vec3d getTranslation(Query query)
+	public Vec3 getTranslation(Query query)
 	{
 		return position.get(query);
 	}
 	
-	public Vec3d getScale(Query query)
+	public Vec3 getScale(Query query)
 	{
 		return scale.get(query);
 	}
 	
-	public Vec3d getRotation(Query query)
+	public Vec3 getRotation(Query query)
 	{
 		return rotation.get(query);
 	}

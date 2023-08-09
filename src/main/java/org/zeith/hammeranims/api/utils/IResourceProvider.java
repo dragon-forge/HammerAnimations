@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.utils;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
 

@@ -1,14 +1,12 @@
 package org.zeith.hammeranims.api.animsys;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 
 public abstract class AnimationSourceType
-		extends IForgeRegistryEntry.Impl<AnimationSourceType>
 {
-	public abstract AnimationSource readSource(NBTTagCompound tag);
+	public abstract AnimationSource readSource(CompoundTag tag);
 	
 	public final ResourceLocation getRegistryKey()
 	{

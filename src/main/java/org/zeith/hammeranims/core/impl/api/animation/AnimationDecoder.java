@@ -1,12 +1,11 @@
 package org.zeith.hammeranims.core.impl.api.animation;
 
-import com.zeitheron.hammercore.lib.zlib.json.JSONObject;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.*;
 import org.zeith.hammeranims.api.animation.event.DecodeAnimationEvent;
+import org.zeith.hammerlib.util.shaded.json.JSONObject;
 
 import java.time.Duration;
 import java.util.*;
@@ -17,14 +16,13 @@ public class AnimationDecoder
 	
 	static
 	{
-		HammerAnimationsApi.EVENT_BUS.register(AnimationDecoder.class);
+		HammerAnimationsApi.EVENT_BUS.addListener(AnimationDecoder::decodeAnimation);
 	}
 	
 	public static void init()
 	{
 	}
 	
-	@SubscribeEvent
 	public static void decodeAnimation(DecodeAnimationEvent e)
 	{
 		JSONObject obj = e.asObject().orElse(null);

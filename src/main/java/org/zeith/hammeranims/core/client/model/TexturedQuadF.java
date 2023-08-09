@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.core.client.model;
 
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.*;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraftforge.api.distmarker.*;
+import org.joml.*;
+import org.zeith.hammeranims.api.geometry.model.RenderData;
 
 public class TexturedQuadF
 {
@@ -20,7 +20,7 @@ public class TexturedQuadF
 	public TexturedQuadF(VertexF[] vertices, float texcoordU1, float texcoordV1, float texcoordU2, float texcoordV2, float textureWidth, float textureHeight)
 	{
 		this(vertices);
-		
+
 //		texcoordU1 = (int) texcoordU1;
 //		texcoordV1 = (int) texcoordV1;
 //		texcoordU2 = (int) texcoordU2;
@@ -46,34 +46,34 @@ public class TexturedQuadF
 	 * Draw this primitive. This is typically called only once as the generated drawing instructions are saved by the
 	 * renderer and reused later.
 	 */
-	@SideOnly(Side.CLIENT)
-	public void bake(BufferBuilder renderer)
+	@OnlyIn(Dist.CLIENT)
+	public void render(RenderData data, VertexConsumer renderer)
 	{
-		Vec3d vec3d = this.vertexPositions[1].vector3D.subtractReverse(this.vertexPositions[0].vector3D);
-		Vec3d vec3d1 = this.vertexPositions[1].vector3D.subtractReverse(this.vertexPositions[2].vector3D);
-		Vec3d vec3d2 = vec3d1.crossProduct(vec3d).normalize();
-		float f = (float) vec3d2.x;
-		float f1 = (float) vec3d2.y;
-		float f2 = (float) vec3d2.z;
+		var vec3d = this.vertexPositions[1].subtractReverse(this.vertexPositions[0].vector3D);
+		var vec3d1 = this.vertexPositions[1].subtractReverse(this.vertexPositions[2].vector3D);
 		
-		if(this.invertNormal)
-		{
-			f = -f;
-			f1 = -f1;
-			f2 = -f2;
-		}
+		var normalVec = vec3d1.cross(vec3d).normalize();
+		if(invertNormal) normalVec = normalVec.scale(-1);
+		float f = (float) normalVec.x;
+		float f1 = (float) normalVec.y;
+		float f2 = (float) normalVec.z;
 		
-		renderer.begin(7, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
+		var lp = data.pose.last();
+		var pose = lp.pose();
+		var norm = lp.normal();
 		
 		for(int i = 0; i < 4; ++i)
 		{
 			VertexF v = this.vertexPositions[i];
-			renderer.pos(v.vector3D.x, v.vector3D.y, v.vector3D.z)
-					.tex(v.texturePositionX, v.texturePositionY)
-					.normal(f, f1, f2)
+			var vp = v.vector3D;
+			
+			renderer.vertex(pose, (float) vp.x, (float) vp.y, (float) vp.z)
+					.color(data.red, data.green, data.blue, data.alpha)
+					.uv(v.texturePositionX, v.texturePositionY)
+					.overlayCoords(data.overlay)
+					.uv2(data.lighting)
+					.normal(norm, f, f1, f2)
 					.endVertex();
 		}
-		
-		Tessellator.getInstance().draw();
 	}
 }

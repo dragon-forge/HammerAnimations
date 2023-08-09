@@ -1,26 +1,26 @@
 package org.zeith.hammeranims.core.contents.sources;
 
-import com.zeitheron.hammercore.utils.base.Cast;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
+import org.zeith.hammerlib.util.java.Cast;
 
 public class TileAnimationSourceType
 		extends AnimationSourceType
 {
 	@Override
-	public TileSourceType readSource(NBTTagCompound tag)
+	public TileSourceType readSource(CompoundTag tag)
 	{
 		return new TileSourceType(tag);
 	}
 	
-	public AnimationSource of(TileEntity tile)
+	public AnimationSource of(BlockEntity tile)
 	{
-		return new TileSourceType(tile.getPos());
+		return new TileSourceType(tile.getBlockPos());
 	}
 	
 	public static class TileSourceType
@@ -33,18 +33,18 @@ public class TileAnimationSourceType
 			this.pos = pos;
 		}
 		
-		public TileSourceType(NBTTagCompound tag)
+		public TileSourceType(CompoundTag tag)
 		{
-			this.pos = new BlockPos(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"));
+			this.pos = new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
 		}
 		
 		@Override
-		public NBTTagCompound writeSource()
+		public CompoundTag writeSource()
 		{
-			NBTTagCompound tag = InstanceHelpers.newNBTCompound();
-			tag.setInteger("x", pos.getX());
-			tag.setInteger("y", pos.getY());
-			tag.setInteger("z", pos.getZ());
+			var tag = InstanceHelpers.newNBTCompound();
+			tag.putInt("x", pos.getX());
+			tag.putInt("y", pos.getY());
+			tag.putInt("z", pos.getZ());
 			return tag;
 		}
 		
@@ -55,9 +55,9 @@ public class TileAnimationSourceType
 		}
 		
 		@Override
-		public IAnimatedObject get(World world)
+		public IAnimatedObject get(Level world)
 		{
-			return Cast.cast(world.getTileEntity(pos), IAnimatedObject.class);
+			return Cast.cast(world.getBlockEntity(pos), IAnimatedObject.class);
 		}
 	}
 }

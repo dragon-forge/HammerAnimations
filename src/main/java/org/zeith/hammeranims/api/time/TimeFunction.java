@@ -1,14 +1,12 @@
 package org.zeith.hammeranims.api.time;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
 
 public abstract class TimeFunction
-		extends IForgeRegistryEntry.Impl<TimeFunction>
 {
 	public abstract double computeTime(AnimationSystem system, double sysTime, float partialTicks, ActiveAnimation animation);
 	

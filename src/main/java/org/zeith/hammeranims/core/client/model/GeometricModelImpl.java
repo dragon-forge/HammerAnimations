@@ -1,11 +1,12 @@
 package org.zeith.hammeranims.core.client.model;
 
 import com.google.common.collect.Lists;
-import com.zeitheron.hammercore.client.utils.UtilsFX;
-import com.zeitheron.hammercore.utils.math.MathHelper;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.*;
+import com.mojang.math.Axis;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.*;
+import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.interp.BlendMode;
 import org.zeith.hammeranims.api.geometry.model.*;
@@ -37,7 +38,7 @@ public class GeometricModelImpl
 			ModelBoneF b = new ModelBoneF(cfg.name);
 			bones.put(cfg.name, b);
 			
-			Vec3d pivot = cfg.pivot;
+			Vec3 pivot = cfg.pivot;
 			b.setRotationPoint((float) pivot.x, (float) pivot.y, (float) pivot.z);
 		}
 		
@@ -76,9 +77,9 @@ public class GeometricModelImpl
 			b.setTextureSize(textureWidth, textureHeight);
 			for(GeometryDataImpl.CubeConfig cube : bone.cubes)
 			{
-				Vec3d cubePos = cube.origin.subtract(bone.pivot);
-				
-//				HammerAnimations.LOG.info("Add box into {}: @ {} Origin{} Offset{}", bone.name, cubePos, cube.origin, new Vec3d(b.offsetX, b.offsetY, b.offsetZ));
+				Vec3 cubePos = cube.origin.subtract(bone.pivot);
+
+//				HammerAnimations.LOG.info("Add box into {}: @ {} Origin{} Offset{}", bone.name, cubePos, cube.origin, new Vec3(b.offsetX, b.offsetY, b.offsetZ));
 				
 				b.addBox(
 						(float) cubePos.x, (float) cubePos.y, (float) cubePos.z,
@@ -104,7 +105,7 @@ public class GeometricModelImpl
 			
 			GeometryTransforms add = entry.getValue();
 			
-			Vec3d vec = add.translation;
+			Vec3 vec = add.translation;
 			bone.offsetX = vec.x;
 			bone.offsetY = vec.y;
 			bone.offsetZ = vec.z;
@@ -115,9 +116,9 @@ public class GeometricModelImpl
 			bone.rotateAngleZ = (float) vec.z;
 			
 			vec = add.scale;
-			bone.scaleX = vec.x;
-			bone.scaleY = vec.y;
-			bone.scaleZ = vec.z;
+			bone.scaleX = (float) vec.x;
+			bone.scaleY = (float) vec.y;
+			bone.scaleZ = (float) vec.z;
 		}
 	}
 	
@@ -144,40 +145,42 @@ public class GeometricModelImpl
 			GeometryTransforms base = bonesBase.get(boneKey);
 			GeometryTransforms add = poseBones.get(boneKey);
 			
-			Vec3d translate = Vec3d.ZERO, rotate = Vec3d.ZERO, scale = base.scale;
+			Vec3 translate = Vec3.ZERO, rotate = Vec3.ZERO, scale = base.scale;
 			
 			if(add != null)
 			{
 				translate = add.translation;
-				rotate = BlendMode.mult(add.rotation, new Vec3d(-1, -1, -1));
+				rotate = BlendMode.mult(add.rotation, new Vec3(-1, 1, 1));
 				scale = BlendMode.mult(scale, add.scale);
 			}
 			
-			
-			Vec3d vec = base.translation.add(translate);
+			Vec3 vec = base.translation.add(translate);
 			bone.offsetX = vec.x;
 			bone.offsetY = vec.y;
 			bone.offsetZ = vec.z;
 			
 			vec = base.rotation.add(rotate);
-			bone.rotateAngleX = (float) (vec.x * MathHelper.torad);
-			bone.rotateAngleY = (float) (vec.y * MathHelper.torad);
-			bone.rotateAngleZ = (float) (vec.z * MathHelper.torad);
+			bone.rotateAngleX = (float) (vec.x * Mth.DEG_TO_RAD);
+			bone.rotateAngleY = (float) (vec.y * Mth.DEG_TO_RAD);
+			bone.rotateAngleZ = (float) (vec.z * Mth.DEG_TO_RAD);
 			
-			bone.scaleX = scale.x;
-			bone.scaleY = scale.y;
-			bone.scaleZ = scale.z;
+			bone.scaleX = (float) scale.x;
+			bone.scaleY = (float) scale.y;
+			bone.scaleZ = (float) scale.z;
 		}
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void renderModel(RenderData data)
 	{
-		UtilsFX.bindTexture(data.texture);
-		GlStateManager.scale(-0.0625f, 0.0625f, 0.0625f);
+		var pose = data.pose;
+		pose.pushPose();
+		pose.scale(0.0625f, 0.0625f, 0.0625f);
+		pose.mulPoseMatrix(new Matrix4f().identity().m00(-1));
 		for(ModelBoneF bone : rootBones)
 			bone.render(data);
+		pose.popPose();
 	}
 	
 	@Override

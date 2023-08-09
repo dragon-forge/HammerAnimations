@@ -1,19 +1,19 @@
 package org.zeith.hammeranims.net;
 
-import com.zeitheron.hammercore.net.*;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.*;
+import org.zeith.hammerlib.net.*;
 
 @MainThreaded
 public class PacketSyncAnimationSystem
-		implements IPacket
+		implements INBTPacket
 {
-	protected NBTTagCompound tag;
+	protected CompoundTag tag;
 	protected AnimationSource source;
 	
 	public PacketSyncAnimationSystem()
@@ -27,30 +27,30 @@ public class PacketSyncAnimationSystem
 	}
 	
 	@Override
-	public void writeToNBT(NBTTagCompound nbt)
+	public void write(CompoundTag nbt)
 	{
-		nbt.setTag("Sys", tag);
-		nbt.setTag("Src", source.writeSource());
-		nbt.setString("Type", source.getType().getRegistryKey().toString());
+		nbt.put("Sys", tag);
+		nbt.put("Src", source.writeSource());
+		nbt.putString("Type", source.getType().getRegistryKey().toString());
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void read(CompoundTag nbt)
 	{
-		tag = nbt.getCompoundTag("Sys");
+		tag = nbt.getCompound("Sys");
 		AnimationSourceType type = HammerAnimationsApi.animationSources()
 				.getValue(new ResourceLocation(nbt.getString("Type")));
 		if(type != null)
-			source = type.readSource(nbt.getCompoundTag("Src"));
+			source = type.readSource(nbt.getCompound("Src"));
 		else
 			HammerAnimations.LOG.warn("Unable to find animation source {}", nbt.getString("Type"));
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void executeOnClient2(PacketContext net)
+	@OnlyIn(Dist.CLIENT)
+	public void clientExecute(PacketContext ctx)
 	{
-		World world = HammerAnimations.PROXY.getClientWorld();
+		Level world = HammerAnimations.PROXY.getClientWorld();
 		if(world != null)
 		{
 			IAnimatedObject object = source.get(world);

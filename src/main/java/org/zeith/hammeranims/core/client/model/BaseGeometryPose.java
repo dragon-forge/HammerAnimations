@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.client.model;
 
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.geometry.model.*;
@@ -18,9 +18,9 @@ public class BaseGeometryPose
 	public void register(ModelBoneF bone)
 	{
 		boneTransforms.put(bone.boneName, new GeometryTransforms(
-				new Vec3d(bone.offsetX, bone.offsetY, bone.offsetZ),
-				new Vec3d(bone.rotateAngleX, bone.rotateAngleY, bone.rotateAngleZ),
-				new Vec3d(bone.scaleX, bone.scaleY, bone.scaleZ)
+				new Vec3(bone.offsetX, bone.offsetY, bone.offsetZ),
+				new Vec3(bone.rotateAngleX, bone.rotateAngleY, bone.rotateAngleZ),
+				new Vec3(bone.scaleX, bone.scaleY, bone.scaleZ)
 		));
 	}
 	

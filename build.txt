@@ -1,20 +1,52 @@
-#Project info
-author=Zeitheron
-start_git_commit=?
-git_commit=https://github.com/dragon-forge/HammerAnimations/commit/{{hash}}
+# Mod Info
+mod_version=20.1.1
+build_candidate=false
 
-#Runtime info
-forge_version=14.23.5.2847
-minecraft_version=1.12.2
-mcp=stable_39
-hl_version=2.0.6.33
-jei_version=4.16.1.302
-# viveapi_version=12.1.1
+# Mod dependencies (jei is not a requirement, but HammerLib is)
+hl_version=20.1.12
+jei_version=15.2.0.22
 
-#Mod info
+# Persistent mod info
 mod_id=hammeranims
-mod_id_fancy=HammerAnimations
+archive_name=HammerAnimations
 mod_name=HammerAnimations
-mod_version=12.2.1
+mod_description=Bedrock model and animation API.
+mod_authors=Zeitheron
+mod_license=All Rights Reserved
+mod_credits=None
+issue_tracker_url=https://github.com/dragon-forge/HammerAnimations/issues
+
+# Mappings
+mappings_channel=parchment
+mappings_version=2023.06.26-1.20.1
+
+# Maven Info
+maven_group=org.zeith.hammeranims
+maven_url=file:///SERVER//Maven
+
+# MC Info
+mc_version=1.20.1
+mc_range=[1.20.1,1.21)
+forge_version=47.1.58
+forge_range=[47,)
+mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
+
+# Misc Info
+java=17
+
+# Project ID on CurseForge
 cf_project=899883
-release_type=release
+modrinth_project=C7cTlgwS
+
+# alpha, beta, release
+release_type=alpha
+
+# List of mods separated by ;
+# If a specific mod for one platform is needed, @m: or @c: prefixes are used.
+# Example for adding Hammer Lib for both Modrinth & CurseForge: 
+# @m:PlkSuVtM;@c:hammer-lib;
+# Which can be simplified to be just "hammer-lib" since the slug is the same on both platforms.
+required_mods=hammer-lib;
+optional_mods=
+incompatible_mods=
+embedded_mods=

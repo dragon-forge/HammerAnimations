@@ -1,9 +1,8 @@
 package org.zeith.hammeranims.core.client.model;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.renderer.*;
-import net.minecraftforge.fml.relauncher.*;
-import org.lwjgl.opengl.GL11;
+import net.minecraftforge.api.distmarker.*;
+import org.joml.Quaternionf;
 import org.zeith.hammeranims.api.geometry.model.RenderData;
 
 import java.util.List;
@@ -17,15 +16,9 @@ public class ModelBoneF
 	
 	public float rotationPointX, rotationPointY, rotationPointZ;
 	public float rotateAngleX, rotateAngleY, rotateAngleZ;
-	public double scaleX = 1.0F, scaleY = 1.0F, scaleZ = 1.0F;
+	public float scaleX = 1.0F, scaleY = 1.0F, scaleZ = 1.0F;
 	public double offsetX, offsetY, offsetZ;
 	
-	private boolean compiled;
-	
-	/** The GL display list rendered by the Tessellator for this model */
-	private int displayList;
-	
-	public boolean mirror;
 	public boolean showModel;
 	
 	/** Makes this and all child bones hidden. */
@@ -61,7 +54,7 @@ public class ModelBoneF
 			offsetX -= parent.offsetX;
 			offsetY -= parent.offsetY;
 			offsetZ -= parent.offsetZ;
-
+			
 			rotationPointX -= parent.rotationPointX;
 			rotationPointY -= parent.rotationPointY;
 			rotationPointZ -= parent.rotationPointZ;
@@ -95,17 +88,19 @@ public class ModelBoneF
 		this.rotationPointZ = rotationPointZIn;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void render(RenderData data)
 	{
+		var pose = data.pose;
+		
 		if(!this.isHidden)
 		{
 			if(this.showModel)
 			{
-				if(!this.compiled) this.bake();
+				var vertices = data.buffers.getBuffer(data.renderTypeByBone.apply(boneName));
 				
-				GlStateManager.pushMatrix();
-				GlStateManager.translate(this.offsetX, this.offsetY, this.offsetZ);
+				pose.pushPose();
+				pose.translate(this.offsetX, this.offsetY, this.offsetZ);
 				
 				if(this.rotateAngleX == 0.0F && this.rotateAngleY == 0.0F && this.rotateAngleZ == 0.0F)
 				{// No rotation is found
@@ -113,73 +108,52 @@ public class ModelBoneF
 					{// Rotation point not found
 						if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
 						{// Scale found
-							GlStateManager.translate(this.scaleX, this.scaleY, this.scaleZ);
-							GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
-							GlStateManager.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
+							pose.translate(this.scaleX, this.scaleY, this.scaleZ);
+							pose.scale(this.scaleX, this.scaleY, this.scaleZ);
+							pose.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
 						}
 						
-						if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
+						if(!isThisBoneInvisible) for(ModelCubeF box : this.cubeList) box.render(data, vertices);
 						
 						if(this.childModels != null) for(ModelBoneF child : this.childModels) child.render(data);
 					} else
 					{// Rotation point is present
-						GlStateManager.translate(this.rotationPointX, this.rotationPointY, this.rotationPointZ);
+						pose.translate(this.rotationPointX, this.rotationPointY, this.rotationPointZ);
 						
 						if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
 						{// Scale found
-							GlStateManager.translate(this.scaleX, this.scaleY, this.scaleZ);
-							GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
-							GlStateManager.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
+							pose.translate(this.scaleX, this.scaleY, this.scaleZ);
+							pose.scale(this.scaleX, this.scaleY, this.scaleZ);
+							pose.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
 						}
 						
-						if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
+						if(!isThisBoneInvisible) for(ModelCubeF box : this.cubeList) box.render(data, vertices);
 						
 						if(this.childModels != null) for(ModelBoneF child : this.childModels) child.render(data);
 					}
 				} else
 				{// Rotation is found
-					GlStateManager.translate(this.rotationPointX, this.rotationPointY, this.rotationPointZ);
+					pose.translate(this.rotationPointX, this.rotationPointY, this.rotationPointZ);
 					
 					if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
 					{// Scale found
-						GlStateManager.translate(this.scaleX, this.scaleY, this.scaleZ);
-						GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
-						GlStateManager.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
+						pose.translate(this.scaleX, this.scaleY, this.scaleZ);
+						pose.scale(this.scaleX, this.scaleY, this.scaleZ);
+						pose.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
 					}
 					
 					// Apply rotation
-					if(this.rotateAngleX != 0.0F)
-						GlStateManager.rotate(this.rotateAngleX * (180F / (float) Math.PI), 1.0F, 0.0F, 0.0F);
-					if(this.rotateAngleY != 0.0F)
-						GlStateManager.rotate(this.rotateAngleY * (180F / (float) Math.PI), 0.0F, 1.0F, 0.0F);
-					if(this.rotateAngleZ != 0.0F)
-						GlStateManager.rotate(this.rotateAngleZ * (180F / (float) Math.PI), 0.0F, 0.0F, 1.0F);
+					if(this.rotateAngleX != 0.0F || this.rotateAngleY != 0.0F || this.rotateAngleZ != 0.0F)
+						pose.mulPose(new Quaternionf().rotateXYZ(rotateAngleX, rotateAngleY, rotateAngleZ));
 					
-					if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
+					if(!isThisBoneInvisible) for(ModelCubeF box : this.cubeList) box.render(data, vertices);
 					
 					if(this.childModels != null) for(ModelBoneF child : this.childModels) child.render(data);
 				}
 				
-				GlStateManager.popMatrix();
+				pose.popPose();
 			}
 		}
-	}
-	
-	/**
-	 * Compiles a GL display list for this model
-	 */
-	@SideOnly(Side.CLIENT)
-	private void bake()
-	{
-		this.displayList = GLAllocation.generateDisplayLists(1);
-		GlStateManager.glNewList(this.displayList, 4864);
-		GlStateManager.pushMatrix();
-//		GlStateManager.scale(-1, 1, 1);
-		BufferBuilder bufferbuilder = Tessellator.getInstance().getBuffer();
-		for(ModelCubeF box : this.cubeList) box.bake(bufferbuilder);
-		GlStateManager.popMatrix();
-		GlStateManager.glEndList();
-		this.compiled = true;
 	}
 	
 	/**
@@ -194,10 +168,5 @@ public class ModelBoneF
 	
 	public void dispose()
 	{
-		if(compiled)
-		{
-			GlStateManager.glDeleteLists(this.displayList, 1);
-			compiled = false;
-		}
 	}
 }

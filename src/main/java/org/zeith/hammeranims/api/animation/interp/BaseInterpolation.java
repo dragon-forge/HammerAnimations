@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import com.zeitheron.hammercore.lib.zlib.json.*;
 import org.zeith.hammeranims.HammerAnimations;
+import org.zeith.hammerlib.util.shaded.json.*;
 
 public abstract class BaseInterpolation
 {

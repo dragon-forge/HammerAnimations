@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Function;
 
@@ -10,7 +10,7 @@ public class Vec3Animation
 	public static final Vec3Animation ONE = new Vec3Animation(new DoubleInterpolation(InterpolatedDouble.constant(1)));
 	
 	protected final BaseInterpolation animation;
-	protected final Function<Query, Vec3d> eval;
+	protected final Function<Query, Vec3> eval;
 	
 	public Vec3Animation(BaseInterpolation a)
 	{
@@ -22,19 +22,19 @@ public class Vec3Animation
 			this.eval = q ->
 			{
 				double[] data = animation.get(q);
-				return new Vec3d(data[0], data[1], data[2]);
+				return new Vec3(data[0], data[1], data[2]);
 			};
 		} else
 		{
 			this.eval = q ->
 			{
 				double i = animation.get(q)[0];
-				return new Vec3d(i, i, i);
+				return new Vec3(i, i, i);
 			};
 		}
 	}
 	
-	public Vec3d get(Query q)
+	public Vec3 get(Query q)
 	{
 		return eval.apply(q);
 	}

@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.client.model;
 
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 import org.zeith.hammeranims.core.utils.EnumFacing;
 
 import java.util.*;
@@ -14,7 +14,7 @@ public class CubeUVs
 	{
 	}
 	
-	public CubeUVs(Vec3d size, float texU, float texV)
+	public CubeUVs(Vec3 size, float texU, float texV)
 	{
 		float dx = (float) size.x, dy = (float) size.y, dz = (float) size.z;
 		

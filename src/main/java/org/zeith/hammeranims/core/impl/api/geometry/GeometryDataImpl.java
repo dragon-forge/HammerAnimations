@@ -1,8 +1,8 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
 import com.google.common.collect.Lists;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
@@ -63,11 +63,11 @@ public class GeometryDataImpl
 	{
 		protected String parent;
 		public final String name;
-		public final Vec3d pivot;
+		public final Vec3 pivot;
 		
 		public final List<CubeConfig> cubes = Lists.newArrayList();
 		
-		public BoneConfig(String name, String parent, Vec3d pivot)
+		public BoneConfig(String name, String parent, Vec3 pivot)
 		{
 			this.name = name;
 			this.parent = parent;
@@ -82,13 +82,13 @@ public class GeometryDataImpl
 	
 	public static class CubeConfig
 	{
-		public final Vec3d origin;
-		public final Vec3d size;
+		public final Vec3 origin;
+		public final Vec3 size;
 		public final CubeUVs uvs;
 		public final float inflate;
 		public final boolean flipX;
 		
-		public CubeConfig(Vec3d origin, Vec3d size, CubeUVs uvs, float inflate, boolean flipX)
+		public CubeConfig(Vec3 origin, Vec3 size, CubeUVs uvs, float inflate, boolean flipX)
 		{
 			this.origin = origin;
 			this.size = size;

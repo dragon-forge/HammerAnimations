@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.api.animation.interp;
 
 import com.google.common.base.Suppliers;
-import com.zeitheron.hammercore.lib.zlib.json.JSONObject;
-import com.zeitheron.hammercore.utils.java.tuples.*;
-import com.zeitheron.hammercore.utils.math.MathHelper;
 import it.unimi.dsi.fastutil.doubles.*;
+import net.minecraft.util.Mth;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
+import org.zeith.hammerlib.util.java.tuples.*;
+import org.zeith.hammerlib.util.shaded.json.JSONObject;
 
 import java.util.*;
 
@@ -201,7 +201,7 @@ public class KeyframeInterpolation
 			double[] b = to.pre.get(query);
 			double[] res = new double[Math.min(a.length, b.length)];
 			for(int i = 0; i < res.length; i++)
-				res[i] = MathHelper.interpolate(a[i], b[i], iv);
+				res[i] = Mth.lerp(iv, a[i], b[i]);
 			return res;
 		}
 	}

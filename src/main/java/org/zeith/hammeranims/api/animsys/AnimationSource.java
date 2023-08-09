@@ -1,13 +1,13 @@
 package org.zeith.hammeranims.api.animsys;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
 
 public abstract class AnimationSource
 {
-	public abstract NBTTagCompound writeSource();
+	public abstract CompoundTag writeSource();
 	
 	public abstract AnimationSourceType getType();
 	
-	public abstract IAnimatedObject get(World world);
+	public abstract IAnimatedObject get(Level world);
 }

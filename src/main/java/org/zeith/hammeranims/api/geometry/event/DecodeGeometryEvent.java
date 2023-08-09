@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.api.geometry.event;
 
-import com.zeitheron.hammercore.lib.zlib.json.*;
-import com.zeitheron.hammercore.utils.base.Cast;
-import net.minecraftforge.fml.common.eventhandler.*;
+import net.minecraftforge.eventbus.api.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
+import org.zeith.hammerlib.util.java.Cast;
+import org.zeith.hammerlib.util.shaded.json.*;
 
 import java.util.*;
 

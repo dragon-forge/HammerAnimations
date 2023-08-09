@@ -1,27 +1,25 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
-import com.zeitheron.hammercore.lib.zlib.json.*;
-import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.world.phys.Vec3;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.event.DecodeGeometryEvent;
 import org.zeith.hammeranims.core.client.model.CubeUVs;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.utils.EnumFacing;
+import org.zeith.hammerlib.util.shaded.json.*;
 
 public class GeometryDecoder
 {
 	static
 	{
-		HammerAnimationsApi.EVENT_BUS.register(AnimationDecoder.class);
+		HammerAnimationsApi.EVENT_BUS.addListener(AnimationDecoder::decodeAnimation);
 	}
 	
 	public static void init()
 	{
 	}
 	
-	@SubscribeEvent
 	public static void decodeGeometry(DecodeGeometryEvent e)
 	{
 		JSONArray arr = e.asArray().orElse(null);
@@ -43,7 +41,7 @@ public class GeometryDecoder
 			String boneId = boneObj.getString("name");
 			JSONArray pivot = boneObj.getJSONArray("pivot");
 			
-			GeometryDataImpl.BoneConfig cfg = new GeometryDataImpl.BoneConfig(boneId, boneObj.optString("parent"), new Vec3d(
+			GeometryDataImpl.BoneConfig cfg = new GeometryDataImpl.BoneConfig(boneId, boneObj.optString("parent"), new Vec3(
 					pivot.getDouble(0),
 					pivot.getDouble(1),
 					pivot.getDouble(2)
@@ -61,7 +59,7 @@ public class GeometryDecoder
 					
 					CubeUVs uv = null;
 					
-					Vec3d sizev = new Vec3d(size.getDouble(0), size.getDouble(1), size.getDouble(2));
+					Vec3 sizev = new Vec3(size.getDouble(0), size.getDouble(1), size.getDouble(2));
 					
 					if(uvRaw instanceof JSONArray)
 					{
@@ -87,7 +85,7 @@ public class GeometryDecoder
 					}
 					
 					cfg.cubes.add(new GeometryDataImpl.CubeConfig(
-							new Vec3d(origin.getDouble(0), origin.getDouble(1), origin.getDouble(2)),
+							new Vec3(origin.getDouble(0), origin.getDouble(1), origin.getDouble(2)),
 							sizev,
 							uv, (float) cubeObj.optDouble("inflate", 0),
 							cubeObj.optBoolean("mirror", false)
