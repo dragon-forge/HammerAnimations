@@ -66,8 +66,10 @@ repositories {
 dependencies {
 	if(hasConfig("hl_version"))
 	{
-		deobfCompile "org.zeith.HammerLib:HammerLib-${config.minecraft_version}:${config.hl_version}"
+        deobfCompile "org.zeith.HammerLib:HammerLib-${config.minecraft_version}:${config.hl_version}"
 	}
+
+    deobfCompile "org.zeith.ColoredLux:ColoredLux-${config.minecraft_version}:12.6.30"
 	
 	if(hasConfig("viveapi_version"))
 	{

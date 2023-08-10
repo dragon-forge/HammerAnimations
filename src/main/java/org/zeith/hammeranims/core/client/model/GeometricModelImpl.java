@@ -37,7 +37,7 @@ public class GeometricModelImpl
 			ModelBoneF b = new ModelBoneF(cfg.name);
 			bones.put(cfg.name, b);
 			
-			Vec3d pivot = cfg.pivot;
+			Vec3d pivot = cfg.pivot.scale(1 / 16F);
 			b.setRotationPoint((float) pivot.x, (float) pivot.y, (float) pivot.z);
 		}
 		
@@ -77,7 +77,7 @@ public class GeometricModelImpl
 			for(GeometryDataImpl.CubeConfig cube : bone.cubes)
 			{
 				Vec3d cubePos = cube.origin.subtract(bone.pivot);
-				
+
 //				HammerAnimations.LOG.info("Add box into {}: @ {} Origin{} Offset{}", bone.name, cubePos, cube.origin, new Vec3d(b.offsetX, b.offsetY, b.offsetZ));
 				
 				b.addBox(
@@ -105,9 +105,9 @@ public class GeometricModelImpl
 			GeometryTransforms add = entry.getValue();
 			
 			Vec3d vec = add.translation;
-			bone.offsetX = vec.x;
-			bone.offsetY = vec.y;
-			bone.offsetZ = vec.z;
+			bone.offsetX = vec.x / 16;
+			bone.offsetY = vec.y / 16;
+			bone.offsetZ = vec.z / 16;
 			
 			vec = add.rotation;
 			bone.rotateAngleX = (float) vec.x;
@@ -155,9 +155,9 @@ public class GeometricModelImpl
 			
 			
 			Vec3d vec = base.translation.add(translate);
-			bone.offsetX = vec.x;
-			bone.offsetY = vec.y;
-			bone.offsetZ = vec.z;
+			bone.offsetX = vec.x / 16;
+			bone.offsetY = vec.y / 16;
+			bone.offsetZ = vec.z / 16;
 			
 			vec = base.rotation.add(rotate);
 			bone.rotateAngleX = (float) (vec.x * MathHelper.torad);
@@ -175,7 +175,7 @@ public class GeometricModelImpl
 	public void renderModel(RenderData data)
 	{
 		UtilsFX.bindTexture(data.texture);
-		GlStateManager.scale(-0.0625f, 0.0625f, 0.0625f);
+		GlStateManager.scale(-1, 1, 1);
 		for(ModelBoneF bone : rootBones)
 			bone.render(data);
 	}

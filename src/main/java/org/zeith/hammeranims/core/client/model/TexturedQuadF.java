@@ -20,7 +20,7 @@ public class TexturedQuadF
 	public TexturedQuadF(VertexF[] vertices, float texcoordU1, float texcoordV1, float texcoordU2, float texcoordV2, float textureWidth, float textureHeight)
 	{
 		this(vertices);
-		
+
 //		texcoordU1 = (int) texcoordU1;
 //		texcoordV1 = (int) texcoordV1;
 //		texcoordU2 = (int) texcoordU2;
@@ -68,7 +68,8 @@ public class TexturedQuadF
 		for(int i = 0; i < 4; ++i)
 		{
 			VertexF v = this.vertexPositions[i];
-			renderer.pos(v.vector3D.x, v.vector3D.y, v.vector3D.z)
+			Vec3d pos = v.vector3D.scale(1 / 16F);
+			renderer.pos(pos.x, pos.y, pos.z)
 					.tex(v.texturePositionX, v.texturePositionY)
 					.normal(f, f1, f2)
 					.endVertex();
