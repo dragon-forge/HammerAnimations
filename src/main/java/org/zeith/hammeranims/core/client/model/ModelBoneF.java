@@ -3,7 +3,6 @@ package org.zeith.hammeranims.core.client.model;
 import com.google.common.collect.Lists;
 import net.minecraft.client.renderer.*;
 import net.minecraftforge.fml.relauncher.*;
-import org.lwjgl.opengl.GL11;
 import org.zeith.hammeranims.api.geometry.model.RenderData;
 
 import java.util.List;
@@ -113,9 +112,9 @@ public class ModelBoneF
 					{// Rotation point not found
 						if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
 						{// Scale found
-							GlStateManager.translate(this.scaleX, this.scaleY, this.scaleZ);
+							GlStateManager.translate(this.scaleX * 0.0625f, this.scaleY * 0.0625f, this.scaleZ * 0.0625f);
 							GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
-							GlStateManager.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
+							GlStateManager.translate(-this.scaleX * 0.0625f, -this.scaleY * 0.0625f, -this.scaleZ * 0.0625f);
 						}
 						
 						if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
@@ -127,9 +126,9 @@ public class ModelBoneF
 						
 						if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
 						{// Scale found
-							GlStateManager.translate(this.scaleX, this.scaleY, this.scaleZ);
+							GlStateManager.translate(this.scaleX * 0.0625f, this.scaleY * 0.0625f, this.scaleZ * 0.0625f);
 							GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
-							GlStateManager.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
+							GlStateManager.translate(-this.scaleX * 0.0625f, -this.scaleY * 0.0625f, -this.scaleZ * 0.0625f);
 						}
 						
 						if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
@@ -142,18 +141,14 @@ public class ModelBoneF
 					
 					if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
 					{// Scale found
-						GlStateManager.translate(this.scaleX, this.scaleY, this.scaleZ);
+						GlStateManager.translate(this.scaleX * 0.0625f, this.scaleY * 0.0625f, this.scaleZ * 0.0625f);
 						GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
-						GlStateManager.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
+						GlStateManager.translate(-this.scaleX * 0.0625f, -this.scaleY * 0.0625f, -this.scaleZ * 0.0625f);
 					}
 					
 					// Apply rotation
-					if(this.rotateAngleX != 0.0F)
-						GlStateManager.rotate(this.rotateAngleX * (180F / (float) Math.PI), 1.0F, 0.0F, 0.0F);
-					if(this.rotateAngleY != 0.0F)
-						GlStateManager.rotate(this.rotateAngleY * (180F / (float) Math.PI), 0.0F, 1.0F, 0.0F);
-					if(this.rotateAngleZ != 0.0F)
-						GlStateManager.rotate(this.rotateAngleZ * (180F / (float) Math.PI), 0.0F, 0.0F, 1.0F);
+					if(this.rotateAngleX != 0.0F || this.rotateAngleY != 0.0F || this.rotateAngleZ != 0.0F)
+						GlStateManager.rotate(QuaternionHelper.create(rotateAngleX, rotateAngleY, rotateAngleZ, false));
 					
 					if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
 					
