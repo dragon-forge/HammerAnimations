@@ -293,7 +293,6 @@ modrinth {
     versionType = config.release_type
     uploadFile = jar
     gameVersions = [config.mc_version]
-    loaders = ['Forge', 'NeoForge']
     dependencies {
         def mods = config.required_mods.split(";")
         if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
