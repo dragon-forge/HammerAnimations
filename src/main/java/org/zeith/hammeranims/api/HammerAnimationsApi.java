@@ -35,11 +35,13 @@ public class HammerAnimationsApi
 		ANIMATION_CONTAINERS = new RegistryBuilder<IAnimationContainer>()
 				.setType(IAnimationContainer.class)
 				.setName(HammerAnimations.id("animations"))
+				.disableSaving()
 				.create();
 		
 		GEOMETRY_CONTAINERS = new RegistryBuilder<IGeometryContainer>()
 				.setType(IGeometryContainer.class)
 				.setName(HammerAnimations.id("geometry"))
+				.disableSaving()
 				.create();
 		
 		ANIMATION_SOURCES = new RegistryBuilder<AnimationSourceType>()
@@ -52,12 +54,14 @@ public class HammerAnimationsApi
 				.setType(TimeFunction.class)
 				.setName(HammerAnimations.id("time_functions"))
 				.setDefaultKey(HammerAnimations.id("linear"))
+				.disableSaving()
 				.create();
 		
 		ANIMATION_ACTIONS = new RegistryBuilder<AnimationAction>()
 				.setType(AnimationAction.class)
 				.setName(HammerAnimations.id("animation_actions"))
 				.setDefaultKey(HammerAnimations.id("empty"))
+				.disableSaving()
 				.create();
 		
 		hasInitialized = true;

@@ -31,8 +31,8 @@ public class ServerProxy
 					"/assets/" + path.getNamespace() + "/" + path.getPath()
 			))
 			{
-				if(res == null) return Optional.empty();
-				return Optional.of(IOUtils.pipeOut(res));
+				if(res != null)
+					return Optional.of(IOUtils.pipeOut(res));
 			} catch(IOException ignored)
 			{
 			}

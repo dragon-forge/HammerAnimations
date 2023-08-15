@@ -57,11 +57,11 @@ public class HammerAnimations
 		
 		ASMDataTable asm = e.getASMHarvestedData();
 		
-		scan(asm, RegisterAnimations.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new AnimationRegistrar(n, mod)));
-		scan(asm, RegisterGeometries.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new GeometryRegistrar(n, mod)));
-		scan(asm, RegisterTimeFunctions.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new TimeFunctionRegistrar(n, mod)));
-		scan(asm, RegisterAnimationSourceTypes.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new AnimationSourceTypesRegistrar(n, mod)));
-		scan(asm, RegisterAnimations.class, (n, mod) -> MinecraftForge.EVENT_BUS.register(new AnimationActionsRegistrar(n, mod)));
+		scan(asm, RegisterAnimations.class, AnimationRegistrar::new);
+		scan(asm, RegisterGeometries.class, GeometryRegistrar::new);
+		scan(asm, RegisterTimeFunctions.class, TimeFunctionRegistrar::new);
+		scan(asm, RegisterAnimationSourceTypes.class, AnimationSourceTypesRegistrar::new);
+		scan(asm, RegisterAnimations.class, AnimationActionsRegistrar::new);
 	}
 	
 	@Mod.EventHandler
