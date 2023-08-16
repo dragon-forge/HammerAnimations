@@ -1,174 +1,102 @@
 package org.zeith.hammeranims.core.client.model;
 
-import com.google.common.collect.Lists;
-import com.mojang.math.Quaternion;
-import net.minecraftforge.api.distmarker.*;
-import org.zeith.hammeranims.api.geometry.model.RenderData;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.geom.ModelPart;
+import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.utils.IPoseEntry;
+import org.zeith.hammeranims.joml.Vector3f;
 
-import java.util.List;
+import java.util.*;
 
 public class ModelBoneF
+		extends ModelPart
 {
-	/** The size of the texture file's width in pixels. */
-	public float textureWidth;
-	/** The size of the texture file's height in pixels. */
-	public float textureHeight;
+	public final String boxName;
+	private final Vector3f scale = new Vector3f(1, 1, 1);
+	public Vector3f offset = new Vector3f();
+	private final Vector3f rotation; // in radians
+	public Vector3f startRotationRadians;
+	private final Map<String, ModelBoneF> children;
+	public List<ModelCubeF> cubes;
 	
-	public float rotationPointX, rotationPointY, rotationPointZ;
-	public float rotateAngleX, rotateAngleY, rotateAngleZ;
-	public float scaleX = 1.0F, scaleY = 1.0F, scaleZ = 1.0F;
-	public double offsetX, offsetY, offsetZ;
-	
-	public boolean showModel;
-	
-	/** Makes this and all child bones hidden. */
-	public boolean isHidden;
-	
-	/** Makes this bone invisible, but all child bones will still render. */
-	public boolean isThisBoneInvisible;
-	
-	public ModelBoneF parent;
-	public List<ModelCubeF> cubeList;
-	public List<ModelBoneF> childModels;
-	public final String boneName;
-	
-	public ModelBoneF(String boneName)
+	public ModelBoneF(String name, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, boolean neverRender)
 	{
-		showModel = true;
-		cubeList = Lists.newArrayList();
-		this.boneName = boneName;
+		super(Collections.emptyList(), Collections.emptyMap());
+		this.boxName = name;
+		this.startRotationRadians = startRotRadians;
+		this.rotation = new Vector3f(startRotRadians);
+		this.visible = !neverRender;
+		this.children = Collections.unmodifiableMap(children);
+		this.cubes = cubes;
 	}
 	
-	public void register(GeometricModelImpl model)
+	public void renderCubes(PoseStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
-		// IF there is no parent, this is the root.
-		if(parent == null) model.rootBones.add(this);
-		
-		model.basePose.register(this);
-	}
-	
-	public void resolveOffsets()
-	{
-		if(parent != null)
+		if(visible)
 		{
-			offsetX -= parent.offsetX;
-			offsetY -= parent.offsetY;
-			offsetZ -= parent.offsetZ;
+			poseStackIn.pushPose();
 			
-			rotationPointX -= parent.rotationPointX;
-			rotationPointY -= parent.rotationPointY;
-			rotationPointZ -= parent.rotationPointZ;
-		}
-		
-		if(childModels != null)
-			for(ModelBoneF c : childModels)
-				c.resolveOffsets();
-	}
-	
-	/**
-	 * Sets the current box's rotation points and rotation angles to another box.
-	 */
-	public void addChild(ModelBoneF child)
-	{
-		if(this.childModels == null) this.childModels = Lists.newArrayList();
-		this.childModels.add(child);
-		child.parent = this;
-	}
-	
-	public ModelBoneF addBox(float offX, float offY, float offZ, float width, float height, float depth, CubeUVs uv, float inflate, boolean flipFaces)
-	{
-		this.cubeList.add(new ModelCubeF(this, uv, offX, offY, offZ, width, height, depth, inflate, flipFaces));
-		return this;
-	}
-	
-	public void setRotationPoint(float rotationPointXIn, float rotationPointYIn, float rotationPointZIn)
-	{
-		this.rotationPointX = rotationPointXIn;
-		this.rotationPointY = rotationPointYIn;
-		this.rotationPointZ = rotationPointZIn;
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	public void render(RenderData data)
-	{
-		var pose = data.pose;
-		
-		if(!this.isHidden)
-		{
-			if(this.showModel)
-			{
-				var vertices = data.buffers.getBuffer(data.renderTypeByBone.apply(boneName));
-				
-				pose.pushPose();
-				pose.translate(this.offsetX, this.offsetY, this.offsetZ);
-				
-				if(this.rotateAngleX == 0.0F && this.rotateAngleY == 0.0F && this.rotateAngleZ == 0.0F)
-				{// No rotation is found
-					if(this.rotationPointX == 0.0F && this.rotationPointY == 0.0F && this.rotationPointZ == 0.0F)
-					{// Rotation point not found
-						if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
-						{// Scale found
-							pose.translate(this.scaleX, this.scaleY, this.scaleZ);
-							pose.scale(this.scaleX, this.scaleY, this.scaleZ);
-							pose.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
-						}
-						
-						if(!isThisBoneInvisible) for(ModelCubeF box : this.cubeList) box.render(data, vertices);
-						
-						if(this.childModels != null) for(ModelBoneF child : this.childModels) child.render(data);
-					} else
-					{// Rotation point is present
-						pose.translate(this.rotationPointX, this.rotationPointY, this.rotationPointZ);
-						
-						if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
-						{// Scale found
-							pose.translate(this.scaleX, this.scaleY, this.scaleZ);
-							pose.scale(this.scaleX, this.scaleY, this.scaleZ);
-							pose.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
-						}
-						
-						if(!isThisBoneInvisible) for(ModelCubeF box : this.cubeList) box.render(data, vertices);
-						
-						if(this.childModels != null) for(ModelBoneF child : this.childModels) child.render(data);
-					}
-				} else
-				{// Rotation is found
-					pose.translate(this.rotationPointX, this.rotationPointY, this.rotationPointZ);
-					
-					if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
-					{// Scale found
-						pose.translate(this.scaleX, this.scaleY, this.scaleZ);
-						pose.scale(this.scaleX, this.scaleY, this.scaleZ);
-						pose.translate(-this.scaleX, -this.scaleY, -this.scaleZ);
-					}
-					
-					// Apply rotation
-					if(this.rotateAngleX != 0.0F || this.rotateAngleY != 0.0F || this.rotateAngleZ != 0.0F)
-					{
-						pose.mulPose(new Quaternion(rotateAngleX, rotateAngleY, rotateAngleZ, false));
-					}
-					
-					if(!isThisBoneInvisible) for(ModelCubeF box : this.cubeList) box.render(data, vertices);
-					
-					if(this.childModels != null) for(ModelBoneF child : this.childModels) child.render(data);
-				}
-				
-				pose.popPose();
-			}
+			this.translateAndRotate(poseStackIn);
+			
+			poseStackIn.scale(scale.x(), scale.y(), scale.z());
+			
+			this.renderCubes(IPoseEntry.read(poseStackIn.last()), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			
+			for(ModelBoneF part : this.children.values())
+				part.renderCubes(poseStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			
+			poseStackIn.popPose();
 		}
 	}
 	
-	/**
-	 * Returns the model renderer with the new texture parameters.
-	 */
-	public ModelBoneF setTextureSize(int textureWidthIn, int textureHeightIn)
+	public void translateAndRotate(PoseStack matrixStackIn)
 	{
-		this.textureWidth = (float) textureWidthIn;
-		this.textureHeight = (float) textureHeightIn;
-		return this;
+		matrixStackIn.translate(-offset.x() / 16F, -offset.y() / 16F, offset.z() / 16F);
+		matrixStackIn.translate(this.x / 16.0F, this.y / 16.0F, this.z / 16.0F);
+		
+		if(rotation.z() != 0.0F)
+			matrixStackIn.mulPose(com.mojang.math.Vector3f.ZP.rotation(rotation.z()));
+		
+		if(rotation.y() != 0.0F)
+			matrixStackIn.mulPose(com.mojang.math.Vector3f.YP.rotation(rotation.y()));
+		
+		if(rotation.x() != 0.0F)
+			matrixStackIn.mulPose(com.mojang.math.Vector3f.XP.rotation(rotation.x()));
+		
+		if(this.scale.x() != 1.0F || this.scale.y() != 1.0F || this.scale.z() != 1.0F)
+			matrixStackIn.scale(scale.x(), scale.y(), scale.z());
 	}
 	
-	public void dispose()
+	private void renderCubes(IPoseEntry matrixEntryIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
+		for(ModelCubeF cube : cubes)
+			cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+	}
+	
+	public Vector3f getTranslation()
+	{
+		return offset;
+	}
+	
+	public Vector3f getRotation()
+	{
+		return rotation;
+	}
+	
+	public Vector3f getScale()
+	{
+		return scale;
+	}
+	
+	public Map<String, ModelBoneF> getChildren()
+	{
+		return children;
+	}
+	
+	public void reset()
+	{
+		rotation.set(startRotationRadians.x, startRotationRadians.y, startRotationRadians.z);
+		offset.set(0, 0, 0);
+		scale.set(1, 1, 1);
 	}
 }

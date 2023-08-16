@@ -34,29 +34,34 @@ public class HammerAnimationsApi
 	public static void newRegistries(NewRegistryEvent e)
 	{
 		ANIMATION_CONTAINERS = e.create(new RegistryBuilder<IAnimationContainer>()
-						.setName(HammerAnimations.id("animations")),
+						.setName(HammerAnimations.id("animations"))
+						.disableSaving(),
 				reg -> RegistryMapping.report(IAnimationContainer.class, reg, false)
 		);
 		
 		GEOMETRY_CONTAINERS = e.create(new RegistryBuilder<IGeometryContainer>()
-						.setName(HammerAnimations.id("geometry")),
+						.setName(HammerAnimations.id("geometry"))
+						.disableSaving(),
 				reg -> RegistryMapping.report(IGeometryContainer.class, reg, false)
 		);
 		
 		ANIMATION_SOURCES = e.create(new RegistryBuilder<AnimationSourceType>()
 						.setName(HammerAnimations.id("animation_sources"))
+						.disableSaving()
 						.disableSaving(),
 				reg -> RegistryMapping.report(AnimationSourceType.class, reg, false)
 		);
 		
 		TIME_FUNCTIONS = e.create(new RegistryBuilder<TimeFunction>()
 						.setName(HammerAnimations.id("time_functions"))
+						.disableSaving()
 						.setDefaultKey(HammerAnimations.id("linear")),
 				reg -> RegistryMapping.report(TimeFunction.class, reg, false)
 		);
 		
 		ANIMATION_ACTIONS = e.create(new RegistryBuilder<AnimationAction>()
 						.setName(HammerAnimations.id("animation_actions"))
+						.disableSaving()
 						.setDefaultKey(HammerAnimations.id("empty")),
 				reg -> RegistryMapping.report(AnimationAction.class, reg, false)
 		);

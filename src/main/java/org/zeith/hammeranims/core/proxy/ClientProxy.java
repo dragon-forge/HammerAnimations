@@ -9,15 +9,12 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
-import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
-import java.io.IOException;
 import java.util.*;
 
 public class ClientProxy
@@ -81,9 +78,9 @@ public class ClientProxy
 	}
 	
 	@Override
-	public IGeometricModel createGeometryData(GeometryDataImpl data)
+	public IGeometricModel createGeometryData(GeometryDataImpl def)
 	{
-		GeometricModelImpl model = new GeometricModelImpl(data);
+		GeometricModelImpl model = new GeometricModelImpl(def);
 		createdModels.add(model);
 		return model;
 	}

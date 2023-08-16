@@ -1,39 +1,32 @@
 package org.zeith.hammeranims.core.client.model;
 
-import net.minecraft.world.phys.Vec3;
+import org.zeith.hammeranims.joml.Vector3f;
 
 public class VertexF
 {
-	public Vec3 vector3D;
-	public float texturePositionX;
-	public float texturePositionY;
+	private final Vector3f pos;
+	private final float u;
+	private final float v;
 	
-	public VertexF(float x, float y, float z, float u, float v)
+	public VertexF(Vector3f pos, float u, float v)
 	{
-		this(new Vec3(x, y, z), u, v);
+		this.pos = pos;
+		this.u = u;
+		this.v = v;
 	}
 	
-	public VertexF setTexturePosition(float u, float v)
+	public Vector3f getPos()
 	{
-		return new VertexF(this, u, v);
+		return pos;
 	}
 	
-	public VertexF(VertexF vt, float u, float v)
+	public float getU()
 	{
-		this.vector3D = vt.vector3D;
-		this.texturePositionX = u;
-		this.texturePositionY = v;
+		return u;
 	}
 	
-	public VertexF(Vec3 pos, float u, float v)
+	public float getV()
 	{
-		this.vector3D = pos;
-		this.texturePositionX = u;
-		this.texturePositionY = v;
-	}
-	
-	public Vec3 subtractReverse(Vec3 vec)
-	{
-		return new Vec3(vec.x - vector3D.x, vec.y - vector3D.y, vec.z - vector3D.z);
+		return v;
 	}
 }
