@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.client.render.tile;
 
 import com.zeitheron.hammercore.client.render.tesr.TESR;
+import com.zeitheron.hammercore.client.utils.RenderBlocks;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -38,8 +39,11 @@ public class RenderTileBilly
 	{
 		model.applySystem(partialTicks, te.getAnimationSystem());
 		
+		data.combinedLightIn = getBrightnessForRB(te, RenderBlocks.getInstance());
+		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + 0.5, y + 1.5, z + 0.5);
+		GlStateManager.disableLighting();
+		GlStateManager.translate(x + 0.5, y, z + 0.5);
 		model.renderModel(data);
 		GlStateManager.popMatrix();
 	}

@@ -1,92 +1,46 @@
 package org.zeith.hammeranims.core.client.model;
 
-import com.google.common.collect.Lists;
 import com.zeitheron.hammercore.client.utils.UtilsFX;
 import com.zeitheron.hammercore.utils.math.MathHelper;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.*;
-import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.animation.interp.BlendMode;
+import org.lwjgl.opengl.GL11;
 import org.zeith.hammeranims.api.geometry.model.*;
+import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
+import org.zeith.hammeranims.core.utils.PoseStack;
 
 import java.util.*;
+
+import static net.minecraft.client.renderer.vertex.DefaultVertexFormats.*;
 
 public class GeometricModelImpl
 		implements IGeometricModel
 {
-	public int textureWidth;
-	public int textureHeight;
+	protected final ModelBoneF root;
 	
-	protected List<ModelBoneF> rootBones = Lists.newArrayList();
-	protected Map<String, ModelBoneF> bones = new HashMap<>();
+	protected final Map<String, ModelBoneF> bones = new HashMap<>();
 	
-	protected final BaseGeometryPose basePose = new BaseGeometryPose(this::hasBone);
-	
-	public GeometricModelImpl(GeometryDataImpl data)
+	public GeometricModelImpl(GeometryDataImpl root)
 	{
-		textureWidth = data.getTextureWidth();
-		textureHeight = data.getTextureHeight();
-		
-		Map<String, GeometryDataImpl.BoneConfig> bonesBase = data.bonesView;
-		
-		// Setup all bones
-		for(GeometryDataImpl.BoneConfig cfg : bonesBase.values())
+		this.root = root.bakeRoot(new ModelBase()
 		{
-			ModelBoneF b = new ModelBoneF(cfg.name);
-			bones.put(cfg.name, b);
-			
-			Vec3d pivot = cfg.pivot.scale(1 / 16F);
-			b.setRotationPoint((float) pivot.x, (float) pivot.y, (float) pivot.z);
-		}
-		
-		// Resolve nesting and register bones
-		for(ModelBoneF b : bones.values())
-		{
-			GeometryDataImpl.BoneConfig cfg = bonesBase.get(b.boneName);
-			String parent = cfg.getParent();
-			if(parent != null && !parent.isEmpty())
+			@Override
+			public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
 			{
-				ModelBoneF pBone = bones.get(parent);
-				if(pBone == null)
-				{
-					HammerAnimations.LOG.warn("[{}]: Unresolved parent bone ({}) for bone {}. The bone {} will be skipped.",
-							data.getContainer().getRegistryKey(), parent,
-							b.boneName, b.boneName
-					);
-					continue;
-				}
-				
-				pBone.addChild(b);
-				b.parent = pBone;
 			}
-			
-			b.register(this);
-		}
-		
-		for(ModelBoneF rt : rootBones)
-			rt.resolveOffsets();
-		
-		// Setup all bones
-		for(GeometryDataImpl.BoneConfig bone : bonesBase.values())
-		{
-			ModelBoneF b = bones.get(bone.name);
-			
-			b.setTextureSize(textureWidth, textureHeight);
-			for(GeometryDataImpl.CubeConfig cube : bone.cubes)
-			{
-				Vec3d cubePos = cube.origin.subtract(bone.pivot);
-
-//				HammerAnimations.LOG.info("Add box into {}: @ {} Origin{} Offset{}", bone.name, cubePos, cube.origin, new Vec3d(b.offsetX, b.offsetY, b.offsetZ));
-				
-				b.addBox(
-						(float) cubePos.x, (float) cubePos.y, (float) cubePos.z,
-						(float) cube.size.x, (float) cube.size.y, (float) cube.size.z,
-						cube.uvs, cube.inflate, cube.flipX
-				);
-			}
-		}
+		});
+		registerBone(this.root);
+	}
+	
+	protected void registerBone(ModelBoneF part)
+	{
+		bones.put(part.boxName, part);
+		part.getChildren().values().forEach(this::registerBone);
 	}
 	
 	public boolean hasBone(String bone)
@@ -97,28 +51,8 @@ public class GeometricModelImpl
 	@Override
 	public void resetPose()
 	{
-		for(Map.Entry<String, GeometryTransforms> entry : basePose.getBoneTransforms().entrySet())
-		{
-			ModelBoneF bone = bones.get(entry.getKey());
-			if(bone == null) continue;
-			
-			GeometryTransforms add = entry.getValue();
-			
-			Vec3d vec = add.translation;
-			bone.offsetX = vec.x / 16;
-			bone.offsetY = vec.y / 16;
-			bone.offsetZ = vec.z / 16;
-			
-			vec = add.rotation;
-			bone.rotateAngleX = (float) vec.x;
-			bone.rotateAngleY = (float) vec.y;
-			bone.rotateAngleZ = (float) vec.z;
-			
-			vec = add.scale;
-			bone.scaleX = vec.x;
-			bone.scaleY = vec.y;
-			bone.scaleZ = vec.z;
-		}
+		for(ModelBoneF s : bones.values())
+			s.reset();
 	}
 	
 	GeometryPose emptyPose = new GeometryPose(this::hasBone);
@@ -133,57 +67,76 @@ public class GeometricModelImpl
 	@Override
 	public void applyPose(GeometryPose pose)
 	{
-		Map<String, GeometryTransforms> bonesBase = basePose.getBoneTransforms();
 		Map<String, GeometryTransforms> poseBones = pose.getBoneTransforms();
 		
-		for(String boneKey : bonesBase.keySet())
+		for(String boneKey : bones.keySet())
 		{
 			ModelBoneF bone = bones.get(boneKey);
 			if(bone == null) continue;
+			bone.reset();
 			
-			GeometryTransforms base = bonesBase.get(boneKey);
 			GeometryTransforms add = poseBones.get(boneKey);
+			if(add == null) continue;
 			
-			Vec3d translate = Vec3d.ZERO, rotate = Vec3d.ZERO, scale = base.scale;
+			Vec3d translate = add.translation,
+					rotate = add.rotation.scale(MathHelper.torad),
+					scale = add.scale;
 			
-			if(add != null)
-			{
-				translate = add.translation;
-				rotate = BlendMode.mult(add.rotation, new Vec3d(-1, -1, -1));
-				scale = BlendMode.mult(scale, add.scale);
-			}
+			bone.offset.add(
+					(float) translate.x,
+					(float) -translate.y,
+					(float) translate.z
+			);
 			
+			bone.getRotation().sub(
+					(float) rotate.x,
+					(float) rotate.y,
+					(float) -rotate.z
+			);
 			
-			Vec3d vec = base.translation.add(translate);
-			bone.offsetX = vec.x / 16;
-			bone.offsetY = vec.y / 16;
-			bone.offsetZ = vec.z / 16;
-			
-			vec = base.rotation.add(rotate);
-			bone.rotateAngleX = (float) (vec.x * MathHelper.torad);
-			bone.rotateAngleY = (float) (vec.y * MathHelper.torad);
-			bone.rotateAngleZ = (float) (vec.z * MathHelper.torad);
-			
-			bone.scaleX = scale.x;
-			bone.scaleY = scale.y;
-			bone.scaleZ = scale.z;
+			bone.getScale().mul(
+					(float) scale.x,
+					(float) scale.y,
+					(float) scale.z
+			);
 		}
 	}
+	
+	public static final VertexFormat POSITION_TEX_LMAP_COLOR_NORMAL = new VertexFormat();
+	
+	static
+	{
+		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(POSITION_3F);
+		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(TEX_2F);
+		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(TEX_2S); // lightmap
+		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(COLOR_4UB);
+		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(NORMAL_3B);
+	}
+	
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void renderModel(RenderData data)
 	{
+		PoseStack pose = new PoseStack();
+		pose.fromGL();
+		
+		GlStateManager.pushMatrix();
+		GlStateManager.loadIdentity();
 		UtilsFX.bindTexture(data.texture);
-		GlStateManager.scale(-1, 1, 1);
-		for(ModelBoneF bone : rootBones)
-			bone.render(data);
+		
+		Tessellator tess = Tessellator.getInstance();
+		BufferBuilder bb = tess.getBuffer();
+		bb.begin(GL11.GL_QUADS, POSITION_TEX_LMAP_COLOR);
+		root.renderCubes(pose, IVertexRenderer.wrap(bb), data.combinedLightIn, data.combinedOverlayIn, data.red, data.green, data.blue, data.alpha);
+		tess.draw();
+		
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
 	public void dispose()
 	{
-		for(ModelBoneF bone : bones.values())
-			bone.dispose();
+	
 	}
 }

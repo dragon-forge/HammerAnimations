@@ -1,5 +1,7 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
+import com.google.common.base.Suppliers;
+import com.google.gson.*;
 import com.zeitheron.hammercore.lib.zlib.json.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -11,6 +13,7 @@ import org.zeith.hammeranims.api.geometry.event.DecodeGeometryEvent;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class GeometryContainerImpl
 		extends IForgeRegistryEntry.Impl<IGeometryContainer>
@@ -30,30 +33,28 @@ public class GeometryContainerImpl
 		this.suffix = ".geo.json";
 	}
 	
-	public static Optional<IGeometryData> defaultReadGeometry(IResourceProvider resources, IGeometryContainer container, Optional<String> text)
+	public static Optional<IGeometryData> defaultReadGeometry(ResourceLocation path, IResourceProvider resources, IGeometryContainer container, Optional<String> text)
 	{
-		return text.map(JSONTokener::new)
-				.flatMap(JSONTokener::nextValueOBJ)
-				.map(json ->
-				{
-					ResourceLocation key = container.getRegistryKey();
-					
-					try
-					{
-						JSONArray geometry = json.getJSONArray("minecraft:geometry");
-						String fmt = json.getString("format_version");
-						
-						DecodeGeometryEvent evt = new DecodeGeometryEvent(resources, container, json, fmt, geometry);
-//						GeometryDecoder.decodeGeometry(evt);
-						HammerAnimationsApi.EVENT_BUS.post(evt);
-						
-						return evt.getDecoded();
-					} catch(Exception e)
-					{
-						HammerAnimations.LOG.error("Failed to load geometry " + key + ", skipping.", e);
-						return null;
-					}
-				});
+		return text.map(txt ->
+		{
+			ResourceLocation key = container.getRegistryKey();
+			
+			try
+			{
+				Supplier<JSONObject> json = Suppliers.memoize(() -> (JSONObject) new JSONTokener(txt).nextValue());
+				Supplier<Object> geometry = Suppliers.memoize(() -> json.get().get("minecraft:geometry"));
+				Supplier<String> fmt = Suppliers.memoize(() -> json.get().getString("format_version"));
+				
+				DecodeGeometryEvent evt = new DecodeGeometryEvent(path, resources, container, json, fmt, geometry, txt);
+				HammerAnimationsApi.EVENT_BUS.post(evt);
+				
+				return evt.getDecoded();
+			} catch(Exception e)
+			{
+				HammerAnimations.LOG.error("Failed to load geometry " + key + ", skipping.", e);
+				return null;
+			}
+		});
 	}
 	
 	@Override
@@ -65,7 +66,7 @@ public class GeometryContainerImpl
 				"bedrock/geometry/" + key.getPath() + suffix
 		);
 		
-		geometry = Optional.ofNullable(defaultReadGeometry(resources, this, resources.readAsString(path)).orElseGet(() ->
+		geometry = Optional.ofNullable(defaultReadGeometry(path, resources, this, resources.readAsString(path)).orElseGet(() ->
 		{
 			HammerAnimations.LOG.warn("Unable to load geometry {} from file {}", key, path);
 			return null;

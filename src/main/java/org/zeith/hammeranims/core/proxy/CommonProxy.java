@@ -25,7 +25,7 @@ public class CommonProxy
 	{
 	}
 	
-	public IGeometricModel createGeometryData(GeometryDataImpl data)
+	public IGeometricModel createGeometryData(GeometryDataImpl def)
 	{
 		return IGeometricModel.EMPTY;
 	}

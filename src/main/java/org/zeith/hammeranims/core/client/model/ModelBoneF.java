@@ -1,198 +1,119 @@
 package org.zeith.hammeranims.core.client.model;
 
-import com.google.common.collect.Lists;
-import net.minecraft.client.renderer.*;
-import net.minecraftforge.fml.relauncher.*;
-import org.zeith.hammeranims.api.geometry.model.RenderData;
+import net.minecraft.client.model.*;
+import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.utils.PoseStack;
+import org.zeith.hammeranims.joml.*;
 
-import java.util.List;
+import java.util.*;
 
 public class ModelBoneF
+		extends ModelRenderer
 {
-	/** The size of the texture file's width in pixels. */
-	public float textureWidth;
-	/** The size of the texture file's height in pixels. */
-	public float textureHeight;
+	private final Vector3f scale = new Vector3f(1, 1, 1);
+	public Vector3f offset = new Vector3f();
+	private final Vector3f rotation; // in radians
+	public Vector3f startRotationRadians;
+	private final Map<String, ModelBoneF> children;
+	public List<ModelCubeF> cubes;
 	
-	public float rotationPointX, rotationPointY, rotationPointZ;
-	public float rotateAngleX, rotateAngleY, rotateAngleZ;
-	public double scaleX = 1.0F, scaleY = 1.0F, scaleZ = 1.0F;
-	public double offsetX, offsetY, offsetZ;
+	private PoseStack.Entry lastTransform = new PoseStack().last();
+	private boolean transformValid;
 	
-	private boolean compiled;
-	
-	/** The GL display list rendered by the Tessellator for this model */
-	private int displayList;
-	
-	public boolean mirror;
-	public boolean showModel;
-	
-	/** Makes this and all child bones hidden. */
-	public boolean isHidden;
-	
-	/** Makes this bone invisible, but all child bones will still render. */
-	public boolean isThisBoneInvisible;
-	
-	public ModelBoneF parent;
-	public List<ModelCubeF> cubeList;
-	public List<ModelBoneF> childModels;
-	public final String boneName;
-	
-	public ModelBoneF(String boneName)
+	public ModelBoneF(ModelBase model, String name, int textureWidth, int textureHeight, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, boolean neverRender)
 	{
-		showModel = true;
-		cubeList = Lists.newArrayList();
-		this.boneName = boneName;
+		super(model, name);
+		this.setTextureSize(textureWidth, textureHeight);
+		this.startRotationRadians = startRotRadians;
+		this.rotation = new Vector3f(startRotRadians);
+		this.isHidden = neverRender;
+		this.children = Collections.unmodifiableMap(children);
+		this.cubes = cubes;
 	}
 	
-	public void register(GeometricModelImpl model)
+	public void renderCubes(PoseStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
-		// IF there is no parent, this is the root.
-		if(parent == null) model.rootBones.add(this);
+		transformValid = true;
 		
-		model.basePose.register(this);
-	}
-	
-	public void resolveOffsets()
-	{
-		if(parent != null)
-		{
-			offsetX -= parent.offsetX;
-			offsetY -= parent.offsetY;
-			offsetZ -= parent.offsetZ;
-
-			rotationPointX -= parent.rotationPointX;
-			rotationPointY -= parent.rotationPointY;
-			rotationPointZ -= parent.rotationPointZ;
-		}
-		
-		if(childModels != null)
-			for(ModelBoneF c : childModels)
-				c.resolveOffsets();
-	}
-	
-	/**
-	 * Sets the current box's rotation points and rotation angles to another box.
-	 */
-	public void addChild(ModelBoneF child)
-	{
-		if(this.childModels == null) this.childModels = Lists.newArrayList();
-		this.childModels.add(child);
-		child.parent = this;
-	}
-	
-	public ModelBoneF addBox(float offX, float offY, float offZ, float width, float height, float depth, CubeUVs uv, float inflate, boolean flipFaces)
-	{
-		this.cubeList.add(new ModelCubeF(this, uv, offX, offY, offZ, width, height, depth, inflate, flipFaces));
-		return this;
-	}
-	
-	public void setRotationPoint(float rotationPointXIn, float rotationPointYIn, float rotationPointZIn)
-	{
-		this.rotationPointX = rotationPointXIn;
-		this.rotationPointY = rotationPointYIn;
-		this.rotationPointZ = rotationPointZIn;
-	}
-	
-	@SideOnly(Side.CLIENT)
-	public void render(RenderData data)
-	{
 		if(!this.isHidden)
 		{
-			if(this.showModel)
-			{
-				if(!this.compiled) this.bake();
-				
-				GlStateManager.pushMatrix();
-				GlStateManager.translate(this.offsetX, this.offsetY, this.offsetZ);
-				
-				if(this.rotateAngleX == 0.0F && this.rotateAngleY == 0.0F && this.rotateAngleZ == 0.0F)
-				{// No rotation is found
-					if(this.rotationPointX == 0.0F && this.rotationPointY == 0.0F && this.rotationPointZ == 0.0F)
-					{// Rotation point not found
-						if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
-						{// Scale found
-							GlStateManager.translate(this.scaleX * 0.0625f, this.scaleY * 0.0625f, this.scaleZ * 0.0625f);
-							GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
-							GlStateManager.translate(-this.scaleX * 0.0625f, -this.scaleY * 0.0625f, -this.scaleZ * 0.0625f);
-						}
-						
-						if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
-						
-						if(this.childModels != null) for(ModelBoneF child : this.childModels) child.render(data);
-					} else
-					{// Rotation point is present
-						GlStateManager.translate(this.rotationPointX, this.rotationPointY, this.rotationPointZ);
-						
-						if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
-						{// Scale found
-							GlStateManager.translate(this.scaleX * 0.0625f, this.scaleY * 0.0625f, this.scaleZ * 0.0625f);
-							GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
-							GlStateManager.translate(-this.scaleX * 0.0625f, -this.scaleY * 0.0625f, -this.scaleZ * 0.0625f);
-						}
-						
-						if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
-						
-						if(this.childModels != null) for(ModelBoneF child : this.childModels) child.render(data);
-					}
-				} else
-				{// Rotation is found
-					GlStateManager.translate(this.rotationPointX, this.rotationPointY, this.rotationPointZ);
-					
-					if(this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)
-					{// Scale found
-						GlStateManager.translate(this.scaleX * 0.0625f, this.scaleY * 0.0625f, this.scaleZ * 0.0625f);
-						GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
-						GlStateManager.translate(-this.scaleX * 0.0625f, -this.scaleY * 0.0625f, -this.scaleZ * 0.0625f);
-					}
-					
-					// Apply rotation
-					if(this.rotateAngleX != 0.0F || this.rotateAngleY != 0.0F || this.rotateAngleZ != 0.0F)
-						GlStateManager.rotate(QuaternionHelper.create(rotateAngleX, rotateAngleY, rotateAngleZ, false));
-					
-					if(!isThisBoneInvisible) GlStateManager.callList(this.displayList);
-					
-					if(this.childModels != null) for(ModelBoneF child : this.childModels) child.render(data);
-				}
-				
-				GlStateManager.popMatrix();
-			}
+			poseStackIn.pushPose();
+			
+			this.translateAndRotate(poseStackIn);
+			
+			poseStackIn.scale(scale.x(), scale.y(), scale.z());
+			
+			lastTransform = poseStackIn.last();
+			
+			this.renderCubes(poseStackIn.last(), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			
+			for(ModelBoneF part : this.children.values())
+				part.renderCubes(poseStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			
+			poseStackIn.popPose();
 		}
 	}
 	
-	/**
-	 * Compiles a GL display list for this model
-	 */
-	@SideOnly(Side.CLIENT)
-	private void bake()
+	public void translateAndRotate(PoseStack matrixStackIn)
 	{
-		this.displayList = GLAllocation.generateDisplayLists(1);
-		GlStateManager.glNewList(this.displayList, 4864);
-		GlStateManager.pushMatrix();
-//		GlStateManager.scale(-1, 1, 1);
-		BufferBuilder bufferbuilder = Tessellator.getInstance().getBuffer();
-		for(ModelCubeF box : this.cubeList) box.bake(bufferbuilder);
-		GlStateManager.popMatrix();
-		GlStateManager.glEndList();
-		this.compiled = true;
+		matrixStackIn.translate(-offset.x() / 16F, -offset.y() / 16F, offset.z() / 16F);
+		matrixStackIn.translate(this.offsetX / 16.0F, this.offsetY / 16.0F, this.offsetZ / 16.0F);
+		
+		if(this.rotation.x() != 0.0F || this.rotation.y() != 0.0F || this.rotation.z() != 0.0F)
+			matrixStackIn.mulPose(new Quaternionf().rotateZYX(rotation.z(), rotation.y(), rotation.x()));
+		
+		if(this.scale.x() != 1.0F || this.scale.y() != 1.0F || this.scale.z() != 1.0F)
+			matrixStackIn.scale(scale.x(), scale.y(), scale.z());
 	}
 	
-	/**
-	 * Returns the model renderer with the new texture parameters.
-	 */
-	public ModelBoneF setTextureSize(int textureWidthIn, int textureHeightIn)
+	private void renderCubes(PoseStack.Entry matrixEntryIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
-		this.textureWidth = (float) textureWidthIn;
-		this.textureHeight = (float) textureHeightIn;
-		return this;
+		for(ModelCubeF cube : cubes)
+			cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
-	public void dispose()
+	public void applyTransform(PoseStack stack)
 	{
-		if(compiled)
-		{
-			GlStateManager.glDeleteLists(this.displayList, 1);
-			compiled = false;
-		}
+		if(isHidden) return;
+		if(!transformValid) return;
+		
+		PoseStack.Entry last = stack.last();
+		last.getPose().set(lastTransform.getPose());
+		last.getNormal().set(lastTransform.getNormal());
+	}
+	
+	public Vector3f getTranslation()
+	{
+		return offset;
+	}
+	
+	public Vector3f getRotation()
+	{
+		return rotation;
+	}
+	
+	public Vector3f getScale()
+	{
+		return scale;
+	}
+	
+	public Map<String, ModelBoneF> getChildren()
+	{
+		return children;
+	}
+	
+	public void reset()
+	{
+		transformValid = false;
+		rotation.set(startRotationRadians.x, startRotationRadians.y, startRotationRadians.z);
+		offset.set(0, 0, 0);
+		scale.set(1, 1, 1);
+	}
+	
+	public void setPos(float x, float y, float z)
+	{
+		offsetX = x;
+		offsetY = y;
+		offsetZ = z;
 	}
 }
