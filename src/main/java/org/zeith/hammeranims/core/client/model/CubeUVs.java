@@ -1,105 +1,140 @@
 package org.zeith.hammeranims.core.client.model;
 
-import net.minecraft.world.phys.Vec3;
+import org.zeith.hammeranims.core.impl.api.geometry.decoder.UVDefinition;
 import org.zeith.hammeranims.core.utils.EnumFacing;
+import org.joml.*;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.lang.Math;
+import java.util.Map;
 
-public class CubeUVs
+public interface CubeUVs
 {
-	public final Map<EnumFacing, float[]> uvMap = new HashMap<>();
+	SizedUV get(EnumFacing direction);
 	
-	public CubeUVs()
+	class BoxUVResolver
+			implements CubeUVs
 	{
+		private final Vector2i uv;
+		private final Vector3f size;
+		
+		public BoxUVResolver(Vector2i uv, Vector3f size)
+		{
+			this.uv = uv;
+			this.size = size;
+		}
+		
+		@Override
+		public SizedUV get(EnumFacing direction)
+		{
+			switch(direction)
+			{
+				case EAST:
+					return SizedUV.fromFloats(uv.x(),
+							uv.y() + depth(), uv.x() + depth(), uv.y() + depth() + height()
+					);
+				case WEST:
+					return SizedUV.fromFloats(
+							uv.x() + depth() + width(),
+							uv.y() + depth(), uv.x() + depth() + width() + depth(), uv.y() + depth() + height()
+					);
+				case DOWN:
+					return SizedUV.fromFloats(
+							uv.x() + depth() + width(), uv.y() + depth(), uv.x() + depth() + width() + width(), uv.y());
+				case UP:
+					return SizedUV.fromFloats(
+							uv.x() + depth(), uv.y(), uv.x() + depth() + width(), uv.y() + depth());
+				case NORTH:
+					return SizedUV.fromFloats(
+							uv.x() + depth(),
+							uv.y() + depth(), uv.x() + depth() + width(), uv.y() + depth() + height()
+					);
+				case SOUTH:
+					return SizedUV.fromFloats(
+							uv.x() + depth() + width() + depth(),
+							uv.y() + depth(),
+							uv.x() + depth() + width() + depth() + width(), uv.y() + depth() + height()
+					);
+				default:
+					throw new IllegalStateException("Wtf?");
+			}
+		}
+		
+		public int width()
+		{
+			return (int) size.x();
+		}
+		
+		public int height()
+		{
+			return (int) size.y();
+		}
+		
+		public int depth()
+		{
+			return (int) size.z();
+		}
 	}
 	
-	public CubeUVs(Vec3 size, float texU, float texV)
+	class FacedUVResolver
+			implements CubeUVs
 	{
-		float dx = (float) size.x, dy = (float) size.y, dz = (float) size.z;
+		private final Map<EnumFacing, UVDefinition.FaceUVDefinition> mappings;
 		
-		uvMap.put(EnumFacing.DOWN, new float[] {
-				texU + dz + dx, texV + dz, texU + dz + dx + dx, texV,
-		});
+		public FacedUVResolver(Map<EnumFacing, UVDefinition.FaceUVDefinition> mappings)
+		{
+			this.mappings = mappings;
+		}
 		
-		uvMap.put(EnumFacing.UP, new float[] {
-				texU + dz, texV, texU + dz + dx, texV + dz
-		});
-		
-		uvMap.put(EnumFacing.NORTH, new float[] {
-				texU + dz, texV + dz, texU + dz + dx, texV + dz + dy,
-		});
-		
-		uvMap.put(EnumFacing.SOUTH, new float[] {
-				texU + dz + dx + dz, texV + dz, texU + dz + dx + dz + dx, texV + dz + dy,
-		});
-		
-		uvMap.put(EnumFacing.WEST, new float[] {
-				texU, texV + dz, texU + dz, texV + dz + dy,
-		});
-		
-		uvMap.put(EnumFacing.EAST, new float[] {
-				texU + dz + dx, texV + dz, texU + dz + dx + dz, texV + dz + dy,
-		});
+		@Override
+		public SizedUV get(EnumFacing direction)
+		{
+			UVDefinition.FaceUVDefinition uvDefinition = mappings.get(direction);
+			if(uvDefinition == null) throw new IllegalStateException("???");
+			
+			return new SizedUV(uvDefinition.uv().x(), uvDefinition.uv().y(),
+					uvDefinition.uv().x() + uvDefinition.size().x(), uvDefinition.uv().y() + uvDefinition.size().y()
+			);
+		}
 	}
 	
-	public void generateQuads(Consumer<TexturedQuadF> quadConsumer,
-							  float textureWidth, float textureHeight,
-							  VertexF v1, VertexF v2, VertexF v3, VertexF v4,
-							  VertexF v5, VertexF v6, VertexF v7, VertexF v8)
+	class SizedUV
 	{
-		// Y- DOWN
-		EnumFacing face = EnumFacing.DOWN;
-		float[] uvs = uvMap.get(face);
-		if(uvs != null && uvs.length == 4)
-			quadConsumer.accept(new TexturedQuadF(new VertexF[] {v6, v5, v1, v2},
-					uvs[0], uvs[1], uvs[2], uvs[3],
-					textureWidth, textureHeight
-			));
+		private final int u1;
+		private final int v1;
+		private final int u2;
+		private final int v2;
 		
-		// Y+ UP
-		face = EnumFacing.UP;
-		uvs = uvMap.get(face);
-		if(uvs != null && uvs.length == 4)
-			quadConsumer.accept(new TexturedQuadF(new VertexF[] {v3, v4, v8, v7},
-					uvs[0], uvs[1], uvs[2], uvs[3],
-					textureWidth, textureHeight
-			));
+		public SizedUV(int u1, int v1, int u2, int v2)
+		{
+			this.u1 = u1;
+			this.v1 = v1;
+			this.u2 = u2;
+			this.v2 = v2;
+		}
 		
-		// Z- NORTH
-		face = EnumFacing.NORTH;
-		uvs = uvMap.get(face);
-		if(uvs != null && uvs.length == 4)
-			quadConsumer.accept(new TexturedQuadF(new VertexF[] {v2, v1, v4, v3},
-					uvs[0], uvs[1], uvs[2], uvs[3],
-					textureWidth, textureHeight
-			));
+		public int u1()
+		{
+			return u1;
+		}
 		
-		// Z+ SOUTH
-		face = EnumFacing.SOUTH;
-		uvs = uvMap.get(face);
-		if(uvs != null && uvs.length == 4)
-			quadConsumer.accept(new TexturedQuadF(new VertexF[] {v5, v6, v7, v8},
-					uvs[0], uvs[1], uvs[2], uvs[3],
-					textureWidth, textureHeight
-			));
+		public int v1()
+		{
+			return v1;
+		}
 		
-		// X+ EAST
-		face = EnumFacing.EAST;
-		uvs = uvMap.get(face);
-		if(uvs != null && uvs.length == 4)
-			quadConsumer.accept(new TexturedQuadF(new VertexF[] {v1, v5, v8, v4},
-					uvs[0], uvs[1], uvs[2], uvs[3],
-					textureWidth, textureHeight
-			));
+		public int u2()
+		{
+			return u2;
+		}
 		
-		// X- WEST
-		face = EnumFacing.WEST;
-		uvs = uvMap.get(face);
-		if(uvs != null && uvs.length == 4)
-			quadConsumer.accept(new TexturedQuadF(new VertexF[] {v6, v2, v3, v7},
-					uvs[0], uvs[1], uvs[2], uvs[3],
-					textureWidth, textureHeight
-			));
+		public int v2()
+		{
+			return v2;
+		}
+		
+		public static SizedUV fromFloats(float u1, float v1, float u2, float v2)
+		{
+			return new SizedUV((int) Math.ceil(u1), (int) Math.ceil(v1), (int) Math.ceil(u2), (int) Math.ceil(v2));
+		}
 	}
 }

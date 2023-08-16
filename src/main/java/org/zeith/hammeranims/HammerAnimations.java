@@ -17,6 +17,7 @@ import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
 import org.zeith.hammeranims.core.proxy.*;
 import org.zeith.hammeranims.core.utils.BasicRegistrar;
+import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.event.fml.FMLFingerprintCheckEvent;
 import org.zeith.hammerlib.util.CommonMessages;
 import org.zeith.hammerlib.util.mcf.ScanDataHelper;
@@ -47,6 +48,8 @@ public class HammerAnimations
 		
 		LOG.info("{} is constructing.", MOD_NAME);
 		PROXY.construct();
+		
+		LanguageAdapter.registerMod(MOD_ID);
 		
 		scan(RegisterAnimations.class, (n, mod) -> BasicRegistrar.perform(IAnimationContainer.class, HammerAnimationsApi::animations, n, mod));
 		scan(RegisterGeometries.class, (n, mod) -> BasicRegistrar.perform(IGeometryContainer.class, HammerAnimationsApi::geometries, n, mod));
