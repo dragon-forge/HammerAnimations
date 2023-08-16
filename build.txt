@@ -7,7 +7,7 @@ git_commit=https://github.com/dragon-forge/HammerAnimations/commit/{{hash}}
 forge_version=14.23.5.2847
 minecraft_version=1.12.2
 mcp=stable_39
-hl_version=2.0.6.33
+hl_version=2.0.6.34
 jei_version=4.16.1.302
 # viveapi_version=12.1.1
 
@@ -15,6 +15,6 @@ jei_version=4.16.1.302
 mod_id=hammeranims
 mod_id_fancy=HammerAnimations
 mod_name=HammerAnimations
-mod_version=12.2.7
+mod_version=12.2.8
 cf_project=899883
 release_type=release

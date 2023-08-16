@@ -19,7 +19,7 @@ import org.zeith.hammeranims.core.utils.reg.*;
 import java.lang.annotation.Annotation;
 import java.util.function.BiConsumer;
 
-@Mod(modid = HammerAnimations.MOD_ID, name = HammerAnimations.MOD_NAME, version = "@VERSION@", certificateFingerprint = "@FINGERPRINT@", dependencies = "required-after:hammercore", updateJSON = "https://api.modrinth.com/updates/C7cTlgwS/forge_updates.json")
+@Mod(modid = HammerAnimations.MOD_ID, name = HammerAnimations.MOD_NAME, version = "@VERSION@", certificateFingerprint = "9f5e2a811a8332a842b34f6967b7db0ac4f24856", dependencies = "required-after:hammercore", updateJSON = "https://api.modrinth.com/updates/C7cTlgwS/forge_updates.json")
 public class HammerAnimations
 {
 	public static final String ROOT_PACKAGE = "org.zeith.hammeranims";
