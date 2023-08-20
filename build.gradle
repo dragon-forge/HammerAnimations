@@ -104,6 +104,14 @@ task deobfJar(type: Jar) {
     classifier = 'deobf'
     manifest {
         attributes 'FMLAT': "${config.mod_id}_at.cfg"
+
+        attributes "Specification-Title": config.mod_id_fancy
+        attributes "Specification-Vendor": "Zeitheron"
+        attributes "Specification-Version": "1"
+        attributes "Implementation-Title": config.mod_id_fancy
+        attributes "Implementation-Version": config.mod_version
+        attributes "Implementation-Vendor": "Zeitheron"
+        attributes "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
     }
 }
 
@@ -112,12 +120,28 @@ task srcJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
 	manifest {
         attributes 'FMLAT': "${config.mod_id}_at.cfg"
+
+        attributes "Specification-Title": config.mod_id_fancy
+        attributes "Specification-Vendor": "Zeitheron"
+        attributes "Specification-Version": "1"
+        attributes "Implementation-Title": config.mod_id_fancy
+        attributes "Implementation-Version": config.mod_version
+        attributes "Implementation-Vendor": "Zeitheron"
+        attributes "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
     }
 }
 
 jar {
 	manifest {
 		attributes 'FMLAT': "${config.mod_id}_at.cfg"
+
+        attributes "Specification-Title": config.mod_id_fancy
+        attributes "Specification-Vendor": "Zeitheron"
+        attributes "Specification-Version": "1"
+        attributes "Implementation-Title": config.mod_id_fancy
+        attributes "Implementation-Version": config.mod_version
+        attributes "Implementation-Vendor": "Zeitheron"
+        attributes "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 	}
 }
 

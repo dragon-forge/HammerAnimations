@@ -1,10 +1,11 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
 import net.minecraft.client.model.ModelBase;
+import net.minecraftforge.fml.relauncher.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
-import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.model.ModelBoneF;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.*;
 
@@ -18,12 +19,16 @@ public class GeometryDataImpl
 	protected final ModelMaterialInfo material;
 	protected final Map<String, ModelPartInfo> bones = new HashMap<>();
 	
+	protected final PositionalModelImpl positionalModel;
+	
 	private GeometryDataImpl(IGeometryContainer container, ModelMeshInfo mesh, ModelMaterialInfo material)
 	{
 		this.container = container;
 		this.mesh = mesh;
 		this.material = material;
 		registerBone(mesh.getRoot());
+		
+		this.positionalModel = PositionalModelImpl.create(container, mesh);
 	}
 	
 	protected void registerBone(ModelPartInfo part)
@@ -32,6 +37,7 @@ public class GeometryDataImpl
 		part.getChildren().forEach(this::registerBone);
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public ModelBoneF bakeRoot(ModelBase model)
 	{
 		return this.mesh.getRoot().bake(model, null, material.getTextureWidth(), material.getTextureHeight());
@@ -67,8 +73,15 @@ public class GeometryDataImpl
 	}
 	
 	@Override
+	public IPositionalModel getPositionalModel()
+	{
+		positionalModel.resetPose();
+		return positionalModel;
+	}
+	
+	@Override
 	public IGeometryContainer getContainer()
 	{
-		return null;
+		return container;
 	}
 }

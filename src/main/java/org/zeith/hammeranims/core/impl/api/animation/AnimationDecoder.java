@@ -13,8 +13,6 @@ import java.util.*;
 
 public class AnimationDecoder
 {
-	public static boolean readBones;
-	
 	static
 	{
 		HammerAnimationsApi.EVENT_BUS.register(AnimationDecoder.class);
@@ -51,21 +49,18 @@ public class AnimationDecoder
 		Duration time = Duration.ofMillis(Math.round(obj.getDouble("animation_length") * 1000));
 		Map<String, BoneAnimation> bones = new HashMap<>();
 		
-		if(readBones)
+		JSONObject bonesObj = obj.getJSONObject("bones");
+		for(String boneKey : bonesObj.keySet())
 		{
-			JSONObject bonesObj = obj.getJSONObject("bones");
-			for(String boneKey : bonesObj.keySet())
+			BoneAnimation parse = BoneAnimation.parse(loc, bonesObj.getJSONObject(boneKey));
+			if(parse == null)
 			{
-				BoneAnimation parse = BoneAnimation.parse(loc, bonesObj.getJSONObject(boneKey));
-				if(parse == null)
-				{
-					HammerAnimations.LOG.warn(
-							"Unable to parse " + e.container.getRegistryKey() + "#" + e.key + " animation's bone " +
-									boneKey + ", skipping.");
-					continue;
-				}
-				bones.put(boneKey, parse);
+				HammerAnimations.LOG.warn(
+						"Unable to parse " + e.container.getRegistryKey() + "#" + e.key + " animation's bone " +
+								boneKey + ", skipping.");
+				continue;
 			}
+			bones.put(boneKey, parse);
 		}
 		
 		final LoopMode mode = modeRaw;

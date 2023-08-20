@@ -3,13 +3,44 @@ package org.zeith.hammeranims.api.geometry.model;
 import net.minecraftforge.fml.relauncher.*;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 
+import javax.annotation.Nullable;
+import java.util.*;
+
 /**
  * Interface for defining a geometric model with pose manipulation and rendering capabilities.
  */
 public interface IGeometricModel
+		extends IGenericModel
 {
 	IGeometricModel EMPTY = new IGeometricModel()
 	{
+		private final GeometryPose pose = new GeometryPose(s -> false);
+		
+		@Override
+		public Set<String> getBoneNames()
+		{
+			return Collections.emptySet();
+		}
+		
+		@Override
+		public Collection<IBone> getBones()
+		{
+			return Collections.emptySet();
+		}
+		
+		@Nullable
+		@Override
+		public IBone getBone(String bone)
+		{
+			return null;
+		}
+		
+		@Override
+		public boolean hasBone(String bone)
+		{
+			return false;
+		}
+		
 		@Override
 		public void resetPose()
 		{
@@ -18,7 +49,8 @@ public interface IGeometricModel
 		@Override
 		public GeometryPose emptyPose()
 		{
-			return new GeometryPose(s -> false);
+			pose.reset();
+			return pose;
 		}
 		
 		@Override
@@ -39,26 +71,6 @@ public interface IGeometricModel
 	};
 	
 	/**
-	 * Resets the pose of the geometric model to its default state.
-	 */
-	void resetPose();
-	
-	/**
-	 * Gets an empty pose with no bones configured.
-	 * This is used for applying animation system to the model.
-	 * The returned object may or may not be a new instance, but is guaranteed to have no configurations.
-	 */
-	GeometryPose emptyPose();
-	
-	/**
-	 * Applies the specified pose to the geometric model's default state.
-	 *
-	 * @param pose
-	 * 		The pose to apply.
-	 */
-	void applyPose(GeometryPose pose);
-	
-	/**
 	 * Renders the model using the provided render data.
 	 *
 	 * @param data
@@ -66,16 +78,6 @@ public interface IGeometricModel
 	 */
 	@SideOnly(Side.CLIENT)
 	void renderModel(RenderData data);
-	
-	/**
-	 * Applies a given animation system to this model. This uses {@link #emptyPose()}, then applies animation system to that and copies the pose over to bones.
-	 */
-	default void applySystem(float partialTime, AnimationSystem system)
-	{
-		GeometryPose pose = emptyPose();
-		system.applyAnimation(partialTime, pose);
-		applyPose(pose);
-	}
 	
 	/**
 	 * Disposes this model and it's used GPU/memory resources.

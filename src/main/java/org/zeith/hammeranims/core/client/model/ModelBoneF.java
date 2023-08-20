@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.client.model;
 
 import net.minecraft.client.model.*;
+import org.zeith.hammeranims.api.geometry.model.IBone;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.utils.PoseStack;
 import org.zeith.hammeranims.joml.*;
@@ -9,6 +10,7 @@ import java.util.*;
 
 public class ModelBoneF
 		extends ModelRenderer
+		implements IBone
 {
 	private final Vector3f scale = new Vector3f(1, 1, 1);
 	public Vector3f offset = new Vector3f();
@@ -82,21 +84,31 @@ public class ModelBoneF
 		last.getNormal().set(lastTransform.getNormal());
 	}
 	
+	@Override
+	public String getName()
+	{
+		return boxName;
+	}
+	
+	@Override
 	public Vector3f getTranslation()
 	{
 		return offset;
 	}
 	
+	@Override
 	public Vector3f getRotation()
 	{
 		return rotation;
 	}
 	
+	@Override
 	public Vector3f getScale()
 	{
 		return scale;
 	}
 	
+	@Override
 	public Map<String, ModelBoneF> getChildren()
 	{
 		return children;

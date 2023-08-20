@@ -1,12 +1,16 @@
 package org.zeith.hammeranims.core.contents.blocks;
 
 import com.zeitheron.hammercore.tile.TileSyncableTickable;
+import com.zeitheron.hammercore.utils.math.MathHelper;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumParticleTypes;
 import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
+import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.tile.IAnimatedTile;
 import org.zeith.hammeranims.core.init.*;
+import org.zeith.hammeranims.joml.*;
 
 public class TileBilly
 		extends TileSyncableTickable
@@ -17,9 +21,16 @@ public class TileBilly
 	@Override
 	public void setupSystem(AnimationSystem.Builder builder)
 	{
-		builder.addLayers(AnimationLayer.builder(CommonLayerNames.LEGS))
+		builder.addLayers(AnimationLayer.builder(CommonLayerNames.LEGS)
+						.mask(
+								ContainersHA.BILLY_GEOM.getPositionalModel()
+										.maskAnyOfOrChildren("body")
+						)
+				)
 				.addLayers(AnimationLayer.builder(CommonLayerNames.AMBIENT));
 	}
+	
+	protected final Matrix4f mat = new Matrix4f();
 	
 	@Override
 	public void tick()
@@ -28,7 +39,7 @@ public class TileBilly
 		animations.tick();
 		
 		int power = world.getRedstonePowerFromNeighbors(pos);
-
+		
 		if(power > 0)
 			animations.startAnimationAt(CommonLayerNames.LEGS, ContainersHA.BILLY_WALK.configure()
 					.speed(power / 15F)
@@ -45,8 +56,24 @@ public class TileBilly
 //		else
 //			animations.startAnimationAt(CommonLayerNames.LEGS, ConfiguredAnimation.noAnimation()
 //					.transitionTime(1F));
-
-		animations.startAnimationAt(CommonLayerNames.AMBIENT, org.zeith.hammeranims.core.init.ContainersHA.BILLY_BREATHE.configure().speed(0.5F));
+		
+		animations.startAnimationAt(CommonLayerNames.AMBIENT, ContainersHA.BILLY_BREATHE.configure()
+				.speed(0.5F));
+		
+		mat.identity()
+				.translate(pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F)
+				.rotateY((float) (MathHelper.torad * 0));
+		IPositionalModel posMod = ContainersHA.BILLY_GEOM.getPositionalModel();
+		posMod.applySystem(1F, animations);
+		if(posMod.applyBoneTransforms(mat, "bob"))
+		{
+			Vector3f relativePos = new Vector3f(-2 / 16F, 1 / 16F, 1 / 16F);
+			mat.transformPosition(relativePos);
+			
+			if(atTickRate(5))
+				world.spawnParticle(EnumParticleTypes.END_ROD, relativePos.x, relativePos.y, relativePos.z, 0, 0.1, 0);
+		}
+		
 	}
 	
 	@Override

@@ -18,6 +18,7 @@ public class AnimationLayer
 		implements ICompoundSerializable
 {
 	public final AnimationSystem system;
+	public final ILayerMask mask;
 	public final Query query;
 	public final String name;
 	public final BlendMode mode;
@@ -29,9 +30,10 @@ public class AnimationLayer
 	
 	public float weight = 1F;
 	
-	public AnimationLayer(AnimationSystem sys, Query query, String name, BlendMode mode)
+	public AnimationLayer(AnimationSystem sys, ILayerMask mask, Query query, String name, BlendMode mode)
 	{
 		this.system = sys;
+		this.mask = mask;
 		this.query = query;
 		this.name = name;
 		this.mode = mode;
@@ -57,14 +59,7 @@ public class AnimationLayer
 			if(currentAnimation != null)
 			{
 				ConfiguredAnimation cur = currentAnimation.config;
-				
-				if(cur.speed == animation.speed && cur.weight == animation.weight
-						&& cur.loopMode == animation.loopMode
-						&& cur.transitionTime == animation.transitionTime
-						&& cur.timeFunction == animation.timeFunction
-						&& cur.reverse == animation.reverse
-						&& cur.animation == animation.animation
-				) return false;
+				if(cur.same(animation)) return false;
 				else break check;
 			}
 			
@@ -91,7 +86,7 @@ public class AnimationLayer
 								   this.weight *
 								   lastAnimation.config.weight;
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
-			pose.apply(lastAnimation.config.animation.getData(), mode, weight, query);
+			pose.apply(lastAnimation.config.animation.getData(), mask, mode, weight, query);
 		}
 		
 		if(currentAnimation != null)
@@ -101,7 +96,7 @@ public class AnimationLayer
 						   (float) Math.min(sysTime - startTime, transitionTime) / transitionTime * this.weight *
 								   currentAnimation.config.weight;
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
-			pose.apply(currentAnimation.config.animation.getData(), mode, weight, query);
+			pose.apply(currentAnimation.config.animation.getData(), mask, mode, weight, query);
 		}
 	}
 	
@@ -171,6 +166,7 @@ public class AnimationLayer
 		
 		protected float weight = 1F;
 		protected Query query = new Query();
+		protected ILayerMask mask = ILayerMask.TRUE;
 		protected BlendMode blendMode = BlendMode.ADD;
 		
 		public Builder(String name)
@@ -181,6 +177,12 @@ public class AnimationLayer
 		public Builder query(Query query)
 		{
 			this.query = query;
+			return this;
+		}
+		
+		public Builder mask(ILayerMask mask)
+		{
+			this.mask = mask;
 			return this;
 		}
 		
@@ -198,7 +200,7 @@ public class AnimationLayer
 		
 		public AnimationLayer build(AnimationSystem sys)
 		{
-			AnimationLayer layer = new AnimationLayer(sys, query, name, blendMode);
+			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode);
 			layer.weight = weight;
 			return layer;
 		}

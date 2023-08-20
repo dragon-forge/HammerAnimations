@@ -1,0 +1,14 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"breathe": {
+			"loop": true,
+			"animation_length": 1.25,
+			"bones": {
+				"chest": {
+					"scale": "1 + math.sin(query.anim_time / 1.25 * 360) * 0.01 + 0.01"
+				}
+			}
+		}
+	}
+}

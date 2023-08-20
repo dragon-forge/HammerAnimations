@@ -25,11 +25,6 @@ import java.util.*;
 public class ClientProxy
 		extends CommonProxy
 {
-	public ClientProxy()
-	{
-		AnimationDecoder.readBones = true;
-	}
-	
 	protected static final List<IGeometricModel> createdModels = new ArrayList<>();
 	protected static final List<IGeometricModel> disposeModels = new ArrayList<>();
 	

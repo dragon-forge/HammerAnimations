@@ -1,6 +1,9 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
+import net.minecraftforge.fml.relauncher.*;
 import org.zeith.hammeranims.core.client.model.ModelCubeF;
+import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl;
+import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl.PositionalBone;
 import org.zeith.hammeranims.joml.Vector3f;
 
 public class ModelCubeInfo
@@ -20,6 +23,7 @@ public class ModelCubeInfo
 		this.mirrored = mirrored;
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public ModelCubeF bake(ModelPartInfo ownerPart, int textureWidth, int textureHeight)
 	{
 		//The position of the cube, relative to the entity origin - located at the bottom front left point of the cube.

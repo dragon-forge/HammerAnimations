@@ -16,6 +16,9 @@ public interface ContainersHA
 	@Key("billy")
 	IAnimationContainer BILLY_ANIM = IAnimationContainer.create();
 	
+	@Key("billy_breathe")
+	IAnimationContainer BILLY_BREATHE = IAnimationContainer.create();
+	
 	@Key("billy")
 	IGeometryContainer BILLY_GEOM = IGeometryContainer.create();
 	
@@ -23,5 +26,4 @@ public interface ContainersHA
 	PrintHelloWorldAction HELLO_WORLD_ACTION = new PrintHelloWorldAction();
 	
 	AnimationHolder BILLY_WALK = new AnimationHolder(BILLY_ANIM, "walk");
-	AnimationHolder BILLY_BREATHE = new AnimationHolder(BILLY_ANIM, "breathe");
 }
