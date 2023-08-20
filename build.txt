@@ -1,5 +1,5 @@
 # Mod Info
-mod_version=20.1.3
+mod_version=20.1.9
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)

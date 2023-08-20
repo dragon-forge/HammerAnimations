@@ -58,12 +58,11 @@ minecraft {
             workingDirectory project.file('run/client')
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', config.mod_id
+            property "mixin.env.disableRefMap", "true"
             def args = new ArrayList()
 
             args.add "--mixin"
             args.add "mixins.${config.mod_id}.json"
-
-            args.add "-Dmixin.env.disableRefMap=true"
 
             if (hasConfig("mc_user") && !config.mc_user.isEmpty()) {
                 def userId = config.mc_user.split(',', 2)
@@ -87,10 +86,10 @@ minecraft {
             workingDirectory project.file('run/server')
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', config.mod_id
+            property "mixin.env.disableRefMap", "true"
             def args = new ArrayList()
             args.add "--mixin"
             args.add "mixins.${config.mod_id}.json"
-            args.add "-Dmixin.env.disableRefMap=true"
             setArgs(args)
             mods {
                 "${mod_id}" {

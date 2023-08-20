@@ -3,13 +3,15 @@ package org.zeith.hammeranims.core.impl.api.animation;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
-import org.zeith.hammeranims.api.animation.IAnimationContainer;
+import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.animation.event.*;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
-import org.zeith.hammerlib.util.shaded.json.JSONTokener;
+import org.zeith.hammeranims.core.init.DefaultsHA;
+import org.zeith.hammerlib.util.shaded.json.*;
 
-import java.util.Optional;
+import javax.annotation.Nonnull;
+import java.util.*;
 
 public class AnimationContainerImpl
 		implements IAnimationContainer
@@ -27,6 +29,27 @@ public class AnimationContainerImpl
 	{
 		this.suffix = ".animation.json";
 	}
+	
+	protected Animation defaultAnimation;
+	protected final AnimationHolder onlyHolder = new AnimationHolder(this, "default")
+	{
+		@Nonnull
+		@Override
+		public Animation get()
+		{
+			Animation animation = defaultAnimation;
+			if(animation == null)
+			{
+				if(this == DefaultsHA.NULL_ANIM)
+				{
+					HammerAnimations.LOG.warn("Unable to find default null animation. This is not supposed to happen!");
+					return null;
+				}
+				return DefaultsHA.NULL_ANIM.get();
+			}
+			return animation;
+		}
+	};
 	
 	public static Optional<IReadAnimationHolder> defaultReadAnimation(IResourceProvider resources, IAnimationContainer container, Optional<String> text)
 	{
@@ -78,6 +101,13 @@ public class AnimationContainerImpl
 			return null;
 		}))).orElse(IReadAnimationHolder.EMPTY);
 		
+		Collection<Animation> anims = animations.values();
+		
+		if(anims.size() == 1)
+			defaultAnimation = anims.iterator().next();
+		else
+			defaultAnimation = DefaultsHA.NULL_ANIM.get();
+		
 		HammerAnimations.LOG.debug("Loaded {} animations in {}: {}", animations.getKeySet()
 				.size(), key, animations.getKeySet());
 	}
@@ -86,6 +116,13 @@ public class AnimationContainerImpl
 	public IReadAnimationHolder getAnimations()
 	{
 		return animations;
+	}
+	
+	@Nonnull
+	@Override
+	public AnimationHolder holder()
+	{
+		return onlyHolder;
 	}
 	
 	@Override

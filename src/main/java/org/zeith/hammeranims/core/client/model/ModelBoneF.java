@@ -2,6 +2,7 @@ package org.zeith.hammeranims.core.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelPart;
+import org.zeith.hammeranims.api.geometry.model.IBone;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.joml.*;
 
@@ -9,6 +10,7 @@ import java.util.*;
 
 public class ModelBoneF
 		extends ModelPart
+		implements IBone
 {
 	public final String boxName;
 	private final Vector3f scale = new Vector3f(1, 1, 1);
@@ -18,10 +20,7 @@ public class ModelBoneF
 	private final Map<String, ModelBoneF> children;
 	public List<ModelCubeF> cubes;
 	
-	private PoseStack.Pose lastTransform = new PoseStack().last();
-	private boolean transformValid;
-	
-	public ModelBoneF(String name, int textureWidth, int textureHeight, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, boolean neverRender)
+	public ModelBoneF(String name, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, boolean neverRender)
 	{
 		super(Collections.emptyList(), Collections.emptyMap());
 		this.boxName = name;
@@ -34,17 +33,11 @@ public class ModelBoneF
 	
 	public void renderCubes(PoseStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
-		transformValid = true;
-		
 		if(visible)
 		{
 			poseStackIn.pushPose();
 			
 			this.translateAndRotate(poseStackIn);
-			
-			poseStackIn.scale(scale.x(), scale.y(), scale.z());
-			
-			lastTransform = poseStackIn.last();
 			
 			this.renderCubes(poseStackIn.last(), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			
@@ -73,30 +66,31 @@ public class ModelBoneF
 			cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
-	public void applyTransform(PoseStack stack)
+	@Override
+	public String getName()
 	{
-		if(!transformValid || !visible) return;
-		
-		PoseStack.Pose last = stack.last();
-		last.pose().set(lastTransform.pose());
-		last.normal().set(lastTransform.normal());
+		return boxName;
 	}
 	
+	@Override
 	public Vector3f getTranslation()
 	{
 		return offset;
 	}
 	
+	@Override
 	public Vector3f getRotation()
 	{
 		return rotation;
 	}
 	
+	@Override
 	public Vector3f getScale()
 	{
 		return scale;
 	}
 	
+	@Override
 	public Map<String, ModelBoneF> getChildren()
 	{
 		return children;
@@ -104,7 +98,6 @@ public class ModelBoneF
 	
 	public void reset()
 	{
-		transformValid = false;
 		rotation.set(startRotationRadians.x, startRotationRadians.y, startRotationRadians.z);
 		offset.set(0, 0, 0);
 		scale.set(1, 1, 1);

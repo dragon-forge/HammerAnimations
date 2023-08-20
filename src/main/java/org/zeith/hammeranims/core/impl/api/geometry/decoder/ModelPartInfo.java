@@ -3,8 +3,10 @@ package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.util.Mth;
+import net.minecraftforge.api.distmarker.*;
 import org.joml.Vector3f;
 import org.zeith.hammeranims.core.client.model.*;
+import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl.PositionalBone;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -49,6 +51,30 @@ public class ModelPartInfo
 		return children;
 	}
 	
+	public PositionalBone bakePositional(@Nullable ModelPartInfo parent)
+	{
+		Vector3f rotationRads = new Vector3f(
+				Mth.DEG_TO_RAD * (rotationDegrees.x()),
+				Mth.DEG_TO_RAD * (rotationDegrees.y()),
+				Mth.DEG_TO_RAD * (rotationDegrees.z())
+		);
+		
+		rotationRads.mul(-1, -1, 1);
+		
+		Object2ObjectArrayMap<String, PositionalBone> bakedChildren = new Object2ObjectArrayMap<>();
+		for(ModelPartInfo child : children)
+			bakedChildren.put(child.name, child.bakePositional(this));
+		
+		PositionalBone part = new PositionalBone(name, rotationRads, bakedChildren);
+		if(parent != null)
+			part.setPos(-(pivot.x() - parent.pivot.x()), (pivot.y() - parent.pivot.y()), pivot.z() - parent.pivot.z());
+		else
+			part.setPos(-pivot.x(), pivot.y(), pivot.z());
+		
+		return part;
+	}
+	
+	@OnlyIn(Dist.CLIENT)
 	public ModelBoneF bake(@Nullable ModelPartInfo parent, int textureWidth, int textureHeight)
 	{
 		ImmutableList.Builder<ModelCubeF> bakedCubes = ImmutableList.builder();
@@ -68,7 +94,7 @@ public class ModelPartInfo
 		for(ModelPartInfo child : children)
 			bakedChildren.put(child.name, child.bake(this, textureWidth, textureHeight));
 		
-		ModelBoneF part = new ModelBoneF(name, textureWidth, textureHeight, rotationRads, bakedCubes.build(), bakedChildren, neverRender);
+		ModelBoneF part = new ModelBoneF(name, rotationRads, bakedCubes.build(), bakedChildren, neverRender);
 		if(parent != null)
 			part.setPos(-(pivot.x() - parent.pivot.x()), (pivot.y() - parent.pivot.y()), pivot.z() - parent.pivot.z());
 		else

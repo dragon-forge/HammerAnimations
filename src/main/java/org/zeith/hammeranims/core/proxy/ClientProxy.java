@@ -23,11 +23,6 @@ public class ClientProxy
 	protected static final List<IGeometricModel> createdModels = new ArrayList<>();
 	protected static final List<IGeometricModel> disposeModels = new ArrayList<>();
 	
-	public ClientProxy()
-	{
-		AnimationDecoder.readBones = true;
-	}
-	
 	@Override
 	public void construct()
 	{

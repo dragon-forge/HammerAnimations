@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.geometry.data;
 
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
-import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.geometry.model.*;
 
 import java.util.*;
 
@@ -36,6 +36,12 @@ public interface IGeometryData
 			}
 			
 			@Override
+			public IPositionalModel getPositionalModel()
+			{
+				return IPositionalModel.EMPTY;
+			}
+			
+			@Override
 			public IGeometryContainer getContainer()
 			{
 				return container;
@@ -50,6 +56,8 @@ public interface IGeometryData
 	Set<String> getBones();
 	
 	IGeometricModel createModel();
+	
+	IPositionalModel getPositionalModel();
 	
 	IGeometryContainer getContainer();
 }

@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
+import net.minecraftforge.api.distmarker.*;
 import org.zeith.hammeranims.core.client.model.ModelCubeF;
 import org.joml.Vector3f;
 
@@ -20,6 +21,7 @@ public class ModelCubeInfo
 		this.mirrored = mirrored;
 	}
 	
+	@OnlyIn(Dist.CLIENT)
 	public ModelCubeF bake(ModelPartInfo ownerPart, int textureWidth, int textureHeight)
 	{
 		//The position of the cube, relative to the entity origin - located at the bottom front left point of the cube.

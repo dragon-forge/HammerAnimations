@@ -1,12 +1,16 @@
 package org.zeith.hammeranims.core.contents.blocks;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.*;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.*;
 import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
+import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.tile.IAnimatedTile;
 import org.zeith.hammeranims.core.init.*;
 import org.zeith.hammerlib.api.io.NBTSerializable;
@@ -27,9 +31,16 @@ public class TileBilly
 	@Override
 	public void setupSystem(AnimationSystem.Builder builder)
 	{
-		builder.addLayers(AnimationLayer.builder(CommonLayerNames.LEGS))
+		builder.addLayers(AnimationLayer.builder(CommonLayerNames.LEGS)
+						.mask(
+								ContainersHA.BILLY_GEOM.getPositionalModel()
+										.maskAnyOfOrChildren("body")
+						)
+				)
 				.addLayers(AnimationLayer.builder(CommonLayerNames.AMBIENT));
 	}
+	
+	protected final Matrix4f mat = new Matrix4f();
 	
 	@Override
 	public void update()
@@ -58,6 +69,20 @@ public class TileBilly
 		
 		animations.startAnimationAt(CommonLayerNames.AMBIENT, ContainersHA.BILLY_BREATHE.configure()
 				.speed(0.5F));
+		
+		mat.identity()
+				.translate(worldPosition.getX() + 0.5F, worldPosition.getY(), worldPosition.getZ() + 0.5F)
+				.rotateY((float) (Mth.DEG_TO_RAD * 0));
+		IPositionalModel posMod = ContainersHA.BILLY_GEOM.getPositionalModel();
+		posMod.applySystem(1F, animations);
+		if(posMod.applyBoneTransforms(mat, "bob"))
+		{
+			Vector3f relativePos = new Vector3f(-2 / 16F, 1 / 16F, 1 / 16F);
+			mat.transformPosition(relativePos);
+			
+			if(atTickRate(5))
+				level.addParticle(ParticleTypes.END_ROD, relativePos.x, relativePos.y, relativePos.z, 0, 0.1, 0);
+		}
 	}
 	
 	@Override
