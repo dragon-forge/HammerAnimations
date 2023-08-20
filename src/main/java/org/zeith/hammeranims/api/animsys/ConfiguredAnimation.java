@@ -21,6 +21,7 @@ public class ConfiguredAnimation
 	public Animation animation;
 	public float weight = 1F; // [0; 1]
 	public float speed = 1F; // 1x
+	public float startTime = 0F;
 	public boolean reverse = false;
 	public float transitionTime = 0.25F; // 0.25 sec
 	public TimeFunction timeFunction = DefaultsHA.LINEAR_TIME;
@@ -50,6 +51,18 @@ public class ConfiguredAnimation
 	public ConfiguredAnimation(Animation animation)
 	{
 		setAnimation(animation);
+	}
+	
+	public boolean same(ConfiguredAnimation other)
+	{
+		return this.speed == other.speed
+				&& this.weight == other.weight
+				&& this.loopMode == other.loopMode
+				&& this.startTime == other.startTime
+				&& this.transitionTime == other.transitionTime
+				&& this.timeFunction == other.timeFunction
+				&& this.reverse == other.reverse
+				&& this.animation == other.animation;
 	}
 	
 	public void setAnimation(Animation animation)
@@ -84,6 +97,18 @@ public class ConfiguredAnimation
 	{
 		this.speed = speed;
 		return this;
+	}
+	
+	public ConfiguredAnimation startTime(float startTime)
+	{
+		this.startTime = startTime;
+		return this;
+	}
+	
+	public ConfiguredAnimation freezeAt(float time)
+	{
+		return startTime(time)
+				.speed(0);
 	}
 	
 	public ConfiguredAnimation reversed(boolean reverse)
@@ -147,7 +172,8 @@ public class ConfiguredAnimation
 	public ActiveAnimation activate(AnimationLayer layer)
 	{
 		ActiveAnimation aa = new ActiveAnimation(this);
-		aa.startTime = layer.startTime;
+		// shift time backwards to make the effect of animation being on a given timeframe
+		aa.startTime = layer.startTime - startTime;
 		return aa;
 	}
 	
@@ -160,6 +186,7 @@ public class ConfiguredAnimation
 		tag.putFloat("Weight", weight);
 		tag.putBoolean("Reverse", reverse);
 		tag.putFloat("Speed", speed);
+		tag.putFloat("StartTime", startTime);
 		tag.putFloat("TransitionTime", transitionTime);
 		if(next != null) tag.put("Next", next.serializeNBT());
 		tag.putByte("LoopMode", (byte) (loopMode != null ? loopMode.ordinal() : LoopMode.ONCE.ordinal()));
@@ -185,6 +212,7 @@ public class ConfiguredAnimation
 		this.weight = tag.getFloat("Weight");
 		this.reverse = tag.getBoolean("Reverse");
 		this.speed = tag.getFloat("Speed");
+		this.startTime = tag.getFloat("StartTime");
 		this.transitionTime = tag.getFloat("TransitionTime");
 		
 		if(tag.contains("Next", Tag.TAG_COMPOUND)) next = new ConfiguredAnimation(tag.getCompound("Next"));

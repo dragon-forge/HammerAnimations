@@ -2,6 +2,7 @@ package org.zeith.hammeranims.core.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelPart;
+import org.zeith.hammeranims.api.geometry.model.IBone;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.utils.IPoseEntry;
 import org.zeith.hammeranims.joml.Vector3f;
@@ -10,6 +11,7 @@ import java.util.*;
 
 public class ModelBoneF
 		extends ModelPart
+		implements IBone
 {
 	public final String boxName;
 	private final Vector3f scale = new Vector3f(1, 1, 1);
@@ -37,8 +39,6 @@ public class ModelBoneF
 			poseStackIn.pushPose();
 			
 			this.translateAndRotate(poseStackIn);
-			
-			poseStackIn.scale(scale.x(), scale.y(), scale.z());
 			
 			this.renderCubes(IPoseEntry.read(poseStackIn.last()), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			
@@ -73,21 +73,31 @@ public class ModelBoneF
 			cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
+	@Override
+	public String getName()
+	{
+		return boxName;
+	}
+	
+	@Override
 	public Vector3f getTranslation()
 	{
 		return offset;
 	}
 	
+	@Override
 	public Vector3f getRotation()
 	{
 		return rotation;
 	}
 	
+	@Override
 	public Vector3f getScale()
 	{
 		return scale;
 	}
 	
+	@Override
 	public Map<String, ModelBoneF> getChildren()
 	{
 		return children;

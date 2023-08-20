@@ -3,9 +3,12 @@ package org.zeith.hammeranims.api.animation;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
+import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationContainerImpl;
 import org.zeith.hammeranims.api.annotations.*;
+
+import javax.annotation.Nonnull;
 
 /**
  * Represents a container for animations in Hammer Models.
@@ -69,5 +72,13 @@ public interface IAnimationContainer
 	default AnimationHolder holder(String sub)
 	{
 		return new AnimationHolder(this, sub);
+	}
+	
+	@Nonnull
+	AnimationHolder holder();
+	
+	default ConfiguredAnimation configure()
+	{
+		return holder().get().configure();
 	}
 }

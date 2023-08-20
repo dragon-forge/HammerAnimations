@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.utils.EmbeddedLocation;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
+import org.zeith.hammeranims.core.impl.api.geometry.constrains.*;
 import org.zeith.hammeranims.core.jomljson.*;
 import org.zeith.hammeranims.core.utils.GsonHelper;
 import org.zeith.hammeranims.joml.*;
@@ -23,7 +24,16 @@ public class GsonGeometryDecoder
 			.registerTypeAdapter(UVDefinition.FaceUVDefinition.class, new UVDefinition.FaceUVDefinition.Deserializer())
 			.registerTypeAdapter(UVDefinition.class, new UVDefinition.Deserializer())
 			.registerTypeAdapter(Vector3f.class, new Vector3fGsonAdapter())
+			.registerTypeAdapter(Vector3d.class, new Vector3dGsonAdapter())
+			.registerTypeAdapter(BoneConstraintsImpl.class, new BoneConstrainsImplAdapter())
+			.registerTypeAdapter(GeometryConstrainsImpl.class, new GeometryConstrainsImplAdapter())
 			.create();
+	
+	public static GeometryConstrainsImpl readGeometryConstraints(String text)
+	{
+		JsonObject json = GsonHelper.parse(text, true);
+		return GSON.fromJson(json, GeometryConstrainsImpl.class);
+	}
 	
 	public static List<Tuple2<EmbeddedLocation, GeometryDataImpl>> readGeometryFile(IGeometryContainer container, ResourceLocation location, String text)
 	{

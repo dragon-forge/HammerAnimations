@@ -3,6 +3,10 @@ package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.util.Mth;
+import net.minecraftforge.api.distmarker.*;
+import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl;
+import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl.PositionalBone;
+import org.zeith.hammeranims.joml.Math;
 import org.zeith.hammeranims.joml.Vector3f;
 import org.zeith.hammeranims.core.client.model.*;
 
@@ -49,6 +53,30 @@ public class ModelPartInfo
 		return children;
 	}
 	
+	public PositionalBone bakePositional(@Nullable ModelPartInfo parent)
+	{
+		Vector3f rotationRads = new Vector3f(
+				org.zeith.hammeranims.joml.Math.TO_RAD_F * (rotationDegrees.x()),
+				org.zeith.hammeranims.joml.Math.TO_RAD_F * (rotationDegrees.y()),
+				Math.TO_RAD_F * (rotationDegrees.z())
+		);
+		
+		rotationRads.mul(-1, -1, 1);
+		
+		Object2ObjectArrayMap<String, PositionalBone> bakedChildren = new Object2ObjectArrayMap<>();
+		for(ModelPartInfo child : children)
+			bakedChildren.put(child.name, child.bakePositional(this));
+		
+		PositionalBone part = new PositionalBone(name, rotationRads, bakedChildren);
+		if(parent != null)
+			part.setPos(-(pivot.x() - parent.pivot.x()), (pivot.y() - parent.pivot.y()), pivot.z() - parent.pivot.z());
+		else
+			part.setPos(-pivot.x(), pivot.y(), pivot.z());
+		
+		return part;
+	}
+	
+	@OnlyIn(Dist.CLIENT)
 	public ModelBoneF bake(@Nullable ModelPartInfo parent, int textureWidth, int textureHeight)
 	{
 		ImmutableList.Builder<ModelCubeF> bakedCubes = ImmutableList.builder();
