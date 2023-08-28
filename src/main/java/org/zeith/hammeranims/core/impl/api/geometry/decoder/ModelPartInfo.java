@@ -90,7 +90,7 @@ public class ModelPartInfo
 		
 		rotationRads.mul(-1, -1, 1);
 		
-		Object2ObjectArrayMap<String, ModelBoneF> bakedChildren = new Object2ObjectArrayMap<>();
+		Map<String, ModelBoneF> bakedChildren = new Object2ObjectArrayMap<>();
 		for(ModelPartInfo child : children)
 			bakedChildren.put(child.name, child.bake(this, textureWidth, textureHeight));
 		

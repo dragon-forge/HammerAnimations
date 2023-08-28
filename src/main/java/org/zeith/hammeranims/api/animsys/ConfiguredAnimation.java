@@ -49,7 +49,7 @@ public class ConfiguredAnimation
 	
 	public Animation getAnimation()
 	{
-		return Cast.or(animation, DefaultsHA.NULL_ANIMATION_SYNTETIC);
+		return animation != null ? animation : DefaultsHA.NULL_ANIMATION_SYNTETIC;
 	}
 	
 	public boolean same(ConfiguredAnimation other)
