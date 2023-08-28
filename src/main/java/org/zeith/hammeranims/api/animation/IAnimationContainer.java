@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
  * - Optionally perform static import for {@link IAnimationContainer#create()}.
  */
 public interface IAnimationContainer
+	extends IAnimationSource
 {
 	/**
 	 * Reloads the animation container using the provided resource provider.
@@ -77,6 +78,13 @@ public interface IAnimationContainer
 	@Nonnull
 	AnimationHolder holder();
 	
+	@Override
+	default AnimationLocation getLocation()
+	{
+		return holder().getLocation();
+	}
+	
+	@Override
 	default ConfiguredAnimation configure()
 	{
 		return holder().get().configure();

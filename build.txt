@@ -1,5 +1,5 @@
 # Mod Info
-mod_version=19.2.9
+mod_version=19.2.10
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
@@ -42,7 +42,7 @@ release_type=release
 
 # List of mods separated by ;
 # If a specific mod for one platform is needed, @m: or @c: prefixes are used.
-# Example for adding Hammer Lib for both Modrinth & CurseForge: 
+# Example for adding Hammer Lib for both Modrinth & CurseForge:
 # @m:PlkSuVtM;@c:hammer-lib;
 # Which can be simplified to be just "hammer-lib" since the slug is the same on both platforms.
 required_mods=hammer-lib;

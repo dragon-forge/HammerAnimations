@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.api.animation;
 
 import org.zeith.hammeranims.HammerAnimations;
+import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 
@@ -8,7 +9,7 @@ import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
 public class AnimationHolder
-		implements Supplier<Animation>
+		implements Supplier<Animation>, IAnimationSource
 {
 	public final IAnimationContainer container;
 	public final String variant;
@@ -36,6 +37,13 @@ public class AnimationHolder
 		return animation;
 	}
 	
+	@Override
+	public AnimationLocation getLocation()
+	{
+		return new AnimationLocation(HammerAnimationsApi.animations().getKey(container), variant);
+	}
+	
+	@Override
 	public ConfiguredAnimation configure()
 	{
 		return get().configure();

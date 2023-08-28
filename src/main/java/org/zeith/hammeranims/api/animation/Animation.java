@@ -3,7 +3,7 @@ package org.zeith.hammeranims.api.animation;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 
-public class Animation
+public class Animation implements IAnimationSource
 {
 	protected final IAnimationContainer container;
 	protected final String key;
@@ -24,11 +24,13 @@ public class Animation
 		return data;
 	}
 	
+	@Override
 	public AnimationLocation getLocation()
 	{
 		return location;
 	}
 	
+	@Override
 	public ConfiguredAnimation configure()
 	{
 		return new ConfiguredAnimation(this);

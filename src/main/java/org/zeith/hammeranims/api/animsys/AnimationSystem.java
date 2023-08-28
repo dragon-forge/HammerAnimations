@@ -47,17 +47,7 @@ public class AnimationSystem
 		return layerMap.get(name);
 	}
 	
-	public boolean startAnimationAt(String layer, Animation animation)
-	{
-		return startAnimationAt(layer, animation.configure());
-	}
-	
-	public boolean startAnimationAt(String layer, AnimationHolder animation)
-	{
-		return startAnimationAt(layer, animation.configure());
-	}
-	
-	public boolean startAnimationAt(String layer, IAnimationContainer animation)
+	public boolean startAnimationAt(String layer, IAnimationSource animation)
 	{
 		return startAnimationAt(layer, animation.configure());
 	}
