@@ -205,22 +205,22 @@ public class KeyframeInterpolation
 					BaseInterpolation pre = BaseInterpolation.parse(frame.get("pre"));
 					BaseInterpolation post = BaseInterpolation.parse(frame.get("post"));
 					kf = new StepKeyFrame(time, pre, post);
-					continue;
-				}
-				
-				String lerpMode = frame.optString("lerp_mode");
-				
-				BaseInterpolation vec = BaseInterpolation.parse(frame.opt("post"));
-				
-				if(lerpMode.equalsIgnoreCase("catmullrom"))
-				{
-					kf = new CatmullRomKeyFrame(time, vec);
-				} else if(lerpMode.equalsIgnoreCase("linear"))
-				{
-					kf = new KeyFrame(time, vec);
 				} else
 				{
-					throw new JSONException("Invalid lerp_mode found: " + lerpMode);
+					String lerpMode = frame.optString("lerp_mode");
+					
+					BaseInterpolation vec = BaseInterpolation.parse(frame.opt("post"));
+					
+					if(lerpMode.equalsIgnoreCase("catmullrom"))
+					{
+						kf = new CatmullRomKeyFrame(time, vec);
+					} else if(lerpMode.equalsIgnoreCase("linear"))
+					{
+						kf = new KeyFrame(time, vec);
+					} else
+					{
+						throw new JSONException("Invalid lerp_mode found: " + lerpMode);
+					}
 				}
 			} else if(o instanceof JSONArray)
 			{
