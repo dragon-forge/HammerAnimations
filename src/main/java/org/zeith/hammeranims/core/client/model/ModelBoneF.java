@@ -2,7 +2,7 @@ package org.zeith.hammeranims.core.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelPart;
-import org.zeith.hammeranims.api.geometry.model.IBone;
+import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.utils.IPoseEntry;
 import org.zeith.hammeranims.joml.Vector3f;
@@ -11,7 +11,7 @@ import java.util.*;
 
 public class ModelBoneF
 		extends ModelPart
-		implements IBone
+		implements IRenderableBone
 {
 	public final String boxName;
 	private final Vector3f scale = new Vector3f(1, 1, 1);
@@ -32,7 +32,8 @@ public class ModelBoneF
 		this.cubes = cubes;
 	}
 	
-	public void renderCubes(PoseStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
+	@Override
+	public void render(PoseStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
 		if(visible)
 		{
@@ -43,12 +44,13 @@ public class ModelBoneF
 			this.renderCubes(IPoseEntry.read(poseStackIn.last()), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			
 			for(ModelBoneF part : this.children.values())
-				part.renderCubes(poseStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+				part.render(poseStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			
 			poseStackIn.popPose();
 		}
 	}
 	
+	@Override
 	public void translateAndRotate(PoseStack matrixStackIn)
 	{
 		matrixStackIn.translate(-offset.x() / 16F, -offset.y() / 16F, offset.z() / 16F);
@@ -103,6 +105,7 @@ public class ModelBoneF
 		return children;
 	}
 	
+	@Override
 	public void reset()
 	{
 		rotation.set(startRotationRadians.x, startRotationRadians.y, startRotationRadians.z);

@@ -40,14 +40,20 @@ public class GeometricModelImpl
 	}
 	
 	@Override
-	public Collection<? extends IBone> getBones()
+	public IRenderableBone getRoot()
+	{
+		return root;
+	}
+	
+	@Override
+	public Collection<? extends IRenderableBone> getBones()
 	{
 		return bones.values();
 	}
 	
 	@Nullable
 	@Override
-	public IBone getBone(String bone)
+	public IRenderableBone getBone(String bone)
 	{
 		return bones.get(bone);
 	}
@@ -116,7 +122,7 @@ public class GeometricModelImpl
 	@OnlyIn(Dist.CLIENT)
 	public void renderModel(RenderData data)
 	{
-		root.renderCubes(data.pose, IVertexRenderer.wrap(data.buffer), data.lighting, data.overlay, data.red, data.green, data.blue, data.alpha);
+		root.render(data.pose, IVertexRenderer.wrap(data.buffer), data.lighting, data.overlay, data.red, data.green, data.blue, data.alpha);
 	}
 	
 	@Override
