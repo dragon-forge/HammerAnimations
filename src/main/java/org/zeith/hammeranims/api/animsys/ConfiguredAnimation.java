@@ -2,7 +2,6 @@ package org.zeith.hammeranims.api.animsys;
 
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
-import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.actions.*;
@@ -11,6 +10,7 @@ import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
+import org.zeith.hammerlib.util.java.Cast;
 
 import java.time.Duration;
 import java.util.*;
@@ -34,13 +34,7 @@ public class ConfiguredAnimation
 	
 	public static ConfiguredAnimation noAnimation()
 	{
-		Animation aNull = DefaultsHA.NULL_ANIMATION.getAnimations().get("null");
-		if(aNull == null)
-		{
-			HammerAnimations.LOG.warn("Unable to find default null animation. This is not supposed to happen!");
-			return new ConfiguredAnimation((Animation) null);
-		}
-		return DefaultsHA.NULL_ANIM.configure();
+		return DefaultsHA.NULL_ANIMATION_SYNTETIC.configure();
 	}
 	
 	public ConfiguredAnimation(CompoundTag tag)
@@ -51,6 +45,11 @@ public class ConfiguredAnimation
 	public ConfiguredAnimation(Animation animation)
 	{
 		setAnimation(animation);
+	}
+	
+	public Animation getAnimation()
+	{
+		return Cast.or(animation, DefaultsHA.NULL_ANIMATION_SYNTETIC);
 	}
 	
 	public boolean same(ConfiguredAnimation other)
@@ -67,9 +66,10 @@ public class ConfiguredAnimation
 	
 	public void setAnimation(Animation animation)
 	{
+		if(animation == null) animation = DefaultsHA.NULL_ANIMATION_SYNTETIC;
+		
 		this.animation = animation;
-		if(animation != null)
-			loopMode = animation.getData().getLoopMode();
+		this.loopMode = animation.getData().getLoopMode();
 	}
 	
 	public ConfiguredAnimation weight(float weight)
