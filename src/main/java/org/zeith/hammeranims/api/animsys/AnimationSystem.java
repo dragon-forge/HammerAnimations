@@ -23,7 +23,7 @@ public class AnimationSystem
 	
 	protected double time;
 	
-	public boolean canSync = true;
+	public boolean canSync = true, autoSync = false;
 	
 	protected final AnimationLayer[] layers;
 	protected final Map<String, AnimationLayer> layerMap;
@@ -81,7 +81,7 @@ public class AnimationSystem
 	
 	public boolean stopAnimation(String layer)
 	{
-		return startAnimationAt(layer, DefaultsHA.NULL_ANIM);
+		return startAnimationAt(layer, ConfiguredAnimation.noAnimation());
 	}
 	
 	public Set<String> getLayerNames()
@@ -164,6 +164,7 @@ public class AnimationSystem
 		@Nonnull
 		protected final IAnimatedObject owner;
 		protected boolean canSync = true;
+		protected boolean autoSync = false;
 		protected final List<AnimationLayer.Builder> layers = new ArrayList<>();
 		
 		public Builder(@Nonnull IAnimatedObject owner)
@@ -183,6 +184,18 @@ public class AnimationSystem
 			return this;
 		}
 		
+		public Builder autoSync()
+		{
+			autoSync = true;
+			return this;
+		}
+		
+		public Builder autoSync(boolean autoSync)
+		{
+			this.autoSync = autoSync;
+			return this;
+		}
+		
 		public AnimationSystem build()
 		{
 			AnimationLayer[] layers = new AnimationLayer[this.layers.size()];
@@ -193,6 +206,8 @@ public class AnimationSystem
 				AnimationLayer al = layers[i] = this.layers.get(i).build(sys);
 				layerMap.put(al.name, al);
 			}
+			sys.canSync = canSync;
+			sys.autoSync = autoSync;
 			return sys;
 		}
 	}

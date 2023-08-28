@@ -80,6 +80,8 @@ public class AnimationLayer
 		startTime = system.getTime(0);
 		currentAnimation = animation.activate(this);
 		
+		if(system.autoSync) system.sync();
+		
 		return true;
 	}
 	
@@ -99,7 +101,7 @@ public class AnimationLayer
 								   this.weight *
 								   lastAnimation.config.weight;
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
-			pose.apply(lastAnimation.config.animation.getData(), mask, mode, weight, query);
+			pose.apply(lastAnimation.config.getAnimation().getData(), mask, mode, weight, query);
 		}
 		
 		if(currentAnimation != null)
@@ -109,7 +111,7 @@ public class AnimationLayer
 						   (float) Math.min(sysTime - startTime, transitionTime) / transitionTime * this.weight *
 								   currentAnimation.config.weight;
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
-			pose.apply(currentAnimation.config.animation.getData(), mask, mode, weight, query);
+			pose.apply(currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
 		}
 	}
 	
