@@ -46,6 +46,12 @@ public class PositionalModelImpl
 	}
 	
 	@Override
+	public IBone getRoot()
+	{
+		return root;
+	}
+	
+	@Override
 	public Set<String> getBoneNames()
 	{
 		return bones.keySet();
@@ -199,6 +205,7 @@ public class PositionalModelImpl
 			return children;
 		}
 		
+		@Override
 		public void reset()
 		{
 			rotation.set(startRotationRadians.x, startRotationRadians.y, startRotationRadians.z);

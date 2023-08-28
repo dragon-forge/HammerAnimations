@@ -64,14 +64,20 @@ public class GeometricModelImpl
 	}
 	
 	@Override
-	public Collection<? extends IBone> getBones()
+	public IRenderableBone getRoot()
+	{
+		return root;
+	}
+	
+	@Override
+	public Collection<? extends IRenderableBone> getBones()
 	{
 		return bones.values();
 	}
 	
 	@Nullable
 	@Override
-	public IBone getBone(String bone)
+	public IRenderableBone getBone(String bone)
 	{
 		return bones.get(bone);
 	}
@@ -157,7 +163,7 @@ public class GeometricModelImpl
 		Tessellator tess = Tessellator.getInstance();
 		BufferBuilder bb = tess.getBuffer();
 		bb.begin(GL11.GL_QUADS, POSITION_TEX_LMAP_COLOR);
-		root.renderCubes(pose, IVertexRenderer.wrap(bb), data.combinedLightIn, data.combinedOverlayIn, data.red, data.green, data.blue, data.alpha);
+		root.render(pose, IVertexRenderer.wrap(bb), data.combinedLightIn, data.combinedOverlayIn, data.red, data.green, data.blue, data.alpha);
 		tess.draw();
 		
 		GlStateManager.popMatrix();

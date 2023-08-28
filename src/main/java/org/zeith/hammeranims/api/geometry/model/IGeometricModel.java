@@ -17,20 +17,26 @@ public interface IGeometricModel
 		private final GeometryPose pose = new GeometryPose(s -> false);
 		
 		@Override
+		public IRenderableBone getRoot()
+		{
+			return null;
+		}
+		
+		@Override
 		public Set<String> getBoneNames()
 		{
 			return Collections.emptySet();
 		}
 		
 		@Override
-		public Collection<IBone> getBones()
+		public Collection<IRenderableBone> getBones()
 		{
 			return Collections.emptySet();
 		}
 		
 		@Nullable
 		@Override
-		public IBone getBone(String bone)
+		public IRenderableBone getBone(String bone)
 		{
 			return null;
 		}
@@ -69,6 +75,16 @@ public interface IGeometricModel
 		{
 		}
 	};
+	
+	@Override
+	IRenderableBone getRoot();
+	
+	@Override
+	Collection<? extends IRenderableBone> getBones();
+	
+	@Nullable
+	@Override
+	IRenderableBone getBone(String bone);
 	
 	/**
 	 * Renders the model using the provided render data.
