@@ -2,8 +2,10 @@ package org.zeith.hammeranims.api.animation;
 
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
+import org.zeith.hammeranims.core.init.DefaultsHA;
 
-public class Animation implements IAnimationSource
+public class Animation
+		implements IAnimationSource
 {
 	protected final IAnimationContainer container;
 	protected final String key;
@@ -34,6 +36,11 @@ public class Animation implements IAnimationSource
 	public ConfiguredAnimation configure()
 	{
 		return new ConfiguredAnimation(this);
+	}
+	
+	public boolean isNull()
+	{
+		return this == DefaultsHA.NULL_ANIMATION_SYNTETIC;
 	}
 	
 	@Override

@@ -28,7 +28,7 @@ public class ReadAnimationHolderImpl
 	{
 		if(anim == null)
 		{
-			HammerAnimations.LOG.warn("Failed to decode animation " + key + " for " + key);
+			HammerAnimations.LOG.warn("Failed to decode animation " + key + " in " + this.key);
 			return;
 		}
 		animations.put(key, anim);

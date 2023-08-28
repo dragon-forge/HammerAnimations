@@ -1,6 +1,5 @@
 package org.zeith.hammeranims.api.animation;
 
-import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.core.init.DefaultsHA;
@@ -25,15 +24,7 @@ public class AnimationHolder
 	public Animation get()
 	{
 		Animation animation = container.getAnimations().get(variant);
-		if(animation == null)
-		{
-			if(this == DefaultsHA.NULL_ANIM)
-			{
-				HammerAnimations.LOG.fatal("Unable to find default null animation. This is not supposed to happen!");
-				return null;
-			}
-			return DefaultsHA.NULL_ANIM.get();
-		}
+		if(animation == null) return DefaultsHA.NULL_ANIMATION_SYNTETIC;
 		return animation;
 	}
 	
