@@ -12,6 +12,8 @@ public class ModelBoneF
 		extends ModelRenderer
 		implements IRenderableBone
 {
+	protected ModelBoneF parent;
+	
 	private final Vector3f scale = new Vector3f(1, 1, 1);
 	public Vector3f offset = new Vector3f();
 	private final Vector3f rotation; // in radians
@@ -31,6 +33,15 @@ public class ModelBoneF
 		this.isHidden = neverRender;
 		this.children = Collections.unmodifiableMap(children);
 		this.cubes = cubes;
+		
+		for(ModelBoneF ch : children.values())
+			ch.parent = this;
+	}
+	
+	@Override
+	public IRenderableBone getParent()
+	{
+		return parent;
 	}
 	
 	@Override

@@ -5,10 +5,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.model.ModelBase;
 import net.minecraftforge.fml.relauncher.*;
 import org.zeith.hammeranims.core.client.model.*;
-import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl.PositionalBone;
 import org.zeith.hammeranims.joml.Math;
-import org.zeith.hammeranims.joml.Vector3f;
+import org.zeith.hammeranims.joml.*;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -92,7 +91,7 @@ public class ModelPartInfo
 		
 		rotationRads.mul(-1, -1, 1);
 		
-		Object2ObjectArrayMap<String, ModelBoneF> bakedChildren = new Object2ObjectArrayMap<>();
+		Map<String, ModelBoneF> bakedChildren = new Object2ObjectArrayMap<>();
 		for(ModelPartInfo child : children)
 			bakedChildren.put(child.name, child.bake(model, this, textureWidth, textureHeight));
 		
