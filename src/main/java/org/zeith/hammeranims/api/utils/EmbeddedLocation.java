@@ -41,7 +41,7 @@ public class EmbeddedLocation
 	@Override
 	public String toString()
 	{
-		return container.toString() + '!' + key;
+		return container + "!" + key;
 	}
 	
 	public void warn(String message)

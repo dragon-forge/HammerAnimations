@@ -7,6 +7,7 @@ import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.*;
 import org.zeith.hammeranims.api.animation.event.DecodeAnimationEvent;
+import org.zeith.hammeranims.core.init.DefaultsHA;
 
 import java.time.Duration;
 import java.util.*;
@@ -25,9 +26,15 @@ public class AnimationDecoder
 	@SubscribeEvent
 	public static void decodeAnimation(DecodeAnimationEvent e)
 	{
+		if(e.container == DefaultsHA.NULL_ANIMATION)
+		{
+			e.setDecoded(DefaultsHA.NULL_ANIMATION_SYNTETIC);
+			return;
+		}
+		
 		JSONObject obj = e.asObject().orElse(null);
 		if(obj == null) return;
-		if(!obj.has("animation_length") || !obj.has("bones"))
+		if(!obj.has("bones"))
 			return;
 		
 		AnimationLocation loc = new AnimationLocation(e.container.getRegistryKey(), e.key);
@@ -46,7 +53,7 @@ public class AnimationDecoder
 				modeRaw = LoopMode.HOLD_ON_LAST_FRAME;
 		}
 		
-		Duration time = Duration.ofMillis(Math.round(obj.getDouble("animation_length") * 1000));
+		Duration time = Duration.ofMillis(Math.round(obj.optDouble("animation_length") * 1000));
 		Map<String, BoneAnimation> bones = new HashMap<>();
 		
 		JSONObject bonesObj = obj.getJSONObject("bones");

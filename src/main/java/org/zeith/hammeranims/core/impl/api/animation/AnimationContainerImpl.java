@@ -40,16 +40,14 @@ public class AnimationContainerImpl
 		public Animation get()
 		{
 			Animation animation = defaultAnimation;
-			if(animation == null)
-			{
-				if(this == DefaultsHA.NULL_ANIM)
-				{
-					HammerAnimations.LOG.warn("Unable to find default null animation. This is not supposed to happen!");
-					return null;
-				}
-				return DefaultsHA.NULL_ANIM.get();
-			}
+			if(animation == null) return DefaultsHA.NULL_ANIMATION_SYNTETIC;
 			return animation;
+		}
+		
+		@Override
+		public AnimationLocation getLocation()
+		{
+			return get().getLocation();
 		}
 	};
 	
@@ -108,7 +106,7 @@ public class AnimationContainerImpl
 		if(anims.size() == 1)
 			defaultAnimation = anims.iterator().next();
 		else
-			defaultAnimation = DefaultsHA.NULL_ANIM.get();
+			defaultAnimation = DefaultsHA.NULL_ANIMATION_SYNTETIC;
 		
 		HammerAnimations.LOG.debug("Loaded {} animations in {}: {}", animations.getKeySet()
 				.size(), key, animations.getKeySet());
