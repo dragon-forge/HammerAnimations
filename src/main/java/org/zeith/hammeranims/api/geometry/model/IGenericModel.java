@@ -25,6 +25,8 @@ public interface IGenericModel
 		return expanded::contains;
 	}
 	
+	IBone getRoot();
+	
 	Set<String> getBoneNames();
 	
 	Collection<? extends IBone> getBones();

@@ -30,6 +30,12 @@ public interface IPositionalModel
 		}
 		
 		@Override
+		public IBone getRoot()
+		{
+			return null;
+		}
+		
+		@Override
 		public Set<String> getBoneNames()
 		{
 			return Collections.emptySet();

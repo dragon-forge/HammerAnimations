@@ -14,5 +14,9 @@ public interface IBone
 	
 	Vector3f getScale();
 	
+	default void reset()
+	{
+	}
+	
 	Map<String, ? extends IBone> getChildren();
 }
