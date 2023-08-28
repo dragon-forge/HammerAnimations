@@ -17,6 +17,7 @@ public class AnimationLayer
 		implements ICompoundSerializable
 {
 	public final AnimationSystem system;
+	public final boolean allowAutoSync;
 	public final ILayerMask mask;
 	public final Query query;
 	public final String name;
@@ -31,13 +32,14 @@ public class AnimationLayer
 	
 	public boolean frozen;
 	
-	public AnimationLayer(AnimationSystem sys, ILayerMask mask, Query query, String name, BlendMode mode)
+	public AnimationLayer(AnimationSystem sys, ILayerMask mask, Query query, String name, BlendMode mode, boolean allowAutoSync)
 	{
 		this.system = sys;
 		this.mask = mask;
 		this.query = query;
 		this.name = name;
 		this.mode = mode;
+		this.allowAutoSync = allowAutoSync;
 	}
 	
 	@Nullable
@@ -79,7 +81,7 @@ public class AnimationLayer
 		startTime = system.getTime(0);
 		currentAnimation = animation.activate(this);
 		
-		if(system.autoSync) system.sync();
+		if(system.autoSync && allowAutoSync) system.sync();
 		
 		return true;
 	}
@@ -199,6 +201,7 @@ public class AnimationLayer
 		protected final String name;
 		
 		protected float weight = 1F;
+		protected boolean allowAutoSync = true;
 		protected Query query = new Query();
 		protected ILayerMask mask = ILayerMask.TRUE;
 		protected BlendMode blendMode = BlendMode.ADD;
@@ -232,9 +235,21 @@ public class AnimationLayer
 			return this;
 		}
 		
+		public Builder allowAutoSync(boolean allowAutoSync)
+		{
+			this.allowAutoSync = allowAutoSync;
+			return this;
+		}
+		
+		public Builder preventAutoSync()
+		{
+			this.allowAutoSync = false;
+			return this;
+		}
+		
 		public AnimationLayer build(AnimationSystem sys)
 		{
-			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode);
+			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync);
 			layer.weight = weight;
 			return layer;
 		}

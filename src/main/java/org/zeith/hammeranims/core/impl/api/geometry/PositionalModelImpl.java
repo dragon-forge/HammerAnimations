@@ -2,8 +2,8 @@ package org.zeith.hammeranims.core.impl.api.geometry;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.zeith.hammeranims.api.geometry.constrains.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.api.geometry.constrains.*;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.ModelMeshInfo;
 import org.zeith.hammeranims.joml.*;
@@ -150,6 +150,8 @@ public class PositionalModelImpl
 	{
 		public final String boxName;
 		
+		protected PositionalBone parent;
+		
 		private final Vector3f scale = new Vector3f(1, 1, 1);
 		public Vector3f offset = new Vector3f();
 		private final Vector3f startRotationRadians;
@@ -166,6 +168,15 @@ public class PositionalModelImpl
 			this.startRotationRadians = startRotRadians;
 			this.rotation = new Vector3f(startRotRadians);
 			this.children = Collections.unmodifiableMap(children);
+			
+			for(PositionalBone p : children.values())
+				p.parent = this;
+		}
+		
+		@Override
+		public PositionalBone getParent()
+		{
+			return parent;
 		}
 		
 		@Override

@@ -2,7 +2,7 @@ package org.zeith.hammeranims.core.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelPart;
-import org.zeith.hammeranims.api.geometry.model.*;
+import org.zeith.hammeranims.api.geometry.model.IRenderableBone;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.utils.IPoseEntry;
 import org.zeith.hammeranims.joml.Vector3f;
@@ -13,6 +13,8 @@ public class ModelBoneF
 		extends ModelPart
 		implements IRenderableBone
 {
+	protected ModelBoneF parent;
+	
 	public final String boxName;
 	private final Vector3f scale = new Vector3f(1, 1, 1);
 	public Vector3f offset = new Vector3f();
@@ -30,6 +32,15 @@ public class ModelBoneF
 		this.visible = !neverRender;
 		this.children = Collections.unmodifiableMap(children);
 		this.cubes = cubes;
+		
+		for(ModelBoneF ch : children.values())
+			ch.parent = this;
+	}
+	
+	@Override
+	public IRenderableBone getParent()
+	{
+		return parent;
 	}
 	
 	@Override
