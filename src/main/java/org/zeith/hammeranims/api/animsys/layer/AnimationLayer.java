@@ -1,10 +1,10 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
 import net.minecraft.nbt.*;
-import org.zeith.hammeranims.api.animation.AnimationLocation;
+import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.*;
-import org.zeith.hammeranims.api.animsys.actions.*;
+import org.zeith.hammeranims.api.animsys.actions.AnimationActionInstance;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
@@ -29,6 +29,8 @@ public class AnimationLayer
 	
 	public float weight = 1F;
 	
+	public boolean frozen;
+	
 	public AnimationLayer(AnimationSystem sys, ILayerMask mask, Query query, String name, BlendMode mode)
 	{
 		this.system = sys;
@@ -47,6 +49,11 @@ public class AnimationLayer
 	public AnimationLocation activeAnimationLocation()
 	{
 		return currentAnimation != null ? currentAnimation.getLocation() : DefaultsHA.NULL_ANIM.get().getLocation();
+	}
+	
+	public Animation activeAnimation()
+	{
+		return currentAnimation != null ? currentAnimation.config.animation : DefaultsHA.NULL_ANIM.get();
 	}
 	
 	public boolean startAnimation(@Nonnull ConfiguredAnimation animation)
@@ -77,6 +84,12 @@ public class AnimationLayer
 	
 	public void applyAnimation(double sysTime, float partialTicks, GeometryPose pose)
 	{
+		if(frozen)
+		{
+			sysTime -= partialTicks * 0.05;
+			partialTicks = 0;
+		}
+		
 		if(lastAnimation != null)
 		{
 			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : 0.25F;
@@ -106,6 +119,15 @@ public class AnimationLayer
 	
 	public void tick(double sysTime)
 	{
+		if(frozen)
+		{
+			startTime += 0.05;
+			if(currentAnimation != null)
+				currentAnimation.startTime += 0.05;
+			if(lastAnimation != null)
+				lastAnimation.startTime += 0.05;
+		}
+		
 		if(lastAnimation != null)
 		{
 			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : 0.25F;
@@ -138,6 +160,7 @@ public class AnimationLayer
 		tag.putFloat("Weight", weight);
 		tag.putString("Name", name);
 		tag.putDouble("StartTime", startTime);
+		tag.putBoolean("Frozen", frozen);
 		if(lastAnimation != null) tag.put("Last", lastAnimation.serializeNBT());
 		if(currentAnimation != null) tag.put("Current", currentAnimation.serializeNBT());
 		return tag;
@@ -148,6 +171,7 @@ public class AnimationLayer
 	{
 		weight = tag.getFloat("Weight");
 		startTime = tag.getDouble("StartTime");
+		frozen = tag.getBoolean("Frozen");
 		if(tag.contains("Last", Tag.TAG_COMPOUND))
 			lastAnimation = new ActiveAnimation(tag.getCompound("Last"));
 		if(tag.contains("Current", Tag.TAG_COMPOUND))
@@ -157,6 +181,15 @@ public class AnimationLayer
 	public static Builder builder(String name)
 	{
 		return new Builder(name);
+	}
+	
+	public void freeze(boolean b)
+	{
+		if(frozen != b)
+		{
+			frozen = b;
+			system.sync();
+		}
 	}
 	
 	public static class Builder

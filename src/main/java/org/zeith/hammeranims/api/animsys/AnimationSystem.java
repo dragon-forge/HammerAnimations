@@ -6,6 +6,7 @@ import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
+import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.net.PacketSyncAnimationSystem;
 import org.zeith.hammerlib.net.Network;
 
@@ -22,6 +23,8 @@ public class AnimationSystem
 	
 	protected double time;
 	
+	public boolean canSync = true;
+	
 	protected final AnimationLayer[] layers;
 	protected final Map<String, AnimationLayer> layerMap;
 	
@@ -34,7 +37,7 @@ public class AnimationSystem
 	
 	public void sync()
 	{
-		if(!owner.getAnimatedObjectWorld().isClientSide) // if on server
+		if(!owner.getAnimatedObjectWorld().isClientSide && canSync) // if on server
 			Network.sendToTracking(
 					new PacketSyncAnimationSystem(this),
 					owner.getAnimatedObjectWorld().getChunkAt(new BlockPos(owner.getAnimatedObjectPosition()))
@@ -45,6 +48,18 @@ public class AnimationSystem
 	public AnimationLayer getLayer(String name)
 	{
 		return layerMap.get(name);
+	}
+	
+	public AnimationLocation activeAnimationLocation(String layer)
+	{
+		var l = getLayer(layer);
+		return l == null ? DefaultsHA.NULL_ANIM.getLocation() : l.activeAnimationLocation();
+	}
+	
+	public boolean isActiveAnimation(String layer, IAnimationSource source)
+	{
+		var al = activeAnimationLocation(layer);
+		return Objects.equals(al, source.getLocation());
 	}
 	
 	public boolean startAnimationAt(String layer, IAnimationSource animation)
@@ -58,6 +73,21 @@ public class AnimationSystem
 		if(l != null)
 			return l.startAnimation(animation);
 		return false;
+	}
+	
+	public boolean stopAnimation(String layer)
+	{
+		return startAnimationAt(layer, DefaultsHA.NULL_ANIM);
+	}
+	
+	public Set<String> getLayerNames()
+	{
+		return layerMap.keySet();
+	}
+	
+	public AnimationLayer[] getLayers()
+	{
+		return layers;
 	}
 	
 	public void tick()
@@ -129,6 +159,7 @@ public class AnimationSystem
 	{
 		@Nonnull
 		protected final IAnimatedObject owner;
+		protected boolean canSync = true;
 		protected final List<AnimationLayer.Builder> layers = new ArrayList<>();
 		
 		public Builder(@Nonnull IAnimatedObject owner)
@@ -142,6 +173,12 @@ public class AnimationSystem
 			return this;
 		}
 		
+		public Builder disableSync()
+		{
+			canSync = false;
+			return this;
+		}
+		
 		public AnimationSystem build()
 		{
 			AnimationLayer[] layers = new AnimationLayer[this.layers.size()];
@@ -152,6 +189,7 @@ public class AnimationSystem
 				AnimationLayer al = layers[i] = this.layers.get(i).build(sys);
 				layerMap.put(al.name, al);
 			}
+			sys.canSync = canSync;
 			return sys;
 		}
 	}
