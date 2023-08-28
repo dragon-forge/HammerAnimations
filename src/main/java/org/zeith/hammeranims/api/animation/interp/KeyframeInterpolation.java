@@ -195,6 +195,7 @@ public class KeyframeInterpolation
 			double time = s.b();
 			
 			Object o = json.get(s.a());
+			IKeyFrame kf;
 			
 			if(o instanceof JSONObject)
 			{
@@ -204,8 +205,7 @@ public class KeyframeInterpolation
 				{
 					BaseInterpolation pre = BaseInterpolation.parse(frame.get("pre"));
 					BaseInterpolation post = BaseInterpolation.parse(frame.get("post"));
-					keyframes.add(new StepKeyFrame(time, pre, post));
-					keyframeTimes.add(time);
+					kf = new StepKeyFrame(time, pre, post);
 					continue;
 				}
 				
@@ -215,12 +215,10 @@ public class KeyframeInterpolation
 				
 				if(lerpMode.equalsIgnoreCase("catmullrom"))
 				{
-					keyframes.add(new CatmullRomKeyFrame(time, vec));
-					keyframeTimes.add(time);
+					kf = new CatmullRomKeyFrame(time, vec);
 				} else if(lerpMode.equalsIgnoreCase("linear"))
 				{
-					keyframes.add(new KeyFrame(time, vec));
-					keyframeTimes.add(time);
+					kf = new KeyFrame(time, vec);
 				} else
 				{
 					throw new JSONException("Invalid lerp_mode found: " + lerpMode);
@@ -230,10 +228,19 @@ public class KeyframeInterpolation
 				BaseInterpolation a = BaseInterpolation.parse(o);
 				if(a == null) return null;
 				if(a.getDoubleCount() < doubleCount) return null;
-				keyframes.add(new KeyFrame(time, a));
-				keyframeTimes.add(time);
+				kf = (new KeyFrame(time, a));
 			} else
 				throw new JSONException("Invalid keyframe at " + s.a() + " found: " + o);
+			
+			// Add first frame if missing
+			if(keyframes.isEmpty() && time > 0)
+			{
+				keyframes.add(kf.withNewTime(0));
+				keyframeTimes.add(time);
+			}
+			
+			keyframes.add(kf);
+			keyframeTimes.add(time);
 		}
 		
 		return new KeyframeInterpolation(doubleCount, keyframeTimes, keyframes);

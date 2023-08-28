@@ -8,7 +8,7 @@ import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
-import org.zeith.hammeranims.net.PacketSyncAnimationSystem;
+import org.zeith.hammeranims.net.*;
 
 import javax.annotation.*;
 import java.util.*;
@@ -20,6 +20,8 @@ public class AnimationSystem
 {
 	@Nonnull
 	public final IAnimatedObject owner;
+	
+	protected boolean hasTicked = false;
 	
 	protected double time;
 	
@@ -96,6 +98,13 @@ public class AnimationSystem
 	
 	public void tick()
 	{
+		if(!hasTicked)
+		{
+			hasTicked = true;
+			if(canSync && owner.getAnimatedObjectWorld().isRemote) // Request animations from server on load
+				HCNet.INSTANCE.sendToServer(new PacketRequestAnimationSystemSync(this));
+		}
+		
 		time += 0.05; // add a tick
 		for(AnimationLayer layer : layers)
 			layer.tick(time);
