@@ -3,7 +3,7 @@ package org.zeith.hammeranims.api.animsys;
 import com.zeitheron.hammercore.net.HCNet;
 import net.minecraft.nbt.*;
 import net.minecraftforge.common.util.Constants;
-import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.animation.IAnimationSource;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
@@ -51,17 +51,7 @@ public class AnimationSystem
 		return layerMap.get(name);
 	}
 	
-	public boolean startAnimationAt(String layer, Animation animation)
-	{
-		return startAnimationAt(layer, animation.configure());
-	}
-	
-	public boolean startAnimationAt(String layer, AnimationHolder animation)
-	{
-		return startAnimationAt(layer, animation.configure());
-	}
-	
-	public boolean startAnimationAt(String layer, IAnimationContainer animation)
+	public boolean startAnimationAt(String layer, IAnimationSource animation)
 	{
 		return startAnimationAt(layer, animation.configure());
 	}
