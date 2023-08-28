@@ -54,12 +54,8 @@ minecraft {
 
 repositories {
     maven {
-        name = "DragonForge"
+        name = "Zeith maven"
         url = "https://maven.zeith.org"
-    }
-    maven {
-        name = "jei"
-        url =  "http://dvs1.progwml6.com/files/maven"
     }
 }
 
@@ -74,12 +70,6 @@ dependencies {
 	if(hasConfig("viveapi_version"))
 	{
 		deobfCompile "org.zeith.viveapi:VivecraftAPI-${config.minecraft_version}:${config.viveapi_version}:deobf"
-	}
-	
-	if(hasConfig("jei_version"))
-	{
-		deobfCompile "mezz.jei:jei_${config.minecraft_version}:${config.jei_version}:api"
-		runtime "mezz.jei:jei_${config.minecraft_version}:${config.jei_version}"
 	}
 }
 
