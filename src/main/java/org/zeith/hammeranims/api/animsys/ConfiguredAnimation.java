@@ -37,6 +37,11 @@ public class ConfiguredAnimation
 		return DefaultsHA.NULL_ANIMATION_SYNTETIC.configure();
 	}
 	
+	public ConfiguredAnimation(ConfiguredAnimation toCopy)
+	{
+		this(toCopy.serializeNBT());
+	}
+	
 	public ConfiguredAnimation(CompoundTag tag)
 	{
 		deserializeNBT(tag);
