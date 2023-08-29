@@ -43,7 +43,7 @@ public class PacketRequestAnimationSystemSync
 	@Override
 	public void serverExecute(PacketContext ctx)
 	{
-		Level world = ctx.getSender().level;
+		Level world = ctx.getSender().level();
 		IAnimatedObject object = source.get(world);
 		if(object != null)
 			ctx.withReply(new PacketSyncAnimationSystem(object.getAnimationSystem()));
