@@ -236,7 +236,7 @@ public class KeyframeInterpolation
 			if(keyframes.isEmpty() && time > 0)
 			{
 				keyframes.add(kf.withNewTime(0));
-				keyframeTimes.add(time);
+				keyframeTimes.add(0);
 			}
 			
 			keyframes.add(kf);
