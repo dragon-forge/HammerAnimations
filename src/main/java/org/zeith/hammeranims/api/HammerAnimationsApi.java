@@ -7,7 +7,6 @@ import net.minecraftforge.registries.*;
 import org.zeith.api.registry.RegistryMapping;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
-import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.time.TimeFunction;
@@ -25,7 +24,6 @@ public class HammerAnimationsApi
 	
 	private static Supplier<IForgeRegistry<IAnimationContainer>> ANIMATION_CONTAINERS;
 	private static Supplier<IForgeRegistry<IGeometryContainer>> GEOMETRY_CONTAINERS;
-	private static Supplier<IForgeRegistry<AnimationSourceType>> ANIMATION_SOURCES;
 	private static Supplier<IForgeRegistry<TimeFunction>> TIME_FUNCTIONS;
 	private static Supplier<IForgeRegistry<AnimationAction>> ANIMATION_ACTIONS;
 	private static boolean hasInitialized = false;
@@ -43,13 +41,6 @@ public class HammerAnimationsApi
 						.setName(HammerAnimations.id("geometry"))
 						.disableSaving(),
 				reg -> RegistryMapping.report(IGeometryContainer.class, reg, false)
-		);
-		
-		ANIMATION_SOURCES = e.create(new RegistryBuilder<AnimationSourceType>()
-						.setName(HammerAnimations.id("animation_sources"))
-						.disableSaving()
-						.disableSaving(),
-				reg -> RegistryMapping.report(AnimationSourceType.class, reg, false)
 		);
 		
 		TIME_FUNCTIONS = e.create(new RegistryBuilder<TimeFunction>()
@@ -92,11 +83,6 @@ public class HammerAnimationsApi
 	public static IForgeRegistry<IGeometryContainer> geometries()
 	{
 		return GEOMETRY_CONTAINERS.get();
-	}
-	
-	public static IForgeRegistry<AnimationSourceType> animationSources()
-	{
-		return ANIMATION_SOURCES.get();
 	}
 	
 	public static IForgeRegistry<TimeFunction> timeFunctions()

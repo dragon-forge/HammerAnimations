@@ -90,19 +90,4 @@ public class TileBilly
 	{
 		return animations;
 	}
-	
-	@Override
-	public void deserializeNBT(CompoundTag nbt)
-	{
-		animations.deserializeNBT(nbt.getCompound("Anims"));
-		super.deserializeNBT(nbt);
-	}
-	
-	@Override
-	public CompoundTag serializeNBT()
-	{
-		var nbt = super.serializeNBT();
-		nbt.put("Anims", animations.serializeNBT());
-		return nbt;
-	}
 }

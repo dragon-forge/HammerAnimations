@@ -18,6 +18,7 @@ public class AnimationLayer
 {
 	public final AnimationSystem system;
 	public final boolean allowAutoSync;
+	public final boolean persistent;
 	public final ILayerMask mask;
 	public final Query query;
 	public final String name;
@@ -32,7 +33,7 @@ public class AnimationLayer
 	
 	public boolean frozen;
 	
-	public AnimationLayer(AnimationSystem sys, ILayerMask mask, Query query, String name, BlendMode mode, boolean allowAutoSync)
+	public AnimationLayer(AnimationSystem sys, ILayerMask mask, Query query, String name, BlendMode mode, boolean allowAutoSync, boolean persistent)
 	{
 		this.system = sys;
 		this.mask = mask;
@@ -40,6 +41,7 @@ public class AnimationLayer
 		this.name = name;
 		this.mode = mode;
 		this.allowAutoSync = allowAutoSync;
+		this.persistent = persistent;
 	}
 	
 	@Nullable
@@ -176,10 +178,14 @@ public class AnimationLayer
 		weight = tag.getFloat("Weight");
 		startTime = tag.getDouble("StartTime");
 		frozen = tag.getBoolean("Frozen");
+		
 		if(tag.contains("Last", Tag.TAG_COMPOUND))
 			lastAnimation = new ActiveAnimation(tag.getCompound("Last"));
+		else lastAnimation = null;
+		
 		if(tag.contains("Current", Tag.TAG_COMPOUND))
 			currentAnimation = new ActiveAnimation(tag.getCompound("Current"));
+		else currentAnimation = null;
 	}
 	
 	public static Builder builder(String name)
@@ -202,6 +208,7 @@ public class AnimationLayer
 		
 		protected float weight = 1F;
 		protected boolean allowAutoSync = true;
+		protected boolean persistent = true;
 		protected Query query = new Query();
 		protected ILayerMask mask = ILayerMask.TRUE;
 		protected BlendMode blendMode = BlendMode.ADD;
@@ -247,9 +254,21 @@ public class AnimationLayer
 			return this;
 		}
 		
+		public Builder persistent(boolean persistent)
+		{
+			this.persistent = persistent;
+			return this;
+		}
+		
+		public Builder nonPersistent()
+		{
+			this.persistent = false;
+			return this;
+		}
+		
 		public AnimationLayer build(AnimationSystem sys)
 		{
-			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync);
+			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync, persistent);
 			layer.weight = weight;
 			return layer;
 		}
