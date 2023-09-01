@@ -28,8 +28,7 @@ public class PacketSyncAnimationSystem
 	public void write(CompoundTag nbt)
 	{
 		nbt.put("Sys", tag);
-		nbt.put("Src", source.writeSource());
-		nbt.putString("Type", source.getType().getRegistryKey().toString());
+		nbt.put("Src", IObjectSource.writeSource(source));
 	}
 	
 	@Override
