@@ -1,9 +1,9 @@
 # Mod Info
-mod_version=19.2.12
+mod_version=19.2.13
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
-hl_version=19.3.62
+hl_version=19.3.63
 
 # Persistent mod info
 mod_id=hammeranims

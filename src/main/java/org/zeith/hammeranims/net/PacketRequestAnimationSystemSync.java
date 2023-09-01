@@ -1,17 +1,15 @@
 package org.zeith.hammeranims.net;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.*;
+import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 import org.zeith.hammerlib.net.*;
 
 public class PacketRequestAnimationSystemSync
 		implements INBTPacket
 {
-	protected AnimationSource source;
+	protected IObjectSource<?> source;
 	
 	public PacketRequestAnimationSystemSync()
 	{
@@ -25,26 +23,20 @@ public class PacketRequestAnimationSystemSync
 	@Override
 	public void write(CompoundTag nbt)
 	{
-		nbt.put("Src", source.writeSource());
-		nbt.putString("Type", source.getType().getRegistryKey().toString());
+		nbt.merge(IObjectSource.writeSource(source));
 	}
 	
 	@Override
 	public void read(CompoundTag nbt)
 	{
-		AnimationSourceType type = HammerAnimationsApi.animationSources()
-				.getValue(new ResourceLocation(nbt.getString("Type")));
-		if(type != null)
-			source = type.readSource(nbt.getCompound("Src"));
-		else
-			HammerAnimations.LOG.warn("Unable to find animation source {}", nbt.getString("Type"));
+		this.source = IObjectSource.readSource(nbt).orElse(null);
 	}
 	
 	@Override
 	public void serverExecute(PacketContext ctx)
 	{
-		Level world = ctx.getSender().level;
-		IAnimatedObject object = source.get(world);
+		var world = ctx.getSender().level;
+		var object = source != null ? source.get(IAnimatedObject.class, world).orElse(null) : null;
 		if(object != null)
 			ctx.withReply(new PacketSyncAnimationSystem(object.getAnimationSystem()));
 	}

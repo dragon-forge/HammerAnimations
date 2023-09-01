@@ -2,7 +2,6 @@ package org.zeith.hammeranims.core.contents.blocks;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -89,20 +88,5 @@ public class TileBilly
 	public AnimationSystem getAnimationSystem()
 	{
 		return animations;
-	}
-	
-	@Override
-	public void deserializeNBT(CompoundTag nbt)
-	{
-		animations.deserializeNBT(nbt.getCompound("Anims"));
-		super.deserializeNBT(nbt);
-	}
-	
-	@Override
-	public CompoundTag serializeNBT()
-	{
-		var nbt = super.serializeNBT();
-		nbt.put("Anims", animations.serializeNBT());
-		return nbt;
 	}
 }

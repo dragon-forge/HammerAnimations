@@ -8,7 +8,6 @@ import net.minecraftforge.fml.javafmlmod.*;
 import org.apache.logging.log4j.*;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
-import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.annotations.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
@@ -54,7 +53,6 @@ public class HammerAnimations
 		scan(RegisterAnimations.class, (n, mod) -> BasicRegistrar.perform(IAnimationContainer.class, HammerAnimationsApi::animations, n, mod));
 		scan(RegisterGeometries.class, (n, mod) -> BasicRegistrar.perform(IGeometryContainer.class, HammerAnimationsApi::geometries, n, mod));
 		scan(RegisterTimeFunctions.class, (n, mod) -> BasicRegistrar.perform(TimeFunction.class, HammerAnimationsApi::timeFunctions, n, mod));
-		scan(RegisterAnimationSourceTypes.class, (n, mod) -> BasicRegistrar.perform(AnimationSourceType.class, HammerAnimationsApi::animationSources, n, mod));
 		scan(RegisterAnimations.class, (n, mod) -> BasicRegistrar.perform(AnimationAction.class, HammerAnimationsApi::animationActions, n, mod));
 	}
 	

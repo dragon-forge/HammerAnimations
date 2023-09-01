@@ -132,7 +132,9 @@ public class AnimationSystem
 		comp.putDouble("Time", time);
 		
 		var layers = newNBTList();
-		for(AnimationLayer layer : this.layers) layers.add(layer.serializeNBT());
+		for(AnimationLayer layer : this.layers)
+			if(layer.persistent) // save only persistent layers
+				layers.add(layer.serializeNBT());
 		comp.put("Layers", layers);
 		
 		return comp;
@@ -148,7 +150,7 @@ public class AnimationSystem
 		{
 			var tag = layers.getCompound(i);
 			AnimationLayer l = layerMap.get(tag.getString("Name"));
-			if(l != null) l.deserializeNBT(tag);
+			if(l != null && l.persistent) l.deserializeNBT(tag);
 		}
 	}
 	
