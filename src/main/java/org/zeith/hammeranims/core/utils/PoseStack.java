@@ -22,6 +22,14 @@ public class PoseStack
 		stack.add(new Entry(matrix4f, matrix3f));
 	}
 	
+	public void reset()
+	{
+		Matrix4f matrix4f = new Matrix4f();
+		Matrix3f matrix3f = new Matrix3f();
+		stack.clear();
+		stack.add(new Entry(matrix4f, matrix3f));
+	}
+	
 	@SideOnly(Side.CLIENT)
 	public PoseStack fromGL()
 	{
@@ -43,6 +51,16 @@ public class PoseStack
 		
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		GL11.glLoadMatrix(poseMatrix.get(BUF_FLOAT_16));
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public void mulGL()
+	{
+		Entry last = this.stack.getLast();
+		Matrix4f poseMatrix = last.pose;
+		
+		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		GL11.glMultMatrix(poseMatrix.get(BUF_FLOAT_16));
 	}
 	
 	public void translate(double pX, double pY, double pZ)

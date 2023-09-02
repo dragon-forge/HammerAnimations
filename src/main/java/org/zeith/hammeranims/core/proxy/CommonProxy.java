@@ -9,7 +9,7 @@ import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
-import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
@@ -61,5 +61,9 @@ public class CommonProxy
 		);
 		
 		HammerAnimationsApi.EVENT_BUS.post(new RefreshStaleModelsEvent());
+	}
+	
+	public void initRD(RenderData data)
+	{
 	}
 }

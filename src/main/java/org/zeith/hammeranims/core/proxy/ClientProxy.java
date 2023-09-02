@@ -2,6 +2,7 @@ package org.zeith.hammeranims.core.proxy;
 
 import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.*;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -10,9 +11,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
-import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
+import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.client.render.tile.RenderTileBilly;
 import org.zeith.hammeranims.core.contents.blocks.TileBilly;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
@@ -73,6 +75,12 @@ public class ClientProxy
 				reloadRegistries(wrapVanillaResources(resourceManager));
 			}
 		});
+	}
+	
+	@Override
+	public void initRD(RenderData data)
+	{
+		data.renderer = IVertexRenderer.wrap(Tessellator.getInstance().getBuffer());
 	}
 	
 	public static void performReload()

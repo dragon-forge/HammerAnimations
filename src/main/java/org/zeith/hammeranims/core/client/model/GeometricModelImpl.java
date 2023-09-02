@@ -153,20 +153,18 @@ public class GeometricModelImpl
 	@SideOnly(Side.CLIENT)
 	public void renderModel(RenderData data)
 	{
-		PoseStack pose = new PoseStack();
-		pose.fromGL();
-		
-		GlStateManager.pushMatrix();
-		GlStateManager.loadIdentity();
+		PoseStack pose = data.pose;
 		UtilsFX.bindTexture(data.texture);
-		
 		Tessellator tess = Tessellator.getInstance();
 		BufferBuilder bb = tess.getBuffer();
 		bb.begin(GL11.GL_QUADS, POSITION_TEX_LMAP_COLOR);
-		root.render(pose, IVertexRenderer.wrap(bb), data.combinedLightIn, data.combinedOverlayIn, data.red, data.green, data.blue, data.alpha);
+		root.render(pose,
+				data.renderer,
+				data.combinedLightIn, data.combinedOverlayIn,
+				data.red, data.green, data.blue, data.alpha
+		);
 		tess.draw();
-		
-		GlStateManager.popMatrix();
+		pose.reset();
 	}
 	
 	@Override
