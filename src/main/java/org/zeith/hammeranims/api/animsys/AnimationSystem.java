@@ -136,7 +136,9 @@ public class AnimationSystem
 		comp.setDouble("Time", time);
 		
 		NBTTagList layers = newNBTList();
-		for(AnimationLayer layer : this.layers) layers.appendTag(layer.serializeNBT());
+		for(AnimationLayer layer : this.layers)
+			if(layer.persistent) // save only persistent layers
+				layers.appendTag(layer.serializeNBT());
 		comp.setTag("Layers", layers);
 		
 		return comp;
@@ -152,7 +154,7 @@ public class AnimationSystem
 		{
 			NBTTagCompound tag = layers.getCompoundTagAt(i);
 			AnimationLayer l = layerMap.get(tag.getString("Name"));
-			if(l != null) l.deserializeNBT(tag);
+			if(l != null && l.persistent) l.deserializeNBT(tag);
 		}
 	}
 	

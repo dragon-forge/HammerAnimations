@@ -15,6 +15,6 @@ jei_version=4.16.1.302
 mod_id=hammeranims
 mod_id_fancy=HammerAnimations
 mod_name=HammerAnimations
-mod_version=12.2.12
+mod_version=12.2.14
 cf_project=899883
 release_type=release
