@@ -1,10 +1,11 @@
 package org.zeith.hammeranims.api.geometry.model;
 
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
-import org.zeith.hammeranims.api.animsys.layer.ILayerMask;
+import org.zeith.hammeranims.api.animsys.layer.*;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Predicate;
 
 public interface IGenericModel
 {
@@ -63,6 +64,17 @@ public interface IGenericModel
 	{
 		GeometryPose pose = emptyPose();
 		system.applyAnimation(partialTime, pose);
+		applyPose(pose);
+	}
+	
+	/**
+	 * Applies a given animation system to this model. This uses {@link #emptyPose()}, then applies animation system to that and copies the pose over to bones.
+	 * This also takes in the layerMask to selectively apply layers.
+	 */
+	default void applySystem(float partialTime, AnimationSystem system, Predicate<AnimationLayer> layerMask)
+	{
+		GeometryPose pose = emptyPose();
+		system.applyAnimation(partialTime, pose, layerMask);
 		applyPose(pose);
 	}
 }
