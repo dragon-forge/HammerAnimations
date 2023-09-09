@@ -12,6 +12,7 @@ import org.zeith.hammerlib.net.Network;
 
 import javax.annotation.*;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static org.zeith.hammeranims.core.utils.InstanceHelpers.*;
 
@@ -123,6 +124,14 @@ public class AnimationSystem
 		double sysTime = getTime(partialTicks);
 		for(AnimationLayer layer : layers)
 			layer.applyAnimation(sysTime, partialTicks, pose);
+	}
+	
+	public void applyAnimation(float partialTicks, GeometryPose pose, Predicate<AnimationLayer> layerMask)
+	{
+		double sysTime = getTime(partialTicks);
+		for(AnimationLayer layer : layers)
+			if(layerMask.test(layer))
+				layer.applyAnimation(sysTime, partialTicks, pose);
 	}
 	
 	@Override
