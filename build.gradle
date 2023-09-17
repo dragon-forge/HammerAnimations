@@ -488,15 +488,15 @@ publishing {
             artifact srcJar
             artifact deobfJar
 
-            pom.withXml {
-                def dependenciesNode = asNode().appendNode('dependencies')
-
-                if (!config.hl_version.isEmpty()) {
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', "org.zeith.hammerlib")
-                    dependencyNode.appendNode('artifactId', "HammerLib-${config.mc_version}")
-                    dependencyNode.appendNode('version', config.hl_version)
-                }
+            // pom.withXml {
+            //     def dependenciesNode = asNode().appendNode('dependencies')
+            // 
+            //     if (!config.hl_version.isEmpty()) {
+            //         def dependencyNode = dependenciesNode.appendNode('dependency')
+            //         dependencyNode.appendNode('groupId', "org.zeith.hammerlib")
+            //         dependencyNode.appendNode('artifactId', "HammerLib-${config.mc_version}")
+            //         dependencyNode.appendNode('version', config.hl_version)
+            //     }
             }
         }
     }
