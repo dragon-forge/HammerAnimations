@@ -497,7 +497,7 @@ publishing {
             //         dependencyNode.appendNode('artifactId', "HammerLib-${config.mc_version}")
             //         dependencyNode.appendNode('version', config.hl_version)
             //     }
-            }
+            // }
         }
     }
     repositories {
