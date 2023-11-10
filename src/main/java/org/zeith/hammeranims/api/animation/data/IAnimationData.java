@@ -26,6 +26,12 @@ public interface IAnimationData
 		{
 			return Collections.emptyMap();
 		}
+		
+		@Override
+		public float getWeight()
+		{
+			return 1F;
+		}
 	};
 	
 	LoopMode getLoopMode();
@@ -38,4 +44,6 @@ public interface IAnimationData
 	{
 		return getLength().toMillis() / 1000D;
 	}
+	
+	float getWeight();
 }

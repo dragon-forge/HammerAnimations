@@ -38,10 +38,21 @@ public class AnimationDecoder
 		AnimationLocation loc = new AnimationLocation(e.container.getRegistryKey(), e.key);
 		
 		if(!"1.8.0".equals(e.formatVersion))
-			loc.warn("Potentially unsupported version of animation: " + e.formatVersion +
-					"; We support 1.8.0. Potential incompatibility may arise!");
+			loc.warn("Potentially unsupported version of animation: {}; We support 1.8.0. Potential incompatibility may arise!", e.formatVersion);
 		
 		Object o = obj.opt("loop");
+		
+		float weight = 1F;
+		String blend_weight = obj.optString("blend_weight", "");
+		if(blend_weight != null && !blend_weight.isEmpty())
+			try
+			{
+				weight = (float) Double.parseDouble(blend_weight);
+			} catch(Exception err)
+			{
+				loc.warn("Found blend_weight: \"{}\", but it's unable to be parsed as a number.", JSONObject.quote(blend_weight));
+			}
+		final float fweight = weight;
 		
 		LoopMode modeRaw = o instanceof Boolean && ((Boolean) o) ? LoopMode.LOOP : LoopMode.ONCE;
 		if(o instanceof String)
@@ -60,9 +71,7 @@ public class AnimationDecoder
 			BoneAnimation parse = BoneAnimation.parse(loc, bonesObj.getJSONObject(boneKey));
 			if(parse == null)
 			{
-				HammerAnimations.LOG.warn(
-						"Unable to parse " + e.container.getRegistryKey() + "#" + e.key + " animation's bone " +
-								boneKey + ", skipping.");
+				loc.warn("Unable to parse bone {}, skipping.", boneKey);
 				continue;
 			}
 			bones.put(boneKey, parse);
@@ -88,6 +97,12 @@ public class AnimationDecoder
 			public Map<String, BoneAnimation> getBoneAnimations()
 			{
 				return bonesView;
+			}
+			
+			@Override
+			public float getWeight()
+			{
+				return fweight;
 			}
 			
 			@Override
