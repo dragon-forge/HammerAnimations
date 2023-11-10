@@ -100,10 +100,10 @@ public class AnimationLayer
 		if(lastAnimation != null)
 		{
 			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : 0.25F;
-			float weight = transitionTime <= 0 ? 0F :
-						   (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime) *
-								   this.weight *
-								   lastAnimation.config.weight;
+			float weight = (transitionTime <= 0
+							? 0F
+							: (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime)
+			) * this.weight * lastAnimation.getWeight();
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
 			pose.apply(lastAnimation.config.getAnimation().getData(), mask, mode, weight, query);
 		}
@@ -111,9 +111,10 @@ public class AnimationLayer
 		if(currentAnimation != null)
 		{
 			float transitionTime = currentAnimation.config.transitionTime;
-			float weight = transitionTime <= 0 ? 1F :
-						   (float) Math.min(sysTime - startTime, transitionTime) / transitionTime * this.weight *
-								   currentAnimation.config.weight;
+			float weight = (transitionTime <= 0
+							? 1F
+							: (float) Math.min(sysTime - startTime, transitionTime) / transitionTime
+			) * this.weight * currentAnimation.getWeight();
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
 			pose.apply(currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
 		}

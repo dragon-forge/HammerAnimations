@@ -58,4 +58,9 @@ public class ActiveAnimation
 		this.startTime = tag.getDouble("StartTime");
 		this.firedActions = tag.getBoolean("FiredActions");
 	}
+	
+	public float getWeight()
+	{
+		return config.weight * config.getAnimation().getData().getWeight();
+	}
 }

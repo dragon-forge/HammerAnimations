@@ -2,7 +2,6 @@ package org.zeith.hammeranims.core.utils;
 
 import com.google.common.collect.Queues;
 import net.minecraftforge.fml.relauncher.*;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.zeith.hammeranims.joml.Math;
 import org.zeith.hammeranims.joml.*;
@@ -12,7 +11,7 @@ import java.util.Deque;
 
 public class PoseStack
 {
-	private static final FloatBuffer BUF_FLOAT_16 = BufferUtils.createFloatBuffer(16);
+	private static final FloatBuffer BUF_FLOAT_16 = MinecraftHelper.createFloatBuf(16);
 	
 	private final Deque<Entry> stack = Queues.newArrayDeque();
 	
