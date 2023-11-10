@@ -7,9 +7,11 @@ import org.zeith.hammeranims.api.time.TimeFunction;
 public class LinearTimeFunction
 		extends TimeFunction
 {
+	public static final float FREEZE_SPEED = 0.0F;
+	
 	@Override
 	public double computeTime(AnimationSystem system, double sysTime, float partialTicks, ActiveAnimation animation)
 	{
-		return (sysTime - animation.startTime) * animation.config.speed;
+		return (sysTime - animation.startTime) * animation.config.speed + animation.config.startTime;
 	}
 }
