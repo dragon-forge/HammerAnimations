@@ -27,8 +27,9 @@ public abstract class TimeFunction
 					case LOOP:
 						return duration > 0 ? duration - (time % duration) : 0;
 					case HOLD_ON_LAST_FRAME:
-					case ONCE:
 						return Math.max(duration - time, 0);
+					case ONCE:
+						return duration - time;
 				}
 			}
 			
@@ -37,8 +38,9 @@ public abstract class TimeFunction
 				case LOOP:
 					return duration > 0 ? time % duration : 0;
 				case HOLD_ON_LAST_FRAME:
-				case ONCE:
 					return Math.min(time, duration);
+				case ONCE:
+					return time;
 			}
 		}
 		
