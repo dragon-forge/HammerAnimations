@@ -17,6 +17,8 @@ import org.zeith.hammeranims.core.utils.InstanceHelpers;
 import java.time.Duration;
 import java.util.*;
 
+import static org.zeith.hammeranims.core.contents.time.LinearTimeFunction.FREEZE_SPEED;
+
 public class ConfiguredAnimation
 		implements ICompoundSerializable
 {
@@ -115,7 +117,7 @@ public class ConfiguredAnimation
 	public ConfiguredAnimation freezeAt(float time)
 	{
 		return startTime(time)
-				.speed(0);
+				.speed(FREEZE_SPEED);
 	}
 	
 	public ConfiguredAnimation reversed(boolean reverse)
@@ -179,8 +181,7 @@ public class ConfiguredAnimation
 	public ActiveAnimation activate(AnimationLayer layer)
 	{
 		ActiveAnimation aa = new ActiveAnimation(this);
-		aa.startTime = layer.startTime -
-				startTime; // shift time backwards to make the effect of animation being on a given timeframe
+		aa.startTime = layer.startTime;
 		return aa;
 	}
 	
