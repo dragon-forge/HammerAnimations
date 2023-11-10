@@ -44,8 +44,8 @@ public class EmbeddedLocation
 		return container + "!" + key;
 	}
 	
-	public void warn(String message)
+	public void warn(String message, Object... args)
 	{
-		HammerAnimations.LOG.warn("[" + this + "]: {}", message);
+		HammerAnimations.LOG.warn("[" + this + "]: " + message, args);
 	}
 }

@@ -13,6 +13,14 @@ public class ExpressionParser
 	
 	public static InterpolatedDouble parse(String expression)
 	{
+		// Try parsing expression as contstant first.
+		try
+		{
+			return InterpolatedDouble.constant(Double.parseDouble(expression));
+		} catch(Throwable e)
+		{
+		}
+		
 		NashornScriptEngine js = (NashornScriptEngine) new NashornScriptEngineFactory().getScriptEngine();
 		try
 		{
@@ -20,7 +28,7 @@ public class ExpressionParser
 			js.put("Math", MATH);
 			js.put("math", MATH);
 			
-			String fun = "function get(query) {\n\treturn " + expression + ";\n}";
+			String fun = "function get(query) {\n\tvar q = query;\n\treturn " + expression + ";\n}";
 			
 			var bindings = (ScriptObjectMirror) js.createBindings();
 			js.eval(fun, bindings);
