@@ -10,7 +10,7 @@ import org.zeith.hammeranims.core.init.DefaultsHA;
 public class ActiveAnimation
 		implements ICompoundSerializable
 {
-	public double startTime;
+	public double activationTime;
 	
 	// Properties
 	public ConfiguredAnimation config;
@@ -33,7 +33,7 @@ public class ActiveAnimation
 		return config.animation == null
 				|| (config.loopMode == LoopMode.ONCE && (
 				(data = config.animation.getData()) == null
-						|| (sysTime - startTime) * config.speed >= data.getLengthSeconds()
+						|| (sysTime - activationTime) * config.speed >= data.getLengthSeconds()
 		));
 	}
 	
@@ -46,7 +46,7 @@ public class ActiveAnimation
 	public NBTTagCompound serializeNBT()
 	{
 		NBTTagCompound tag = config.serializeNBT();
-		tag.setDouble("StartTime", startTime);
+		tag.setDouble("ActivationTime", activationTime);
 		tag.setBoolean("FiredActions", firedActions);
 		return tag;
 	}
@@ -55,7 +55,7 @@ public class ActiveAnimation
 	public void deserializeNBT(NBTTagCompound tag)
 	{
 		config = new ConfiguredAnimation(tag);
-		this.startTime = tag.getDouble("StartTime");
+		this.activationTime = tag.getDouble("ActivationTime");
 		this.firedActions = tag.getBoolean("FiredActions");
 	}
 	

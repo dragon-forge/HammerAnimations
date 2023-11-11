@@ -12,6 +12,6 @@ public class LinearTimeFunction
 	@Override
 	public double computeTime(AnimationSystem system, double sysTime, float partialTicks, ActiveAnimation animation)
 	{
-		return (sysTime - animation.startTime) * animation.config.speed + animation.config.startTime;
+		return (sysTime - animation.activationTime) * animation.config.speed + animation.config.startTime;
 	}
 }

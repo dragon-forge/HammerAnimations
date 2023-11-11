@@ -4,7 +4,6 @@ import com.zeitheron.hammercore.utils.base.Cast;
 import net.minecraft.nbt.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
-import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.actions.*;
@@ -181,7 +180,7 @@ public class ConfiguredAnimation
 	public ActiveAnimation activate(AnimationLayer layer)
 	{
 		ActiveAnimation aa = new ActiveAnimation(this);
-		aa.startTime = layer.startTime;
+		aa.activationTime = layer.startTime;
 		return aa;
 	}
 	
