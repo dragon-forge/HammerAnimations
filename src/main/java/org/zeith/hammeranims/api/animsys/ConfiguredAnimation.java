@@ -179,7 +179,7 @@ public class ConfiguredAnimation
 	public ActiveAnimation activate(AnimationLayer layer)
 	{
 		ActiveAnimation aa = new ActiveAnimation(this);
-		aa.startTime = layer.startTime;
+		aa.activationTime = layer.startTime;
 		return aa;
 	}
 	
