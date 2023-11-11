@@ -130,9 +130,9 @@ public class AnimationLayer
 		{
 			startTime += 0.05;
 			if(currentAnimation != null)
-				currentAnimation.startTime += 0.05;
+				currentAnimation.activationTime += 0.05;
 			if(lastAnimation != null)
-				lastAnimation.startTime += 0.05;
+				lastAnimation.activationTime += 0.05;
 		}
 		
 		if(lastAnimation != null)
