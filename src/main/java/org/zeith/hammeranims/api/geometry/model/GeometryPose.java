@@ -33,6 +33,20 @@ public class GeometryPose
 		}
 	}
 	
+	public GeometryPose copy()
+	{
+		GeometryPose c = new GeometryPose(availableBones);
+		for(Map.Entry<String, GeometryTransforms> bone : boneTransforms.entrySet())
+			c.boneTransforms.put(bone.getKey(), bone.getValue().copy());
+		return c;
+	}
+	
+	public GeometryTransforms getTransform(String bone)
+	{
+		if(!availableBones.test(bone)) return null;
+		return boneTransforms.computeIfAbsent(bone, key -> GeometryTransforms.createDefault());
+	}
+	
 	public Map<String, GeometryTransforms> getBoneTransforms()
 	{
 		return boneTransformsView;
