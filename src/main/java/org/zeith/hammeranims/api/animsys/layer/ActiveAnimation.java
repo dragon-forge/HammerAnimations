@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.*;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
@@ -16,6 +16,9 @@ public class ActiveAnimation
 	public ConfiguredAnimation config;
 	
 	public boolean firedActions;
+	
+	// May be used to tweak animation's weight while it's active!
+	public float realTimeWeight = 1F;
 	
 	public ActiveAnimation(CompoundTag tag)
 	{
@@ -48,6 +51,7 @@ public class ActiveAnimation
 		var tag = config.serializeNBT();
 		tag.putDouble("ActivationTime", activationTime);
 		tag.putBoolean("FiredActions", firedActions);
+		tag.putFloat("ActiveWeight", realTimeWeight);
 		return tag;
 	}
 	
@@ -57,10 +61,12 @@ public class ActiveAnimation
 		config = new ConfiguredAnimation(tag);
 		this.activationTime = tag.getDouble("ActivationTime");
 		this.firedActions = tag.getBoolean("FiredActions");
+		if(tag.contains("ActiveWeight", Tag.TAG_ANY_NUMERIC)) this.realTimeWeight = tag.getFloat("ActiveWeight");
+		else this.realTimeWeight = 1F;
 	}
 	
 	public float getWeight()
 	{
-		return config.weight * config.getAnimation().getData().getWeight();
+		return realTimeWeight * config.weight * config.getAnimation().getData().getWeight();
 	}
 }
