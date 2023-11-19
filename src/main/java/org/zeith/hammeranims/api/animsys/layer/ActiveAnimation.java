@@ -17,6 +17,9 @@ public class ActiveAnimation
 	
 	public boolean firedActions;
 	
+	// May be used to tweak animation's weight while it's active!
+	public float realTimeWeight = 1F;
+	
 	public ActiveAnimation(NBTTagCompound tag)
 	{
 		deserializeNBT(tag);
@@ -48,6 +51,7 @@ public class ActiveAnimation
 		NBTTagCompound tag = config.serializeNBT();
 		tag.setDouble("ActivationTime", activationTime);
 		tag.setBoolean("FiredActions", firedActions);
+		tag.setFloat("ActiveWeight", realTimeWeight);
 		return tag;
 	}
 	
@@ -57,10 +61,11 @@ public class ActiveAnimation
 		config = new ConfiguredAnimation(tag);
 		this.activationTime = tag.getDouble("ActivationTime");
 		this.firedActions = tag.getBoolean("FiredActions");
+		this.realTimeWeight = tag.getFloat("ActiveWeight");
 	}
 	
 	public float getWeight()
 	{
-		return config.weight * config.getAnimation().getData().getWeight();
+		return realTimeWeight * config.weight * config.getAnimation().getData().getWeight();
 	}
 }

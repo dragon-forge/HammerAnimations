@@ -51,4 +51,13 @@ public class GeometryTransforms
 			scale = new Vec3d(x, y, z);
 		}
 	}
+	
+	public GeometryTransforms copy()
+	{
+		return new GeometryTransforms(
+				translation,
+				rotation,
+				scale
+		);
+	}
 }
