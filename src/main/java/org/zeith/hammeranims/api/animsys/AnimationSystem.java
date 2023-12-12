@@ -8,7 +8,7 @@ import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.net.*;
-import org.zeith.hammerlib.net.Network;
+import org.zeith.hammerlib.net.*;
 
 import javax.annotation.*;
 import java.util.*;
@@ -38,11 +38,16 @@ public class AnimationSystem
 		this.layerMap = Collections.unmodifiableMap(layerMap);
 	}
 	
+	public IPacket createSyncPacket()
+	{
+		return new PacketSyncAnimationSystem(this);
+	}
+	
 	public void sync()
 	{
 		if(!owner.getAnimatedObjectWorld().isClientSide && canSync) // if on server
 			Network.sendToTracking(
-					new PacketSyncAnimationSystem(this),
+					createSyncPacket(),
 					owner.getAnimatedObjectWorld().getChunkAt(new BlockPos(owner.getAnimatedObjectPosition()))
 			);
 	}
@@ -91,6 +96,11 @@ public class AnimationSystem
 	public AnimationLayer[] getLayers()
 	{
 		return layers;
+	}
+	
+	public Set<Map.Entry<String, AnimationLayer>> entrySet()
+	{
+		return layerMap.entrySet();
 	}
 	
 	public void tick()
