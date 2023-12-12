@@ -2,8 +2,8 @@ package org.zeith.hammeranims.net;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.api.distmarker.*;
-import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.animsys.*;
+import org.zeith.hammeranims.api.animsys.AnimationSystem;
+import org.zeith.hammeranims.core.client.ClientHammerHooks;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 import org.zeith.hammerlib.net.*;
 
@@ -42,11 +42,6 @@ public class PacketSyncAnimationSystem
 	@OnlyIn(Dist.CLIENT)
 	public void clientExecute(PacketContext ctx)
 	{
-		var world = HammerAnimations.PROXY.getClientWorld();
-		if(world != null && source != null)
-		{
-			var object = source.get(IAnimatedObject.class, world).orElse(null);
-			if(object != null) object.getAnimationSystem().deserializeNBT(tag);
-		}
+		ClientHammerHooks.applySystem(source, tag, 100);
 	}
 }
