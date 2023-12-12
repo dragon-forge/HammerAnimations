@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.net;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 import org.zeith.hammerlib.net.*;
@@ -21,13 +21,13 @@ public class PacketRequestAnimationSystemSync
 	}
 	
 	@Override
-	public void write(CompoundTag nbt)
+	public void write(CompoundNBT nbt)
 	{
 		nbt.merge(IObjectSource.writeSource(source));
 	}
 	
 	@Override
-	public void read(CompoundTag nbt)
+	public void read(CompoundNBT nbt)
 	{
 		this.source = IObjectSource.readSource(nbt).orElse(null);
 	}
@@ -35,8 +35,8 @@ public class PacketRequestAnimationSystemSync
 	@Override
 	public void serverExecute(PacketContext ctx)
 	{
-		var world = ctx.getSender().level;
-		var object = source != null ? source.get(IAnimatedObject.class, world).orElse(null) : null;
+		World world = ctx.getSender().level;
+		IAnimatedObject object = source != null ? source.get(IAnimatedObject.class, world).orElse(null) : null;
 		if(object != null)
 			ctx.withReply(new PacketSyncAnimationSystem(object.getAnimationSystem()));
 	}

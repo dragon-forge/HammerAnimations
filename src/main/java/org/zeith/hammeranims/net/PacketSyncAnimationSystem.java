@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.net;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.api.distmarker.*;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 import org.zeith.hammeranims.core.client.ClientHammerHooks;
@@ -11,7 +11,7 @@ import org.zeith.hammerlib.net.*;
 public class PacketSyncAnimationSystem
 		implements INBTPacket
 {
-	protected CompoundTag tag;
+	protected CompoundNBT tag;
 	protected IObjectSource<?> source;
 	
 	public PacketSyncAnimationSystem()
@@ -25,14 +25,14 @@ public class PacketSyncAnimationSystem
 	}
 	
 	@Override
-	public void write(CompoundTag nbt)
+	public void write(CompoundNBT nbt)
 	{
 		nbt.put("Sys", tag);
 		nbt.put("Src", IObjectSource.writeSource(source));
 	}
 	
 	@Override
-	public void read(CompoundTag nbt)
+	public void read(CompoundNBT nbt)
 	{
 		tag = nbt.getCompound("Sys");
 		source = IObjectSource.readSource(nbt.getCompound("Src")).orElse(null);

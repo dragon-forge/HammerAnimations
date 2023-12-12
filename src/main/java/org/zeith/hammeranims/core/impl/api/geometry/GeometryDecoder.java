@@ -3,6 +3,7 @@ package org.zeith.hammeranims.core.impl.api.geometry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.event.DecodeGeometryEvent;
+import org.zeith.hammeranims.api.utils.EmbeddedLocation;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.GsonGeometryDecoder;
 import org.zeith.hammerlib.util.java.tuples.Tuple2;
 
@@ -22,7 +23,7 @@ public class GeometryDecoder
 	{
 		try
 		{
-			for(var tup : GsonGeometryDecoder.readGeometryFile(e.container, e.path, e.text))
+			for(Tuple2<EmbeddedLocation, GeometryDataImpl> tup : GsonGeometryDecoder.readGeometryFile(e.container, e.path, e.text))
 			{
 				e.setDecoded(tup.b());
 				return;

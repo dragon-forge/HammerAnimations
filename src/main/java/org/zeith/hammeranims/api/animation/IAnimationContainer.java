@@ -1,12 +1,12 @@
 package org.zeith.hammeranims.api.animation;
 
-import net.minecraft.resources.ResourceLocation;
-import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
+import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationContainerImpl;
-import org.zeith.hammeranims.api.annotations.*;
 
 import javax.annotation.Nonnull;
 
@@ -14,13 +14,13 @@ import javax.annotation.Nonnull;
  * Represents a container for animations in Hammer Models.
  * <p>
  * Animation containers may be registered in a simple way:
- * - Annotate your class with all animations with @{@link RegisterAnimations}
- * - Declare static final IAnimationContainer constants, annotate each one with @{@link Key}
+ * - Annotate your class with all animations with @{@link org.zeith.hammerlib.annotations.SimplyRegister}
+ * - Declare static final IAnimationContainer constants, annotate each one with @{@link org.zeith.hammerlib.annotations.RegistryName}
  * - Assign all these constants with {@link IAnimationContainer#create()} values.
  * - Optionally perform static import for {@link IAnimationContainer#create()}.
  */
 public interface IAnimationContainer
-	extends IAnimationSource
+	extends IAnimationSource, IForgeRegistryEntry<IAnimationContainer>
 {
 	/**
 	 * Reloads the animation container using the provided resource provider.

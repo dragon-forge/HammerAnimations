@@ -1,14 +1,13 @@
 package org.zeith.hammeranims.core.init;
 
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.tileentity.TileEntityType;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.core.client.render.tile.RenderTileBilly;
 import org.zeith.hammeranims.core.contents.actions.PrintHelloWorldAction;
 import org.zeith.hammeranims.core.contents.blocks.*;
 import org.zeith.hammerlib.annotations.*;
-import org.zeith.hammerlib.annotations.client.TileRenderer;
-import org.zeith.hammerlib.api.forge.BlockAPI;
+import org.zeith.hammerlib.api.forge.TileAPI;
 
 @SimplyRegister
 public interface ContainersHA
@@ -18,7 +17,7 @@ public interface ContainersHA
 	
 	@RegistryName("billy")
 	@TileRenderer(RenderTileBilly.class)
-	BlockEntityType<TileBilly> BILLY_TILE = BlockAPI.createBlockEntityType(TileBilly::new, BILLY_BLOCK);
+	TileEntityType<TileBilly> BILLY_TILE = TileAPI.createType(TileBilly::new, BILLY_BLOCK);
 	
 	@RegistryName("billy")
 	IAnimationContainer BILLY_ANIM = IAnimationContainer.create();

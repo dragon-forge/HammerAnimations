@@ -1,19 +1,19 @@
 package org.zeith.hammeranims.api.geometry.model;
 
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.math.vector.Vector3d;
 import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
 
-import static net.minecraft.world.phys.Vec3.ZERO;
+import static net.minecraft.util.math.vector.Vector3d.ZERO;
 
 public class GeometryTransforms
 {
-	public static final Vec3 ONE = new Vec3(1, 1, 1);
+	public static final Vector3d ONE = new Vector3d(1, 1, 1);
 	
-	public Vec3 translation;
-	public Vec3 rotation; // (in degrees)
-	public Vec3 scale;
+	public Vector3d translation;
+	public Vector3d rotation; // (in degrees)
+	public Vector3d scale;
 	
-	public GeometryTransforms(Vec3 translation, Vec3 rotation, Vec3 scale)
+	public GeometryTransforms(Vector3d translation, Vector3d rotation, Vector3d scale)
 	{
 		this.translation = translation;
 		this.rotation = rotation;
@@ -32,7 +32,7 @@ public class GeometryTransforms
 			double x = Math.max(constraints.getMinTranslationX(), Math.min(constraints.getMaxTranslationX(), translation.x));
 			double y = Math.max(constraints.getMinTranslationY(), Math.min(constraints.getMaxTranslationY(), translation.y));
 			double z = Math.max(constraints.getMinTranslationZ(), Math.min(constraints.getMaxTranslationZ(), translation.z));
-			translation = new Vec3(x, y, z);
+			translation = new Vector3d(x, y, z);
 		}
 		
 		if(constraints.hasRotation())
@@ -40,7 +40,7 @@ public class GeometryTransforms
 			double x = Math.max(constraints.getMinRotationX(), Math.min(constraints.getMaxRotationX(), rotation.x));
 			double y = Math.max(constraints.getMinRotationY(), Math.min(constraints.getMaxRotationY(), rotation.y));
 			double z = Math.max(constraints.getMinRotationZ(), Math.min(constraints.getMaxRotationZ(), rotation.z));
-			rotation = new Vec3(x, y, z);
+			rotation = new Vector3d(x, y, z);
 		}
 		
 		if(constraints.hasScale())
@@ -48,7 +48,7 @@ public class GeometryTransforms
 			double x = Math.max(constraints.getMinScaleX(), Math.min(constraints.getMaxScaleX(), scale.x));
 			double y = Math.max(constraints.getMinScaleY(), Math.min(constraints.getMaxScaleY(), scale.y));
 			double z = Math.max(constraints.getMinScaleZ(), Math.min(constraints.getMaxScaleZ(), scale.z));
-			scale = new Vec3(x, y, z);
+			scale = new Vector3d(x, y, z);
 		}
 	}
 	

@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.api.geometry;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
@@ -11,6 +12,7 @@ import org.zeith.hammeranims.core.impl.api.geometry.GeometryContainerImpl;
 import javax.annotation.Nonnull;
 
 public interface IGeometryContainer
+		extends IForgeRegistryEntry<IGeometryContainer>
 {
 	void reload(IResourceProvider provider);
 	

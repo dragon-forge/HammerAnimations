@@ -1,27 +1,27 @@
 package org.zeith.hammeranims.core.utils;
 
 import net.minecraft.nbt.*;
-import net.minecraft.network.chat.Component;
+import net.minecraft.util.text.*;
 
 public class InstanceHelpers
 {
-	public static Component componentText(String text)
+	public static ITextComponent componentText(String text)
 	{
-		return Component.literal(text);
+		return new StringTextComponent(text);
 	}
 	
-	public static CompoundTag newNBTCompound()
+	public static CompoundNBT newNBTCompound()
 	{
-		return new CompoundTag();
+		return new CompoundNBT();
 	}
 	
-	public static ListTag newNBTList()
+	public static ListNBT newNBTList()
 	{
-		return new ListTag();
+		return new ListNBT();
 	}
 	
-	public static StringTag newNBTString(String s)
+	public static StringNBT newNBTString(String s)
 	{
-		return StringTag.valueOf(s);
+		return StringNBT.valueOf(s);
 	}
 }

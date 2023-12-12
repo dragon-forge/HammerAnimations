@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.impl.api.animation;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
@@ -8,12 +9,13 @@ import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.animation.event.*;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.init.DefaultsHA;
-import org.zeith.hammerlib.util.shaded.json.JSONTokener;
+import org.zeith.hammerlib.util.shaded.json.*;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 
 public class AnimationContainerImpl
+		extends ForgeRegistryEntry<IAnimationContainer>
 		implements IAnimationContainer
 {
 	protected IReadAnimationHolder animations = IReadAnimationHolder.EMPTY;
@@ -61,7 +63,7 @@ public class AnimationContainerImpl
 					{
 						ReadAnimationHolderImpl holder = new ReadAnimationHolderImpl(key);
 						
-						var animations = json.getJSONObject("animations");
+						JSONObject animations = json.getJSONObject("animations");
 						String fmt = json.getString("format_version");
 						
 						for(String animKey : animations.keySet())

@@ -2,10 +2,10 @@ package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.*;
 import org.zeith.hammeranims.core.client.model.*;
 import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl.PositionalBone;
+import org.zeith.hammeranims.core.utils.MinecraftHelper;
 import org.zeith.hammeranims.joml.Math;
 import org.zeith.hammeranims.joml.*;
 
@@ -84,9 +84,9 @@ public class ModelPartInfo
 			bakedCubes.add(cube.bake(this, textureWidth, textureHeight));
 		
 		Vector3f rotationRads = new Vector3f(
-				Mth.DEG_TO_RAD * (rotationDegrees.x()),
-				Mth.DEG_TO_RAD * (rotationDegrees.y()),
-				Mth.DEG_TO_RAD * (rotationDegrees.z())
+				MinecraftHelper.DEG_TO_RAD_F * (rotationDegrees.x()),
+				MinecraftHelper.DEG_TO_RAD_F * (rotationDegrees.y()),
+				MinecraftHelper.DEG_TO_RAD_F * (rotationDegrees.z())
 		);
 		
 		rotationRads.mul(-1, -1, 1);

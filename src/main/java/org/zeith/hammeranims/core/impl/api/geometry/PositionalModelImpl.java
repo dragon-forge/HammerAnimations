@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.math.vector.Vector3d;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.constrains.*;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.ModelMeshInfo;
+import org.zeith.hammeranims.core.utils.MinecraftHelper;
 import org.zeith.hammeranims.joml.*;
 
 import javax.annotation.*;
@@ -107,8 +107,8 @@ public class PositionalModelImpl
 			if(add == null) continue;
 			add.applyConstraints(boneConstraints.get(boneKey));
 			
-			Vec3 translate = add.translation,
-					rotate = add.rotation.scale(Mth.DEG_TO_RAD),
+			Vector3d translate = add.translation,
+					rotate = add.rotation.scale(MinecraftHelper.DEG_TO_RAD),
 					scale = add.scale;
 			
 			bone.offset.add(

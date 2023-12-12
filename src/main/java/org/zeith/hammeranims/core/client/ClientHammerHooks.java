@@ -1,8 +1,8 @@
 package org.zeith.hammeranims.core.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -18,14 +18,14 @@ import java.util.*;
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ClientHammerHooks
 {
-	private static final List<Tuple3.Mutable3<IObjectSource<?>, CompoundTag, Integer>> QUEUED_SYSTEMS = new ArrayList<>();
+	private static final List<Tuple3.Mutable3<IObjectSource<?>, CompoundNBT, Integer>> QUEUED_SYSTEMS = new ArrayList<>();
 	
 	@SubscribeEvent
 	public static void clientTick(TickEvent.ClientTickEvent e)
 	{
 		if(e.phase == TickEvent.Phase.END) return;
 		
-		var w = Minecraft.getInstance().level;
+		World w = Minecraft.getInstance().level;
 		if(w == null)
 		{
 			QUEUED_SYSTEMS.clear();
@@ -49,7 +49,7 @@ public class ClientHammerHooks
 	 * Apply animation system client-side for a given animation address with a given timeout.
 	 * This has a
 	 */
-	public static void applySystem(IObjectSource<?> source, CompoundTag tag, int timeout)
+	public static void applySystem(IObjectSource<?> source, CompoundNBT tag, int timeout)
 	{
 		if(source == null || tag == null)
 		{
@@ -61,9 +61,9 @@ public class ClientHammerHooks
 			QUEUED_SYSTEMS.add(Tuples.mutable(source, tag, timeout));
 	}
 	
-	private static boolean applyAnimationSystem(Level world, IObjectSource<?> source, CompoundTag tag)
+	private static boolean applyAnimationSystem(World world, IObjectSource<?> source, CompoundNBT tag)
 	{
-		var obj = Cast.cast(source.get(world), IAnimatedObject.class);
+		IAnimatedObject obj = Cast.cast(source.get(world), IAnimatedObject.class);
 		if(obj == null) return false;
 		AnimationSystem sys = obj.getAnimationSystem();
 		if(sys == null) return true;

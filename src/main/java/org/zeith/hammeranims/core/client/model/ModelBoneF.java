@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.core.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.geom.ModelPart;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import org.zeith.hammeranims.api.geometry.model.IRenderableBone;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.utils.IPoseEntry;
@@ -10,7 +10,7 @@ import org.zeith.hammeranims.joml.Vector3f;
 import java.util.*;
 
 public class ModelBoneF
-		extends ModelPart
+		extends ModelRenderer
 		implements IRenderableBone
 {
 	protected ModelBoneF parent;
@@ -25,7 +25,7 @@ public class ModelBoneF
 	
 	public ModelBoneF(String name, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, boolean neverRender)
 	{
-		super(Collections.emptyList(), Collections.emptyMap());
+		super(1, 1, 0, 0);
 		this.boxName = name;
 		this.startRotationRadians = startRotRadians;
 		this.rotation = new Vector3f(startRotRadians);
@@ -44,7 +44,7 @@ public class ModelBoneF
 	}
 	
 	@Override
-	public void render(PoseStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
+	public void render(MatrixStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
 		if(visible)
 		{
@@ -62,25 +62,25 @@ public class ModelBoneF
 	}
 	
 	@Override
-	public void translateAndRotate(PoseStack pPoseStack)
+	public void translateAndRotate(MatrixStack pPoseStack)
 	{
 		transform(pPoseStack);
 	}
 	
 	@Override
-	public void transform(PoseStack matrixStackIn)
+	public void transform(MatrixStack matrixStackIn)
 	{
 		matrixStackIn.translate(-offset.x() / 16F, -offset.y() / 16F, offset.z() / 16F);
 		matrixStackIn.translate(this.x / 16.0F, this.y / 16.0F, this.z / 16.0F);
 		
 		if(rotation.z() != 0.0F)
-			matrixStackIn.mulPose(com.mojang.math.Vector3f.ZP.rotation(rotation.z()));
+			matrixStackIn.mulPose(net.minecraft.util.math.vector.Vector3f.ZP.rotation(rotation.z()));
 		
 		if(rotation.y() != 0.0F)
-			matrixStackIn.mulPose(com.mojang.math.Vector3f.YP.rotation(rotation.y()));
+			matrixStackIn.mulPose(net.minecraft.util.math.vector.Vector3f.YP.rotation(rotation.y()));
 		
 		if(rotation.x() != 0.0F)
-			matrixStackIn.mulPose(com.mojang.math.Vector3f.XP.rotation(rotation.x()));
+			matrixStackIn.mulPose(net.minecraft.util.math.vector.Vector3f.XP.rotation(rotation.x()));
 		
 		if(this.scale.x() != 1.0F || this.scale.y() != 1.0F || this.scale.z() != 1.0F)
 			matrixStackIn.scale(scale.x(), scale.y(), scale.z());

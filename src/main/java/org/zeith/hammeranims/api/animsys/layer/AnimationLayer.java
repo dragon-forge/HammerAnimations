@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.*;
@@ -171,9 +172,9 @@ public class AnimationLayer
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundNBT serializeNBT()
 	{
-		var tag = InstanceHelpers.newNBTCompound();
+		CompoundNBT tag = InstanceHelpers.newNBTCompound();
 		tag.putFloat("Weight", weight);
 		tag.putString("Name", name);
 		tag.putDouble("StartTime", startTime);
@@ -184,17 +185,17 @@ public class AnimationLayer
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag tag)
+	public void deserializeNBT(CompoundNBT tag)
 	{
 		weight = tag.getFloat("Weight");
 		startTime = tag.getDouble("StartTime");
 		frozen = tag.getBoolean("Frozen");
 		
-		if(tag.contains("Last", Tag.TAG_COMPOUND))
+		if(tag.contains("Last", Constants.NBT.TAG_COMPOUND))
 			lastAnimation = new ActiveAnimation(tag.getCompound("Last"));
 		else lastAnimation = null;
 		
-		if(tag.contains("Current", Tag.TAG_COMPOUND))
+		if(tag.contains("Current", Constants.NBT.TAG_COMPOUND))
 			currentAnimation = new ActiveAnimation(tag.getCompound("Current"));
 		else currentAnimation = null;
 	}

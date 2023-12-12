@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
@@ -20,7 +21,7 @@ public class ActiveAnimation
 	// May be used to tweak animation's weight while it's active!
 	public float realTimeWeight = 1F;
 	
-	public ActiveAnimation(CompoundTag tag)
+	public ActiveAnimation(CompoundNBT tag)
 	{
 		deserializeNBT(tag);
 	}
@@ -46,9 +47,9 @@ public class ActiveAnimation
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundNBT serializeNBT()
 	{
-		var tag = config.serializeNBT();
+		CompoundNBT tag = config.serializeNBT();
 		tag.putDouble("ActivationTime", activationTime);
 		tag.putBoolean("FiredActions", firedActions);
 		tag.putFloat("ActiveWeight", realTimeWeight);
@@ -56,12 +57,12 @@ public class ActiveAnimation
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag tag)
+	public void deserializeNBT(CompoundNBT tag)
 	{
 		config = new ConfiguredAnimation(tag);
 		this.activationTime = tag.getDouble("ActivationTime");
 		this.firedActions = tag.getBoolean("FiredActions");
-		if(tag.contains("ActiveWeight", Tag.TAG_ANY_NUMERIC)) this.realTimeWeight = tag.getFloat("ActiveWeight");
+		if(tag.contains("ActiveWeight", Constants.NBT.TAG_ANY_NUMERIC)) this.realTimeWeight = tag.getFloat("ActiveWeight");
 		else this.realTimeWeight = 1F;
 	}
 	

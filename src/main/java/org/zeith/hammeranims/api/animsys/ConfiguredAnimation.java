@@ -1,7 +1,8 @@
 package org.zeith.hammeranims.api.animsys;
 
 import net.minecraft.nbt.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.actions.*;
@@ -44,7 +45,7 @@ public class ConfiguredAnimation
 		this(toCopy.serializeNBT());
 	}
 	
-	public ConfiguredAnimation(CompoundTag tag)
+	public ConfiguredAnimation(CompoundNBT tag)
 	{
 		deserializeNBT(tag);
 	}
@@ -62,13 +63,13 @@ public class ConfiguredAnimation
 	public boolean same(ConfiguredAnimation other)
 	{
 		return this.speed == other.speed
-				&& this.weight == other.weight
-				&& this.loopMode == other.loopMode
-				&& this.startTime == other.startTime
-				&& this.transitionTime == other.transitionTime
-				&& this.timeFunction == other.timeFunction
-				&& this.reverse == other.reverse
-				&& this.animation == other.animation;
+			   && this.weight == other.weight
+			   && this.loopMode == other.loopMode
+			   && this.startTime == other.startTime
+			   && this.transitionTime == other.transitionTime
+			   && this.timeFunction == other.timeFunction
+			   && this.reverse == other.reverse
+			   && this.animation == other.animation;
 	}
 	
 	public void setAnimation(Animation animation)
@@ -184,9 +185,9 @@ public class ConfiguredAnimation
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundNBT serializeNBT()
 	{
-		var tag = InstanceHelpers.newNBTCompound();
+		CompoundNBT tag = InstanceHelpers.newNBTCompound();
 		tag.putString("Time", timeFunction.getRegistryKey().toString());
 		tag.putString("Animation", animation.getLocation().toString());
 		tag.putFloat("Weight", weight);
@@ -199,7 +200,7 @@ public class ConfiguredAnimation
 		
 		if(!this.onFinish.isEmpty())
 		{
-			var onFinish = InstanceHelpers.newNBTList();
+			ListNBT onFinish = InstanceHelpers.newNBTList();
 			for(AnimationActionInstance finish : this.onFinish)
 				onFinish.add(finish.serializeNBT());
 			tag.put("OnFinish", onFinish);
@@ -209,7 +210,7 @@ public class ConfiguredAnimation
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag tag)
+	public void deserializeNBT(CompoundNBT tag)
 	{
 		this.timeFunction = HammerAnimationsApi.timeFunctions().getValue(new ResourceLocation(tag.getString("Time")));
 		if(this.timeFunction == null) this.timeFunction = DefaultsHA.LINEAR_TIME;
@@ -221,11 +222,11 @@ public class ConfiguredAnimation
 		this.startTime = tag.getFloat("StartTime");
 		this.transitionTime = tag.getFloat("TransitionTime");
 		
-		if(tag.contains("Next", Tag.TAG_COMPOUND)) next = new ConfiguredAnimation(tag.getCompound("Next"));
+		if(tag.contains("Next", Constants.NBT.TAG_COMPOUND)) next = new ConfiguredAnimation(tag.getCompound("Next"));
 		
 		loopMode = LoopMode.values()[tag.getByte("LoopMode") % LoopMode.VALUE_COUNT];
 		
-		var onFinish = tag.getList("OnFinish", Tag.TAG_COMPOUND);
+		ListNBT onFinish = tag.getList("OnFinish", Constants.NBT.TAG_COMPOUND);
 		this.onFinish.clear();
 		for(int i = 0; i < onFinish.size(); i++)
 		{

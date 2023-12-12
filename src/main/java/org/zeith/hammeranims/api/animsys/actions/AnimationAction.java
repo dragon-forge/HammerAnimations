@@ -1,15 +1,17 @@
 package org.zeith.hammeranims.api.animsys.actions;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 
 import javax.annotation.Nonnull;
 
 public abstract class AnimationAction
+		extends ForgeRegistryEntry<AnimationAction>
 {
 	@Nonnull
 	protected AnimationActionInstance createInstance()
@@ -23,7 +25,7 @@ public abstract class AnimationAction
 	}
 	
 	@Nonnull
-	public AnimationActionInstance deserializeInstance(CompoundTag tag)
+	public AnimationActionInstance deserializeInstance(CompoundNBT tag)
 	{
 		AnimationActionInstance inst = createInstance();
 		inst.deserializeNBT(tag);
@@ -32,12 +34,12 @@ public abstract class AnimationAction
 	
 	public abstract void execute(AnimationActionInstance instance, AnimationLayer layer);
 	
-	public Level getAnimationWorld(AnimationLayer layer)
+	public World getAnimationWorld(AnimationLayer layer)
 	{
 		return layer.system.owner.getAnimatedObjectWorld();
 	}
 	
-	public Vec3 getAnimationPos(AnimationLayer layer)
+	public Vector3d getAnimationPos(AnimationLayer layer)
 	{
 		return layer.system.owner.getAnimatedObjectPosition();
 	}

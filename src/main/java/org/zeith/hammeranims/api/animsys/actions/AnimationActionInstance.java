@@ -1,7 +1,8 @@
 package org.zeith.hammeranims.api.animsys.actions;
 
-import net.minecraft.nbt.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
@@ -15,7 +16,7 @@ public class AnimationActionInstance
 {
 	public static final AnimationActionInstance EMPTY = new AnimationActionInstance(DefaultsHA.EMPTY_ACTION);
 	
-	private CompoundTag extra;
+	private CompoundNBT extra;
 	
 	public final AnimationAction action;
 	
@@ -35,7 +36,7 @@ public class AnimationActionInstance
 	}
 	
 	@Nonnull
-	public static AnimationActionInstance of(CompoundTag tag)
+	public static AnimationActionInstance of(CompoundNBT tag)
 	{
 		AnimationAction action = HammerAnimationsApi.animationActions()
 				.getValue(new ResourceLocation(tag.getString("Id")));
@@ -44,26 +45,26 @@ public class AnimationActionInstance
 			   : action.deserializeInstance(tag);
 	}
 	
-	public CompoundTag getExtra()
+	public CompoundNBT getExtra()
 	{
-		CompoundTag i = InstanceHelpers.newNBTCompound();
+		CompoundNBT i = InstanceHelpers.newNBTCompound();
 		if(extra == null && !isEmpty()) extra = i;
 		return i;
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundNBT serializeNBT()
 	{
-		CompoundTag tag = InstanceHelpers.newNBTCompound();
+		CompoundNBT tag = InstanceHelpers.newNBTCompound();
 		if(extra != null) tag.put("Extra", extra);
 		tag.putString("Id", action.getRegistryKey().toString());
 		return tag;
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag nbt)
+	public void deserializeNBT(CompoundNBT nbt)
 	{
-		if(nbt.contains("Extra", Tag.TAG_COMPOUND))
+		if(nbt.contains("Extra", Constants.NBT.TAG_COMPOUND))
 			extra = nbt.getCompound("Extra");
 	}
 }

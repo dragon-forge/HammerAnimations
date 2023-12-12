@@ -1,8 +1,8 @@
 package org.zeith.hammeranims.api.tile;
 
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 import org.zeith.hammerlib.util.java.Cast;
@@ -13,21 +13,21 @@ public interface IAnimatedTile
 	@Override
 	default IObjectSource<?> getAnimationSource()
 	{
-		BlockEntity tile = Cast.cast(this);
+		TileEntity tile = Cast.cast(this);
 		return IObjectSource.ofTile(tile).get();
 	}
 	
 	@Override
-	default Level getAnimatedObjectWorld()
+	default World getAnimatedObjectWorld()
 	{
-		BlockEntity tile = Cast.cast(this);
+		TileEntity tile = Cast.cast(this);
 		return tile.getLevel();
 	}
 	
 	@Override
-	default Vec3 getAnimatedObjectPosition()
+	default Vector3d getAnimatedObjectPosition()
 	{
-		BlockEntity tile = Cast.cast(this);
-		return Vec3.atCenterOf(tile.getBlockPos());
+		TileEntity tile = Cast.cast(this);
+		return Vector3d.atCenterOf(tile.getBlockPos());
 	}
 }

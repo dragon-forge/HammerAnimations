@@ -42,7 +42,7 @@ version = config.mod_version
 group = config.maven_group
 archivesBaseName = "${config.archive_name}-${config.mc_version}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 mixin {
     add sourceSets.main, "mixins.${config.mod_id}.refmap.json"
@@ -81,6 +81,9 @@ repositories {
     maven {
         name = "Zeitheron Maven"
         url = "https://maven.zeith.org/"
+        content {
+            includeGroupByRegex "org\\.zeith.*"
+        }
     }
     flatDir { dirs "libraries/${config.mc_version}/all" }
     flatDir { dirs "libraries/${config.mc_version}/classpathOnly" }
@@ -92,6 +95,13 @@ dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
 	implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
+
+    ////// UTILITY STUFF //////
+    // implementation 'java-oo:javac-oo-plugin:0.5'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly 'org.jetbrains:annotations:24.0.1'
+    ///////////////////////////
 
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 

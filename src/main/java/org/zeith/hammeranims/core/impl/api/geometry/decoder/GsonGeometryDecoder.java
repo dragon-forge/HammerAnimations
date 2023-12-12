@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
 import com.google.gson.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.utils.EmbeddedLocation;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;

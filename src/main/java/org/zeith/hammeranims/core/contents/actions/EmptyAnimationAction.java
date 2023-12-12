@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.contents.actions;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.CompoundNBT;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.animsys.actions.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
@@ -10,7 +10,7 @@ public class EmptyAnimationAction
 {
 	@NotNull
 	@Override
-	public AnimationActionInstance deserializeInstance(CompoundTag tag)
+	public AnimationActionInstance deserializeInstance(CompoundNBT tag)
 	{
 		return createInstance();
 	}

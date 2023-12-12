@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.client.render;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 public interface IVertexRenderer
 {
@@ -11,7 +11,7 @@ public interface IVertexRenderer
 				float nx, float ny, float nz // normal
 	);
 	
-	static IVertexRenderer wrap(VertexConsumer bb)
+	static IVertexRenderer wrap(IVertexBuilder bb)
 	{
 		return bb::vertex;
 	}

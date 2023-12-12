@@ -1,9 +1,8 @@
 package org.zeith.hammeranims.core.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import org.zeith.hammeranims.joml.*;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.utils.*;
+import org.zeith.hammeranims.joml.*;
 
 import java.lang.Math;
 import java.util.*;

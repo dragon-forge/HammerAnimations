@@ -1,7 +1,5 @@
 package org.zeith.hammeranims.core.proxy;
 
-import net.minecraft.server.packs.resources.*;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.fml.ModList;
@@ -10,9 +8,10 @@ import net.minecraftforge.forgespi.locating.IModFile;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammerlib.util.java.tuples.*;
+import org.zeith.hammerlib.util.mcf.RunnableReloader;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,20 +27,7 @@ public class ServerProxy
 	
 	public void reloadResources(AddReloadListenerEvent e)
 	{
-		e.addListener(new SimplePreparableReloadListener<Void>()
-		{
-			@Override
-			protected Void prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler)
-			{
-				return null;
-			}
-			
-			@Override
-			protected void apply(Void pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler)
-			{
-				reloadRegistries(wrapClassLoaderResources(), false);
-			}
-		});
+		e.addListener(new RunnableReloader(() -> reloadRegistries(wrapClassLoaderResources(), false)));
 	}
 	
 	public static IResourceProvider wrapClassLoaderResources()
@@ -55,7 +41,7 @@ public class ServerProxy
 		{
 			IModFile owner = namespace2ModFile.get(path.getNamespace());
 			
-			var res = owner.findResource("assets", path.getNamespace(), path.getPath());
+			Path res = owner.findResource("assets/" + path.getNamespace() + "/" + path.getPath());
 			
 			if(Files.isRegularFile(res))
 				try

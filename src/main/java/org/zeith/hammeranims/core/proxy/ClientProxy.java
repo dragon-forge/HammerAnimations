@@ -1,18 +1,17 @@
 package org.zeith.hammeranims.core.proxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.packs.resources.*;
-import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.client.event.*;
+import net.minecraft.client.resources.ReloadListener;
+import net.minecraft.profiler.IProfiler;
+import net.minecraft.resources.*;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
-import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
-import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
 import java.util.*;
@@ -28,12 +27,11 @@ public class ClientProxy
 	{
 		super.construct();
 		
-		var modBus = FMLJavaModLoadingContext.get().getModEventBus();
-		var forgeBus = MinecraftForge.EVENT_BUS;
+		IEventBus forgeBus = MinecraftForge.EVENT_BUS;
 		
-		modBus.addListener(this::registerReloaders);
 		forgeBus.addListener(this::clientTick);
-		forgeBus.addListener(this::registerClientCommand);
+		
+		registerReloaders((IReloadableResourceManager) Minecraft.getInstance().getResourceManager());
 	}
 	
 	private void clientTick(TickEvent.ClientTickEvent e)
@@ -47,27 +45,22 @@ public class ClientProxy
 		}
 	}
 	
-	public void registerClientCommand(RegisterClientCommandsEvent e)
+	public void registerReloaders(IReloadableResourceManager e)
 	{
-		e.getDispatcher().register(CommandReloadHA.command());
-	}
-	
-	public void registerReloaders(RegisterClientReloadListenersEvent e)
-	{
-		e.registerReloadListener(new SimplePreparableReloadListener<Void>()
+		e.registerReloadListener(new ReloadListener<Void>()
 		{
 			@Override
-			protected Void prepare(ResourceManager resources, ProfilerFiller profiler)
+			protected Void prepare(IResourceManager pResourceManager, IProfiler pProfiler)
 			{
 				return null;
 			}
 			
 			@Override
-			protected void apply(Void nothing, ResourceManager resources, ProfilerFiller profiler)
+			protected void apply(Void pObject, IResourceManager pResourceManager, IProfiler pProfiler)
 			{
 				disposeModels.addAll(createdModels);
 				createdModels.clear();
-				reloadRegistries(wrapVanillaResources(resources), true);
+				reloadRegistries(wrapVanillaResources(pResourceManager), true);
 			}
 		});
 	}
@@ -81,7 +74,7 @@ public class ClientProxy
 	}
 	
 	@Override
-	public Level getClientWorld()
+	public World getClientWorld()
 	{
 		return Minecraft.getInstance().level;
 	}

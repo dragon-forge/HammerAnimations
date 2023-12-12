@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core;
 
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -13,7 +13,7 @@ public class HammerHooks
 	@SubscribeEvent
 	public static void playerStartTracking(PlayerEvent.StartTracking e)
 	{
-		if(e.getTarget() instanceof IAnimatedObject o && e.getEntity() instanceof ServerPlayer player)
-			Network.sendTo(o.getAnimationSystem().createSyncPacket(), player);
+		if(e.getTarget() instanceof IAnimatedObject && e.getEntity() instanceof ServerPlayerEntity)
+			Network.sendTo(((IAnimatedObject) e.getTarget()).getAnimationSystem().createSyncPacket(), (ServerPlayerEntity) e.getEntity());
 	}
 }

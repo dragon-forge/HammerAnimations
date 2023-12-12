@@ -2,14 +2,14 @@ package org.zeith.hammeranims.core.client;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.commands.*;
+import net.minecraft.command.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.core.proxy.ClientProxy;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
 
 public class CommandReloadHA
 {
-	public static LiteralArgumentBuilder<CommandSourceStack> command()
+	public static LiteralArgumentBuilder<CommandSource> command()
 	{
 		return Commands.literal(HammerAnimations.MOD_ID)
 				.then(Commands.literal("reload")

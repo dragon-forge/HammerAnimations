@@ -1,11 +1,13 @@
 package org.zeith.hammeranims.core.js;
 
-import net.minecraft.util.Mth;
-import org.openjdk.nashorn.api.scripting.*;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import net.minecraft.util.math.MathHelper;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
+import org.zeith.hammeranims.core.utils.MinecraftHelper;
 
 import javax.script.*;
-import java.util.*;
+import java.util.Random;
+import java.util.function.Function;
 
 public class ExpressionParser
 {
@@ -21,7 +23,7 @@ public class ExpressionParser
 		{
 		}
 		
-		NashornScriptEngine js = (NashornScriptEngine) new NashornScriptEngineFactory().getScriptEngine();
+		ScriptEngine js = NashornFactory.createEngine();
 		try
 		{
 			js.put("Java", null); // Prevent exploiting Java types.
@@ -30,9 +32,9 @@ public class ExpressionParser
 			
 			String fun = "function get(query) {\n\tvar q = query;\n\treturn " + expression + ";\n}";
 			
-			var bindings = (ScriptObjectMirror) js.createBindings();
+			ScriptObjectMirror bindings = (ScriptObjectMirror) js.createBindings();
 			js.eval(fun, bindings);
-			var get = (ScriptObjectMirror) bindings.getMember("get");
+			ScriptObjectMirror get = (ScriptObjectMirror) bindings.getMember("get");
 			
 			InterpolatedDouble id0 = get.to(InterpolatedDouble.class);
 			
@@ -61,12 +63,12 @@ public class ExpressionParser
 		
 		public double cos(double x)
 		{
-			return Mth.cos((float) (x * Mth.DEG_TO_RAD));
+			return MathHelper.cos((float) (x * MinecraftHelper.DEG_TO_RAD));
 		}
 		
 		public double sin(double x)
 		{
-			return Mth.sin((float) (x * Mth.DEG_TO_RAD));
+			return MathHelper.sin((float) (x * MinecraftHelper.DEG_TO_RAD));
 		}
 		
 		public double abs(double x)
@@ -209,6 +211,25 @@ public class ExpressionParser
 			interpolatedAngle = (interpolatedAngle % 360 + 360) % 360;
 			
 			return interpolatedAngle;
+		}
+	}
+	
+	static class NashornFactory
+	{
+		NashornFactory()
+		{
+		}
+		
+		static ScriptEngine createEngine()
+		{
+			return (new jdk.nashorn.api.scripting.NashornScriptEngineFactory())
+					.getScriptEngine(s -> false);
+		}
+		
+		@SuppressWarnings("unchecked")
+		static <A, R> Function<A, R> getFunction(Bindings obj)
+		{
+			return a -> (R) ((ScriptObjectMirror) obj).call(obj, a);
 		}
 	}
 }

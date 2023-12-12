@@ -1,7 +1,8 @@
 package org.zeith.hammeranims.api.animsys;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
@@ -60,13 +61,14 @@ public class AnimationSystem
 	
 	public AnimationLocation activeAnimationLocation(String layer)
 	{
-		var l = getLayer(layer);
+		AnimationLayer
+				l = getLayer(layer);
 		return l == null ? DefaultsHA.NULL_ANIM.getLocation() : l.activeAnimationLocation();
 	}
 	
 	public boolean isActiveAnimation(String layer, IAnimationSource source)
 	{
-		var al = activeAnimationLocation(layer);
+		AnimationLocation al = activeAnimationLocation(layer);
 		return Objects.equals(al, source.getLocation());
 	}
 	
@@ -145,12 +147,12 @@ public class AnimationSystem
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundNBT serializeNBT()
 	{
-		var comp = newNBTCompound();
+		CompoundNBT comp = newNBTCompound();
 		comp.putDouble("Time", time);
 		
-		var layers = newNBTList();
+		ListNBT layers = newNBTList();
 		for(AnimationLayer layer : this.layers)
 			if(layer.persistent) // save only persistent layers
 				layers.add(layer.serializeNBT());
@@ -160,14 +162,14 @@ public class AnimationSystem
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag nbt)
+	public void deserializeNBT(CompoundNBT nbt)
 	{
 		time = nbt.getDouble("Time");
 		
-		var layers = nbt.getList("Layers", Tag.TAG_COMPOUND);
+		ListNBT layers = nbt.getList("Layers", Constants.NBT.TAG_COMPOUND);
 		for(int i = 0; i < layers.size(); i++)
 		{
-			var tag = layers.getCompound(i);
+			CompoundNBT tag = layers.getCompound(i);
 			AnimationLayer l = layerMap.get(tag.getString("Name"));
 			if(l != null && l.persistent) l.deserializeNBT(tag);
 		}

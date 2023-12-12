@@ -2,7 +2,8 @@ package org.zeith.hammeranims.core.impl.api.geometry;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
@@ -19,6 +20,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class GeometryContainerImpl
+		extends ForgeRegistryEntry<IGeometryContainer>
 		implements IGeometryContainer
 {
 	protected GeometryConstrainsImpl constraints = new GeometryConstrainsImpl(Collections.emptyMap());

@@ -2,29 +2,30 @@ package org.zeith.hammeranims.core.utils;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
-import net.minecraft.core.Vec3i;
-import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.vector.Vector3i;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
 public enum EnumFacing
-		implements StringRepresentable
+		implements IStringSerializable
 {
-	DOWN(0, 1, -1, "down", AxisDirection.NEGATIVE, Axis.Y, new Vec3i(0, -1, 0)),
-	UP(1, 0, -1, "up", AxisDirection.POSITIVE, Axis.Y, new Vec3i(0, 1, 0)),
-	NORTH(2, 3, 2, "north", AxisDirection.NEGATIVE, Axis.Z, new Vec3i(0, 0, -1)),
-	SOUTH(3, 2, 0, "south", AxisDirection.POSITIVE, Axis.Z, new Vec3i(0, 0, 1)),
-	WEST(4, 5, 1, "west", AxisDirection.NEGATIVE, Axis.X, new Vec3i(-1, 0, 0)),
-	EAST(5, 4, 3, "east", AxisDirection.POSITIVE, Axis.X, new Vec3i(1, 0, 0));
+	DOWN(0, 1, -1, "down", AxisDirection.NEGATIVE, Axis.Y, new Vector3i(0, -1, 0)),
+	UP(1, 0, -1, "up", AxisDirection.POSITIVE, Axis.Y, new Vector3i(0, 1, 0)),
+	NORTH(2, 3, 2, "north", AxisDirection.NEGATIVE, Axis.Z, new Vector3i(0, 0, -1)),
+	SOUTH(3, 2, 0, "south", AxisDirection.POSITIVE, Axis.Z, new Vector3i(0, 0, 1)),
+	WEST(4, 5, 1, "west", AxisDirection.NEGATIVE, Axis.X, new Vector3i(-1, 0, 0)),
+	EAST(5, 4, 3, "east", AxisDirection.POSITIVE, Axis.X, new Vector3i(1, 0, 0));
 	
 	public final int index, opposite, horizontalIndex;
 	public final String name;
 	public final AxisDirection axisDirection;
 	public final Axis axis;
-	public final Vec3i offset;
+	public final Vector3i offset;
 	
-	EnumFacing(int index, int opposite, int horizontalIndex, String name, AxisDirection axisDirection, Axis axis, Vec3i offset)
+	EnumFacing(int index, int opposite, int horizontalIndex, String name, AxisDirection axisDirection, Axis axis, Vector3i offset)
 	{
 		this.index = index;
 		this.opposite = opposite;
@@ -36,13 +37,13 @@ public enum EnumFacing
 	}
 	
 	@Override
-	public String getSerializedName()
+	public @NotNull String getSerializedName()
 	{
 		return name;
 	}
 	
 	public enum Axis
-			implements Predicate<EnumFacing>, StringRepresentable
+			implements Predicate<EnumFacing>, IStringSerializable
 	{
 		X("x", EnumFacing.Plane.HORIZONTAL),
 		Y("y", EnumFacing.Plane.VERTICAL),
@@ -50,12 +51,21 @@ public enum EnumFacing
 		
 		private static final Map<String, EnumFacing.Axis> NAME_LOOKUP = Maps.newHashMap();
 		private final String name;
+		/**
+		 * -- GETTER --
+		 * Get this Axis' Plane (VERTICAL for Y, HORIZONTAL for X and Z)
+		 */
 		private final EnumFacing.Plane plane;
 		
 		Axis(String name, EnumFacing.Plane plane)
 		{
 			this.name = name;
 			this.plane = plane;
+		}
+		
+		public Plane getPlane()
+		{
+			return plane;
 		}
 		
 		/**
@@ -103,16 +113,8 @@ public enum EnumFacing
 			return face != null && face.axis == this;
 		}
 		
-		/**
-		 * Get this Axis' Plane (VERTICAL for Y, HORIZONTAL for X and Z)
-		 */
-		public EnumFacing.Plane getPlane()
-		{
-			return this.plane;
-		}
-		
 		@Override
-		public String getSerializedName()
+		public @NotNull String getSerializedName()
 		{
 			return this.name;
 		}
@@ -131,6 +133,10 @@ public enum EnumFacing
 		POSITIVE(1, "Towards positive"),
 		NEGATIVE(-1, "Towards negative");
 		
+		/**
+		 * -- GETTER --
+		 * Get the offset for this AxisDirection. 1 for POSITIVE, -1 for NEGATIVE
+		 */
 		private final int offset;
 		private final String description;
 		
@@ -140,14 +146,12 @@ public enum EnumFacing
 			this.description = description;
 		}
 		
-		/**
-		 * Get the offset for this AxisDirection. 1 for POSITIVE, -1 for NEGATIVE
-		 */
 		public int getOffset()
 		{
-			return this.offset;
+			return offset;
 		}
 		
+		@Override
 		public String toString()
 		{
 			return this.description;
@@ -196,7 +200,7 @@ public enum EnumFacing
 			return face != null && face.axis.getPlane() == this;
 		}
 		
-		public Iterator<EnumFacing> iterator()
+		public @NotNull Iterator<EnumFacing> iterator()
 		{
 			return Iterators.forArray(this.facings());
 		}

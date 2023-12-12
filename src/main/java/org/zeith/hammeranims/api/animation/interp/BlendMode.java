@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.math.vector.Vector3d;
 import org.zeith.hammeranims.api.geometry.model.GeometryTransforms;
 import org.zeith.hammerlib.util.java.functions.Function3;
 
@@ -19,26 +19,26 @@ public enum BlendMode
 			(base, extra, weight) -> mult(base, lerp(GeometryTransforms.ONE, extra.scale(-1), weight))
 	);
 	
-	public final Function3<Vec3, Vec3, Float, Vec3> additiveTransform;
-	public final Function3<Vec3, Vec3, Float, Vec3> multiplicativeTransform;
+	public final Function3<Vector3d, Vector3d, Float, Vector3d> additiveTransform;
+	public final Function3<Vector3d, Vector3d, Float, Vector3d> multiplicativeTransform;
 	
-	BlendMode(Function3<Vec3, Vec3, Float, Vec3> additiveTransform, Function3<Vec3, Vec3, Float, Vec3> multiplicativeTransform)
+	BlendMode(Function3<Vector3d, Vector3d, Float, Vector3d> additiveTransform, Function3<Vector3d, Vector3d, Float, Vector3d> multiplicativeTransform)
 	{
 		this.additiveTransform = additiveTransform;
 		this.multiplicativeTransform = multiplicativeTransform;
 	}
 	
-	public static Vec3 lerp(Vec3 a, Vec3 b, float d)
+	public static Vector3d lerp(Vector3d a, Vector3d b, float d)
 	{
-		return new Vec3(
+		return new Vector3d(
 				(a.x + (b.x - a.x) * d),
 				(a.y + (b.y - a.y) * d),
 				(a.z + (b.z - a.z) * d)
 		);
 	}
 	
-	public static Vec3 mult(Vec3 a, Vec3 b)
+	public static Vector3d mult(Vector3d a, Vector3d b)
 	{
-		return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z);
+		return new Vector3d(a.x * b.x, a.y * b.y, a.z * b.z);
 	}
 }

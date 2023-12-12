@@ -1,13 +1,12 @@
 
 {
   "required": true,
-  "minVersion": "0.8.5",
+  "minVersion": "0.8.2",
   "package": "org.zeith.hammeranims.mixins",
   "refmap": "mixins.hammeranims.refmap.json",
   "target": "@env(DEFAULT)",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "Matrix4fAccessor"
   ],
   "client": [
   ],

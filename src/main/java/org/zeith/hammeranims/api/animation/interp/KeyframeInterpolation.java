@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.animation.interp;
 
 import it.unimi.dsi.fastutil.doubles.*;
-import net.minecraft.util.Mth;
+import net.minecraft.util.math.MathHelper;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animation.interp.keyframes.*;
 import org.zeith.hammerlib.util.java.tuples.*;
@@ -85,7 +85,7 @@ public class KeyframeInterpolation
 		double[] b = next.getVec(IKeyFrame.KeyFrameState.NEXT).get(query);
 		double[] res = new double[Math.min(a.length, b.length)];
 		for(int i = 0; i < res.length; i++)
-			res[i] = Mth.lerp(iv, a[i], b[i]);
+			res[i] = MathHelper.lerp(iv, a[i], b[i]);
 		return res;
 	}
 	

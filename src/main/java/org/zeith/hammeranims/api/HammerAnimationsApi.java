@@ -1,10 +1,10 @@
 package org.zeith.hammeranims.api;
 
 import com.google.common.collect.Lists;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.*;
-import org.zeith.api.registry.RegistryMapping;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
@@ -14,6 +14,8 @@ import org.zeith.hammeranims.api.utils.IResourceProvider;
 
 import java.util.*;
 import java.util.function.Supplier;
+
+import static org.zeith.hammerlib.util.java.Cast.constant;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class HammerAnimationsApi
@@ -29,32 +31,36 @@ public class HammerAnimationsApi
 	private static boolean hasInitialized = false;
 	
 	@SubscribeEvent
-	public static void newRegistries(NewRegistryEvent e)
+	public static void newRegistries(RegistryEvent.NewRegistry e)
 	{
-		ANIMATION_CONTAINERS = e.create(new RegistryBuilder<IAnimationContainer>()
-						.setName(HammerAnimations.id("animations"))
-						.disableSaving(),
-				reg -> RegistryMapping.report(IAnimationContainer.class, reg, false)
+		ANIMATION_CONTAINERS = constant(new RegistryBuilder<IAnimationContainer>()
+				.setType(IAnimationContainer.class)
+				.setName(HammerAnimations.id("animations"))
+				.disableSaving()
+				.create()
 		);
 		
-		GEOMETRY_CONTAINERS = e.create(new RegistryBuilder<IGeometryContainer>()
-						.setName(HammerAnimations.id("geometry"))
-						.disableSaving(),
-				reg -> RegistryMapping.report(IGeometryContainer.class, reg, false)
+		GEOMETRY_CONTAINERS = constant(new RegistryBuilder<IGeometryContainer>()
+				.setType(IGeometryContainer.class)
+				.setName(HammerAnimations.id("geometry"))
+				.disableSaving()
+				.create()
 		);
 		
-		TIME_FUNCTIONS = e.create(new RegistryBuilder<TimeFunction>()
+		TIME_FUNCTIONS = constant(new RegistryBuilder<TimeFunction>()
+						.setType(TimeFunction.class)
 						.setName(HammerAnimations.id("time_functions"))
 						.disableSaving()
-						.setDefaultKey(HammerAnimations.id("linear")),
-				reg -> RegistryMapping.report(TimeFunction.class, reg, false)
+						.setDefaultKey(HammerAnimations.id("linear"))
+				.create()
 		);
 		
-		ANIMATION_ACTIONS = e.create(new RegistryBuilder<AnimationAction>()
+		ANIMATION_ACTIONS = constant(new RegistryBuilder<AnimationAction>()
+						.setType(AnimationAction.class)
 						.setName(HammerAnimations.id("animation_actions"))
 						.disableSaving()
-						.setDefaultKey(HammerAnimations.id("empty")),
-				reg -> RegistryMapping.report(AnimationAction.class, reg, false)
+						.setDefaultKey(HammerAnimations.id("empty"))
+				.create()
 		);
 		
 		hasInitialized = true;

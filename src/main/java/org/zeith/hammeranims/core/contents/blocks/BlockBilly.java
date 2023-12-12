@@ -1,16 +1,13 @@
 package org.zeith.hammeranims.core.contents.blocks;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.*;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.*;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockReader;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.core.init.ContainersHA;
-import org.zeith.hammerlib.api.forge.BlockAPI;
 
 public class BlockBilly
-		extends BaseEntityBlock
+		extends ContainerBlock
 {
 	public BlockBilly()
 	{
@@ -19,15 +16,8 @@ public class BlockBilly
 	
 	@Nullable
 	@Override
-	public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState)
+	public TileEntity newBlockEntity(IBlockReader p_196283_1_)
 	{
-		return ContainersHA.BILLY_TILE.create(pPos, pState);
-	}
-	
-	@Nullable
-	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
-	{
-		return BlockAPI.ticker(pLevel);
+		return ContainersHA.BILLY_TILE.create();
 	}
 }

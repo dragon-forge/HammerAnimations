@@ -1,14 +1,17 @@
 package org.zeith.hammeranims.core.contents.actions;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.ChatType;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.animsys.actions.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
 import org.zeith.hammerlib.util.java.Cast;
+
+import java.util.UUID;
 
 public class PrintHelloWorldAction
 		extends AnimationAction
@@ -29,25 +32,26 @@ public class PrintHelloWorldAction
 	@Override
 	public void execute(AnimationActionInstance instance, AnimationLayer layer)
 	{
-		Level world = getAnimationWorld(layer);
+		World world = getAnimationWorld(layer);
 		
 		String msg = Cast.optionally(instance, HelloWorldActionInstance.class)
 				.map(HelloWorldActionInstance::message)
 				.orElse("");
 		
-		if(world instanceof ServerLevel sl)
-			sl.getServer().getPlayerList().broadcastSystemMessage(InstanceHelpers.componentText(
+		if(world instanceof ServerWorld)
+			world.getServer().getPlayerList().broadcastMessage(InstanceHelpers.componentText(
 					"Hello from server! Owner " + layer.system.owner + "@" + getAnimationPos(layer) +
-							" has finished animation " +
-							layer.getCurrentAnimation().getLocation() + " with message: " + msg), false);
+					" has finished animation " +
+					layer.getCurrentAnimation().getLocation() + " with message: " + msg), ChatType.CHAT, UUID.randomUUID());
 		else
 		{
-			for(Player player : world.players())
+			for(PlayerEntity player : world.players())
 			{
-				player.sendSystemMessage(InstanceHelpers.componentText(
-						"Hello from client! Owner " + layer.system.owner + "@" + getAnimationPos(layer) +
+				player.sendMessage(InstanceHelpers.componentText(
+								"Hello from client! Owner " + layer.system.owner + "@" + getAnimationPos(layer) +
 								" has finished animation " +
-								layer.getCurrentAnimation().getLocation() + " with message: " + msg)
+								layer.getCurrentAnimation().getLocation() + " with message: " + msg),
+						UUID.randomUUID()
 				);
 			}
 		}
@@ -75,15 +79,15 @@ public class PrintHelloWorldAction
 		}
 		
 		@Override
-		public CompoundTag serializeNBT()
+		public CompoundNBT serializeNBT()
 		{
-			CompoundTag tag = super.serializeNBT();
+			CompoundNBT tag = super.serializeNBT();
 			tag.putString("Msg", message);
 			return tag;
 		}
 		
 		@Override
-		public void deserializeNBT(CompoundTag nbt)
+		public void deserializeNBT(CompoundNBT nbt)
 		{
 			message = nbt.getString("Msg");
 			super.deserializeNBT(nbt);

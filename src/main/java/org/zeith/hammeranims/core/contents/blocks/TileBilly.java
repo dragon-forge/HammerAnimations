@@ -1,16 +1,14 @@
 package org.zeith.hammeranims.core.contents.blocks;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.entity.*;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.TileEntityType;
 import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.tile.IAnimatedTile;
 import org.zeith.hammeranims.core.init.*;
+import org.zeith.hammeranims.core.utils.MinecraftHelper;
 import org.zeith.hammeranims.joml.*;
 import org.zeith.hammerlib.api.io.NBTSerializable;
 import org.zeith.hammerlib.tiles.TileSyncableTickable;
@@ -22,9 +20,14 @@ public class TileBilly
 	@NBTSerializable
 	public final AnimationSystem animations = AnimationSystem.create(this);
 	
-	public TileBilly(BlockEntityType<TileBilly> type, BlockPos pos, BlockState state)
+	public TileBilly(TileEntityType<TileBilly> type)
 	{
-		super(type, pos, state);
+		super(type);
+	}
+	
+	public TileBilly()
+	{
+		super(ContainersHA.BILLY_TILE);
 	}
 	
 	@Override
@@ -71,7 +74,7 @@ public class TileBilly
 		
 		mat.identity()
 				.translate(worldPosition.getX() + 0.5F, worldPosition.getY(), worldPosition.getZ() + 0.5F)
-				.rotateY((float) (Mth.DEG_TO_RAD * 0));
+				.rotateY((float) (MinecraftHelper.DEG_TO_RAD * 0));
 		IPositionalModel posMod = ContainersHA.BILLY_GEOM.getPositionalModel();
 		posMod.applySystem(1F, animations);
 		if(posMod.applyBoneTransforms(mat, "bob"))
