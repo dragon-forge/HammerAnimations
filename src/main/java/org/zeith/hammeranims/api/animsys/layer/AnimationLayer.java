@@ -61,6 +61,11 @@ public class AnimationLayer
 		return currentAnimation != null ? currentAnimation.config.animation : DefaultsHA.NULL_ANIM.get();
 	}
 	
+	public boolean startAnimation(@Nonnull IAnimationSource animation)
+	{
+		return startAnimation(animation.configure());
+	}
+	
 	public boolean startAnimation(@Nonnull ConfiguredAnimation animation)
 	{
 		check:
@@ -159,6 +164,11 @@ public class AnimationLayer
 			if(currentAnimation.config.next != null)
 				startAnimation(currentAnimation.config.next);
 		}
+	}
+	
+	public boolean stopAnimation()
+	{
+		return startAnimation(ConfiguredAnimation.noAnimation());
 	}
 	
 	@Override

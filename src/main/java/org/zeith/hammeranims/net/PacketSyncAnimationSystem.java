@@ -3,11 +3,11 @@ package org.zeith.hammeranims.net;
 import com.zeitheron.hammercore.net.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.*;
+import org.zeith.hammeranims.core.client.ClientHammerHooks;
 
 @MainThreaded
 public class PacketSyncAnimationSystem
@@ -43,18 +43,13 @@ public class PacketSyncAnimationSystem
 		if(type != null)
 			source = type.readSource(nbt.getCompoundTag("Src"));
 		else
-			HammerAnimations.LOG.warn("Unable to find animation source {}", nbt.getString("Type"));
+			HammerAnimations.LOG.warn("Unable to find animation source {} sent by server.", nbt.getString("Type"));
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void executeOnClient2(PacketContext net)
 	{
-		World world = HammerAnimations.PROXY.getClientWorld();
-		if(world != null)
-		{
-			IAnimatedObject object = source.get(world);
-			if(object != null) object.getAnimationSystem().deserializeNBT(tag);
-		}
+		ClientHammerHooks.applySystem(source, tag, 100);
 	}
 }

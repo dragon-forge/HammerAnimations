@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.animsys;
 
-import com.zeitheron.hammercore.net.HCNet;
+import com.zeitheron.hammercore.net.*;
 import net.minecraft.nbt.*;
 import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
@@ -38,11 +38,16 @@ public class AnimationSystem
 		this.layerMap = Collections.unmodifiableMap(layerMap);
 	}
 	
+	public IPacket createSyncPacket()
+	{
+		return new PacketSyncAnimationSystem(this);
+	}
+	
 	public void sync()
 	{
 		if(!owner.getAnimatedObjectWorld().isRemote && canSync) // if on server
 			HCNet.INSTANCE.sendToAllAroundTracking(
-					new PacketSyncAnimationSystem(this),
+					createSyncPacket(),
 					HCNet.point(
 							owner.getAnimatedObjectWorld(),
 							owner.getAnimatedObjectPosition(),
@@ -95,6 +100,11 @@ public class AnimationSystem
 	public AnimationLayer[] getLayers()
 	{
 		return layers;
+	}
+	
+	public Set<Map.Entry<String, AnimationLayer>> entrySet()
+	{
+		return layerMap.entrySet();
 	}
 	
 	public void tick()
