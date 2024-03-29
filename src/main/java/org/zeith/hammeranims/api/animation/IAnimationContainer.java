@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
  * - Optionally perform static import for {@link IAnimationContainer#create()}.
  */
 public interface IAnimationContainer
-	extends IAnimationSource, IForgeRegistryEntry<IAnimationContainer>
+		extends IAnimationSource, IForgeRegistryEntry<IAnimationContainer>
 {
 	/**
 	 * Reloads the animation container using the provided resource provider.

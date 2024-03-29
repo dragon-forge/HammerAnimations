@@ -5,7 +5,7 @@ import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.core.contents.actions.EmptyAnimationAction;
-import org.zeith.hammeranims.core.contents.time.LinearTimeFunction;
+import org.zeith.hammeranims.core.contents.time.*;
 import org.zeith.hammerlib.annotations.*;
 
 @SimplyRegister
@@ -16,6 +16,9 @@ public interface DefaultsHA
 	
 	@RegistryName("linear")
 	TimeFunction LINEAR_TIME = new LinearTimeFunction();
+	
+	@RegistryName("normalized")
+	NormalizedTimeFunction NORMALIZED_TIME = new NormalizedTimeFunction();
 	
 	@RegistryName("empty")
 	AnimationAction EMPTY_ACTION = new EmptyAnimationAction();

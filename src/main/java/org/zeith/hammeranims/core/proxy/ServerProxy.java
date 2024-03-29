@@ -8,7 +8,6 @@ import net.minecraftforge.forgespi.locating.IModFile;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammerlib.util.java.tuples.*;
-import org.zeith.hammerlib.util.mcf.RunnableReloader;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -27,7 +26,9 @@ public class ServerProxy
 	
 	public void reloadResources(AddReloadListenerEvent e)
 	{
-		e.addListener(new RunnableReloader(() -> reloadRegistries(wrapClassLoaderResources(), false)));
+		e.addListener((preparationBarrier, resourceManager, profilerFiller, profilerFiller1, pBackgroundExecutor, pGameExecutor) ->
+				reloadRegistries(preparationBarrier, wrapClassLoaderResources(), false, pGameExecutor, pBackgroundExecutor)
+		);
 	}
 	
 	public static IResourceProvider wrapClassLoaderResources()

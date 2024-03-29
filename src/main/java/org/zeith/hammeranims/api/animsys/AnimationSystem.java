@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.animsys;
 
+import lombok.var;
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
@@ -46,11 +47,13 @@ public class AnimationSystem
 	
 	public void sync()
 	{
-		if(!owner.getAnimatedObjectWorld().isClientSide && canSync) // if on server
-			Network.sendToTracking(
-					createSyncPacket(),
-					owner.getAnimatedObjectWorld().getChunkAt(new BlockPos(owner.getAnimatedObjectPosition()))
-			);
+		var world = owner.getAnimatedObjectWorld();
+		if(owner.getAnimatedObjectWorld().isClientSide || !canSync) // if on server
+			return;
+		var pos = new BlockPos(owner.getAnimatedObjectPosition());
+		if(!world.isLoaded(pos))
+			return;
+		Network.sendToTracking(createSyncPacket(), world.getChunkAt(pos));
 	}
 	
 	@Nullable

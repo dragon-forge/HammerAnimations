@@ -56,6 +56,7 @@ public class TileBilly
 			animations.startAnimationAt(CommonLayerNames.LEGS, ContainersHA.BILLY_WALK.configure()
 					.speed(power / 15F)
 					.loopMode(LoopMode.ONCE)
+					.timeFunction(DefaultsHA.NORMALIZED_TIME.of(10))
 					.next(ContainersHA.BILLY_WALK.configure()
 							.speed(2F)
 							.loopMode(LoopMode.ONCE)
@@ -79,11 +80,16 @@ public class TileBilly
 		posMod.applySystem(1F, animations);
 		if(posMod.applyBoneTransforms(mat, "bob"))
 		{
-			Vector3f relativePos = new Vector3f(-2 / 16F, 1 / 16F, 1 / 16F);
+			Vector3f relativePos = new Vector3f(-2 / 16F, 2 / 16F, 1 / 16F);
 			mat.transformPosition(relativePos);
 			
+			Vector3f relativePosUp = new Vector3f(-2 / 16F, 2 / 16F, 2 / 16F);
+			mat.transformPosition(relativePosUp);
+			
+			relativePosUp.sub(relativePos).normalize(0.1f);
+			
 			if(atTickRate(5))
-				level.addParticle(ParticleTypes.END_ROD, relativePos.x, relativePos.y, relativePos.z, 0, 0.1, 0);
+				level.addParticle(ParticleTypes.END_ROD, relativePos.x, relativePos.y, relativePos.z, relativePosUp.x, relativePosUp.y, relativePosUp.z);
 		}
 	}
 	

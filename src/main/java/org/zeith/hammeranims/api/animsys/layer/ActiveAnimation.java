@@ -37,7 +37,7 @@ public class ActiveAnimation
 		return config.animation == null
 				|| (config.loopMode == LoopMode.ONCE && (
 				(data = config.animation.getData()) == null
-						|| (sysTime - activationTime) * config.speed >= data.getLengthSeconds()
+						|| (sysTime - activationTime) * config.speed >= getLengthSeconds()
 		));
 	}
 	
@@ -69,5 +69,10 @@ public class ActiveAnimation
 	public float getWeight()
 	{
 		return realTimeWeight * config.weight * config.getAnimation().getData().getWeight();
+	}
+	
+	public double getLengthSeconds()
+	{
+		return config.timeFunction.getLengthSeconds(this);
 	}
 }

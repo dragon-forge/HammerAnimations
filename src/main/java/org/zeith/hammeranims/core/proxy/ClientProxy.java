@@ -1,20 +1,19 @@
 package org.zeith.hammeranims.core.proxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.ReloadListener;
-import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.*;
+import net.minecraft.util.Util;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class ClientProxy
 		extends CommonProxy
@@ -47,21 +46,11 @@ public class ClientProxy
 	
 	public void registerReloaders(IReloadableResourceManager e)
 	{
-		e.registerReloadListener(new ReloadListener<Void>()
+		e.registerReloadListener((preparationBarrier, resourceManager, profilerFiller, profilerFiller1, pBackgroundExecutor, pGameExecutor) ->
 		{
-			@Override
-			protected Void prepare(IResourceManager pResourceManager, IProfiler pProfiler)
-			{
-				return null;
-			}
-			
-			@Override
-			protected void apply(Void pObject, IResourceManager pResourceManager, IProfiler pProfiler)
-			{
-				disposeModels.addAll(createdModels);
-				createdModels.clear();
-				reloadRegistries(wrapVanillaResources(pResourceManager), true);
-			}
+			disposeModels.addAll(createdModels);
+			createdModels.clear();
+			return reloadRegistries(preparationBarrier, wrapVanillaResources(resourceManager), true, pGameExecutor, pBackgroundExecutor);
 		});
 	}
 	
@@ -83,7 +72,13 @@ public class ClientProxy
 	{
 		disposeModels.addAll(createdModels);
 		createdModels.clear();
-		HammerAnimations.PROXY.reloadRegistries(wrapVanillaResources(Minecraft.getInstance()
-				.getResourceManager()), true);
+		Minecraft mc = Minecraft.getInstance();
+		
+		IFutureReloadListener.IStage b = CompletableFuture::completedFuture;
+		
+		HammerAnimations.PROXY.reloadRegistries(b, wrapVanillaResources(mc.getResourceManager()), true,
+				mc,
+				Util.backgroundExecutor()
+		);
 	}
 }
