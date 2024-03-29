@@ -6,7 +6,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.apache.logging.log4j.*;
+import org.zeith.hammeranims.core.contents.entity.EntityBilly;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
 import org.zeith.hammeranims.core.proxy.CommonProxy;
@@ -55,6 +57,9 @@ public class HammerAnimations
 	public void preInit(FMLPreInitializationEvent e)
 	{
 		HammerCore.registerKernelsForMod(MOD_ID);
+		EntityRegistry.registerModEntity(id("billy"), EntityBilly.class, "billy", 0, this, 64, 2, true);
+		
+		PROXY.preInit();
 	}
 	
 	@Mod.EventHandler

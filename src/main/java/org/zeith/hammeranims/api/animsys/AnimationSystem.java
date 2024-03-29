@@ -99,6 +99,11 @@ public class AnimationSystem
 		return startAnimationAt(layer, ConfiguredAnimation.noAnimation());
 	}
 	
+	public boolean stopAnimation(String layer, float transitionTime)
+	{
+		return startAnimationAt(layer, ConfiguredAnimation.noAnimation().transitionTime(transitionTime));
+	}
+	
 	public Set<String> getLayerNames()
 	{
 		return layerMap.keySet();

@@ -8,6 +8,7 @@ import net.minecraft.client.resources.*;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.resource.*;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.zeith.hammeranims.HammerAnimations;
@@ -17,8 +18,10 @@ import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.client.render.*;
+import org.zeith.hammeranims.core.client.render.entity.RenderEntityBilly;
 import org.zeith.hammeranims.core.client.render.tile.RenderTileBilly;
 import org.zeith.hammeranims.core.contents.blocks.TileBilly;
+import org.zeith.hammeranims.core.contents.entity.EntityBilly;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
 import java.io.IOException;
@@ -57,11 +60,19 @@ public class ClientProxy
 	}
 	
 	@Override
+	public void preInit()
+	{
+		super.preInit();
+		RenderingRegistry.registerEntityRenderingHandler(EntityBilly.class, RenderEntityBilly::new);
+	}
+	
+	@Override
 	public void init()
 	{
 		super.init();
 		
 		ClientCommandHandler.instance.registerCommand(new CommandReloadHA());
+		
 		
 		new RenderTileBilly().bindTo(TileBilly.class);
 		
