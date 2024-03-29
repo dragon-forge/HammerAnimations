@@ -17,6 +17,6 @@ public class Query
 	{
 		this.anim_time = anim.config.timeFunction.getTime(system, sysTime, partialTicks, anim);
 		var a = anim.config.animation;
-		this.anim_duration = this.anim_length = a != null && a.getData() != null ? a.getData().getLengthSeconds() : 0;
+		this.anim_duration = this.anim_length = anim.getLengthSeconds();
 	}
 }

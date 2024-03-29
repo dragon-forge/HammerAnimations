@@ -1,24 +1,51 @@
 package org.zeith.hammeranims.api.time;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
 
+import javax.annotation.Nonnull;
+
 public abstract class TimeFunction
 {
-	public abstract double computeTime(AnimationSystem system, double sysTime, float partialTicks, ActiveAnimation animation);
+	public abstract double computeTime(AnimationSystem system, double sysTime, float partialTicks, ActiveAnimation animation, TimeFunctionInstance instance);
 	
-	public double getTime(AnimationSystem system, double sysTime, float partialTicks, ActiveAnimation animation)
+	@Nonnull
+	protected TimeFunctionInstance createInstance()
 	{
-		double time = computeTime(system, sysTime, partialTicks, animation);
+		return new TimeFunctionInstance(this);
+	}
+	
+	public TimeFunctionInstance defaultInstance()
+	{
+		return createInstance();
+	}
+	
+	@Nonnull
+	public TimeFunctionInstance deserializeInstance(CompoundTag tag)
+	{
+		TimeFunctionInstance inst = createInstance();
+		inst.deserializeNBT(tag);
+		return inst;
+	}
+	
+	public double getLengthSeconds(ActiveAnimation animation, TimeFunctionInstance instance)
+	{
+		return animation.config.animation.getData().getLengthSeconds();
+	}
+	
+	public double getTime(AnimationSystem system, double sysTime, float partialTicks, ActiveAnimation animation, TimeFunctionInstance instance)
+	{
+		double time = computeTime(system, sysTime, partialTicks, animation, instance);
 		
 		if(animation.config.animation != null)
 		{
 			LoopMode mode = animation.config.loopMode;
 			
-			double duration = animation.config.animation.getData().getLengthSeconds();
+			double duration = getLengthSeconds(animation, instance);
 			
 			if(animation.config.reverse)
 			{

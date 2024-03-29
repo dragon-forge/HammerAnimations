@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.proxy;
 
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.*;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -12,10 +13,10 @@ import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
-import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 public class ClientProxy
 		extends CommonProxy
@@ -54,21 +55,11 @@ public class ClientProxy
 	
 	public void registerReloaders(RegisterClientReloadListenersEvent e)
 	{
-		e.registerReloadListener(new SimplePreparableReloadListener<Void>()
+		e.registerReloadListener((preparationBarrier, resourceManager, profilerFiller, profilerFiller1, pBackgroundExecutor, pGameExecutor) ->
 		{
-			@Override
-			protected Void prepare(ResourceManager resources, ProfilerFiller profiler)
-			{
-				return null;
-			}
-			
-			@Override
-			protected void apply(Void nothing, ResourceManager resources, ProfilerFiller profiler)
-			{
-				disposeModels.addAll(createdModels);
-				createdModels.clear();
-				reloadRegistries(wrapVanillaResources(resources), true);
-			}
+			disposeModels.addAll(createdModels);
+			createdModels.clear();
+			return reloadRegistries(preparationBarrier, wrapVanillaResources(resourceManager), true, pGameExecutor, pBackgroundExecutor);
 		});
 	}
 	
@@ -90,7 +81,13 @@ public class ClientProxy
 	{
 		disposeModels.addAll(createdModels);
 		createdModels.clear();
-		HammerAnimations.PROXY.reloadRegistries(wrapVanillaResources(Minecraft.getInstance()
-				.getResourceManager()), true);
+		var mc = Minecraft.getInstance();
+		
+		PreparableReloadListener.PreparationBarrier b = CompletableFuture::completedFuture;
+		
+		HammerAnimations.PROXY.reloadRegistries(b, wrapVanillaResources(mc.getResourceManager()), true,
+				mc,
+				Util.backgroundExecutor()
+		);
 	}
 }
