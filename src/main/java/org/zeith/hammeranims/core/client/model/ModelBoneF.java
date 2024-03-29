@@ -14,6 +14,8 @@ public class ModelBoneF
 {
 	protected ModelBoneF parent;
 	
+	public IRenderableHook renderHook = IRenderableHook.NOTHING;
+	
 	private final Vector3f scale = new Vector3f(1, 1, 1);
 	public Vector3f offset = new Vector3f();
 	private final Vector3f rotation; // in radians
@@ -85,6 +87,7 @@ public class ModelBoneF
 	{
 		for(ModelCubeF cube : cubes)
 			cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		renderHook.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
 	public void applyTransform(PoseStack stack)

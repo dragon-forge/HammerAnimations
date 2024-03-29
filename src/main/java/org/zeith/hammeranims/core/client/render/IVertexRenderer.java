@@ -2,10 +2,13 @@ package org.zeith.hammeranims.core.client.render;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraftforge.fml.relauncher.*;
+import org.zeith.hammeranims.core.client.render.vertex.IVertexOperator;
 
 public interface IVertexRenderer
 {
-	IVertexRenderer DUMMY = (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz) -> {};
+	IVertexRenderer DUMMY = (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz) ->
+	{
+	};
 	
 	void vertex(float x, float y, float z,// position
 				float red, float green, float blue, float alpha, // color
@@ -13,6 +16,18 @@ public interface IVertexRenderer
 				int packedOverlay, int packedLight, //
 				float nx, float ny, float nz // normal
 	);
+	
+	default IVertexRenderer apply(IVertexOperator op)
+	{
+		return op.apply(this);
+	}
+	
+	default IVertexRenderer apply(IVertexOperator... ops)
+	{
+		IVertexRenderer r = this;
+		for(IVertexOperator op : ops) r = op.apply(r);
+		return r;
+	}
 	
 	@SideOnly(Side.CLIENT)
 	static IVertexRenderer wrap(BufferBuilder bb)
