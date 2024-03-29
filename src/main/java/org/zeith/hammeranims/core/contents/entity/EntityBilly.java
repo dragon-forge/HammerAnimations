@@ -46,7 +46,7 @@ public class EntityBilly
 		animations.tick();
 		super.tick();
 		
-		if(level.isClientSide) return;
+		if(level().isClientSide) return;
 		
 		setCustomNameVisible(false);
 		setCustomName(ContainersHA.BILLY_BLOCK.getName());

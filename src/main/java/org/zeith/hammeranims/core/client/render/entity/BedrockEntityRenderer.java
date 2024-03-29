@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.core.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,8 +34,8 @@ public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEn
 	{
 		super.setupRotations(pEntityLiving, pMatrixStack, pAgeInTicks, pRotationYaw, pPartialTicks);
 		pMatrixStack.translate(0, 1.5F, 0);
-		pMatrixStack.mulPose(Vector3f.XP.rotationDegrees(180f));
-		pMatrixStack.mulPose(Vector3f.YP.rotationDegrees(180f));
+		pMatrixStack.mulPose(Axis.XP.rotationDegrees(180f));
+		pMatrixStack.mulPose(Axis.YP.rotationDegrees(180f));
 	}
 	
 	protected void addProcessors(BedrockModelWrapper<T> model)
