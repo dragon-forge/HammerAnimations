@@ -1,7 +1,5 @@
 package org.zeith.hammeranims.core.proxy;
 
-import net.minecraft.server.packs.resources.*;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.fml.ModList;
@@ -28,20 +26,9 @@ public class ServerProxy
 	
 	public void reloadResources(AddReloadListenerEvent e)
 	{
-		e.addListener(new SimplePreparableReloadListener<Void>()
-		{
-			@Override
-			protected Void prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler)
-			{
-				return null;
-			}
-			
-			@Override
-			protected void apply(Void pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler)
-			{
-				reloadRegistries(wrapClassLoaderResources(), false);
-			}
-		});
+		e.addListener((preparationBarrier, resourceManager, profilerFiller, profilerFiller1, pBackgroundExecutor, pGameExecutor) ->
+				reloadRegistries(preparationBarrier, wrapClassLoaderResources(), false, pGameExecutor, pBackgroundExecutor)
+		);
 	}
 	
 	public static IResourceProvider wrapClassLoaderResources()

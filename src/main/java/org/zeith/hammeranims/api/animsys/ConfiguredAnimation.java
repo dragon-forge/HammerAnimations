@@ -1,12 +1,10 @@
 package org.zeith.hammeranims.api.animsys;
 
 import net.minecraft.nbt.*;
-import net.minecraft.resources.ResourceLocation;
-import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.actions.*;
 import org.zeith.hammeranims.api.animsys.layer.*;
-import org.zeith.hammeranims.api.time.TimeFunction;
+import org.zeith.hammeranims.api.time.*;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
@@ -25,7 +23,7 @@ public class ConfiguredAnimation
 	public float startTime = 0F;
 	public boolean reverse = false;
 	public float transitionTime = 0.25F; // 0.25 sec
-	public TimeFunction timeFunction = DefaultsHA.LINEAR_TIME;
+	public TimeFunctionInstance timeFunction = TimeFunctionInstance.EMPTY;
 	public boolean important = false;
 	public LoopMode loopMode = LoopMode.ONCE;
 	
@@ -61,13 +59,13 @@ public class ConfiguredAnimation
 	public boolean same(ConfiguredAnimation other)
 	{
 		return this.speed == other.speed
-				&& this.weight == other.weight
-				&& this.loopMode == other.loopMode
-				&& this.startTime == other.startTime
-				&& this.transitionTime == other.transitionTime
-				&& this.timeFunction == other.timeFunction
-				&& this.reverse == other.reverse
-				&& this.animation == other.animation;
+			   && this.weight == other.weight
+			   && this.loopMode == other.loopMode
+			   && this.startTime == other.startTime
+			   && this.transitionTime == other.transitionTime
+			   && this.timeFunction.equals(other.timeFunction)
+			   && this.reverse == other.reverse
+			   && this.animation == other.animation;
 	}
 	
 	public void setAnimation(Animation animation)
@@ -142,6 +140,12 @@ public class ConfiguredAnimation
 	
 	public ConfiguredAnimation timeFunction(TimeFunction timeFunction)
 	{
+		this.timeFunction = timeFunction.defaultInstance();
+		return this;
+	}
+	
+	public ConfiguredAnimation timeFunction(TimeFunctionInstance timeFunction)
+	{
 		this.timeFunction = timeFunction;
 		return this;
 	}
@@ -186,7 +190,7 @@ public class ConfiguredAnimation
 	public CompoundTag serializeNBT()
 	{
 		var tag = InstanceHelpers.newNBTCompound();
-		tag.putString("Time", timeFunction.getRegistryKey().toString());
+		tag.put("Time", timeFunction.serializeNBT());
 		tag.putString("Animation", animation.getLocation().toString());
 		tag.putFloat("Weight", weight);
 		tag.putBoolean("Reverse", reverse);
@@ -210,8 +214,7 @@ public class ConfiguredAnimation
 	@Override
 	public void deserializeNBT(CompoundTag tag)
 	{
-		this.timeFunction = HammerAnimationsApi.timeFunctions().getValue(new ResourceLocation(tag.getString("Time")));
-		if(this.timeFunction == null) this.timeFunction = DefaultsHA.LINEAR_TIME;
+		this.timeFunction = TimeFunctionInstance.of(tag.getCompound("Time"));
 		
 		this.setAnimation(new AnimationLocation(tag.getString("Animation")).resolve().orElse(null));
 		this.weight = tag.getFloat("Weight");
