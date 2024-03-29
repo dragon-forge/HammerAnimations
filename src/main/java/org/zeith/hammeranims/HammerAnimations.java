@@ -9,12 +9,10 @@ import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.event.*;
 import org.apache.logging.log4j.*;
-import org.zeith.hammeranims.api.annotations.*;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
 import org.zeith.hammeranims.core.init.ContainersHA;
 import org.zeith.hammeranims.core.proxy.CommonProxy;
-import org.zeith.hammeranims.core.utils.reg.*;
 
 import java.lang.annotation.Annotation;
 import java.util.function.BiConsumer;
@@ -54,14 +52,6 @@ public class HammerAnimations
 		LOG.info("{} is constructing.", MOD_NAME);
 		MinecraftForge.EVENT_BUS.register(PROXY);
 		PROXY.construct();
-		
-		ASMDataTable asm = e.getASMHarvestedData();
-		
-		scan(asm, RegisterAnimations.class, AnimationRegistrar::new);
-		scan(asm, RegisterGeometries.class, GeometryRegistrar::new);
-		scan(asm, RegisterTimeFunctions.class, TimeFunctionRegistrar::new);
-		scan(asm, RegisterAnimationSourceTypes.class, AnimationSourceTypesRegistrar::new);
-		scan(asm, RegisterAnimations.class, AnimationActionsRegistrar::new);
 	}
 	
 	@Mod.EventHandler
