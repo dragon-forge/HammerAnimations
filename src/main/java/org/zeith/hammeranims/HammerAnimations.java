@@ -4,25 +4,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.*;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.*;
-import org.zeith.hammeranims.api.HammerAnimationsApi;
-import org.zeith.hammeranims.api.animation.IAnimationContainer;
-import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
-import org.zeith.hammeranims.api.annotations.*;
-import org.zeith.hammeranims.api.geometry.IGeometryContainer;
-import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
 import org.zeith.hammeranims.core.proxy.*;
-import org.zeith.hammeranims.core.utils.BasicRegistrar;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.event.fml.FMLFingerprintCheckEvent;
 import org.zeith.hammerlib.util.CommonMessages;
-import org.zeith.hammerlib.util.mcf.ScanDataHelper;
-
-import java.lang.annotation.Annotation;
-import java.util.function.*;
 
 @Mod(HammerAnimations.MOD_ID)
 public class HammerAnimations
@@ -49,11 +38,6 @@ public class HammerAnimations
 		PROXY.construct();
 		
 		LanguageAdapter.registerMod(MOD_ID);
-		
-		scan(RegisterAnimations.class, (n, mod) -> BasicRegistrar.perform(IAnimationContainer.class, HammerAnimationsApi::animations, n, mod));
-		scan(RegisterGeometries.class, (n, mod) -> BasicRegistrar.perform(IGeometryContainer.class, HammerAnimationsApi::geometries, n, mod));
-		scan(RegisterTimeFunctions.class, (n, mod) -> BasicRegistrar.perform(TimeFunction.class, HammerAnimationsApi::timeFunctions, n, mod));
-		scan(RegisterAnimations.class, (n, mod) -> BasicRegistrar.perform(AnimationAction.class, HammerAnimationsApi::animationActions, n, mod));
 	}
 	
 	@SubscribeEvent
@@ -67,21 +51,5 @@ public class HammerAnimations
 	public static ResourceLocation id(String path)
 	{
 		return new ResourceLocation(MOD_ID, path);
-	}
-	
-	private void scan(Class<? extends Annotation> type, BiConsumer<Supplier<Class<?>>, FMLModContainer> handler)
-	{
-		for(ScanDataHelper.ModAwareAnnotationData data : ScanDataHelper.lookupAnnotatedObjects(type))
-		{
-			var mod = data.getOwnerMod().orElse(null);
-			if(mod == null)
-			{
-				LOG.warn("Skipping @{}-annotated class {} since it does not belong to any mod.", type.getSimpleName(), data.clazz());
-				continue;
-			}
-			handler.accept(data::getOwnerClass, mod);
-			LOG.info("Applied @{} to {}, which belongs to {} ({})", type.getSimpleName(), data.clazz(), mod.getModId(), mod.getModInfo()
-					.getDisplayName());
-		}
 	}
 }
