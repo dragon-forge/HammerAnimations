@@ -1,28 +1,27 @@
 package org.zeith.hammeranims.core.init;
 
+import com.zeitheron.hammercore.annotations.*;
 import org.zeith.hammeranims.api.animation.*;
-import org.zeith.hammeranims.api.annotations.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.core.contents.actions.PrintHelloWorldAction;
 import org.zeith.hammeranims.core.contents.blocks.BlockBilly;
 
-@RegisterAnimationActions
-@RegisterAnimations
-@RegisterGeometries
+@SimplyRegister
 public interface ContainersHA
 {
+	@RegistryName("billy")
 	BlockBilly BILLY_BLOCK = new BlockBilly();
 	
-	@Key("billy")
+	@RegistryName("billy")
 	IAnimationContainer BILLY_ANIM = IAnimationContainer.create();
 	
-	@Key("billy_breathe")
+	@RegistryName("billy_breathe")
 	IAnimationContainer BILLY_BREATHE = IAnimationContainer.create();
 	
-	@Key("billy")
+	@RegistryName("billy")
 	IGeometryContainer BILLY_GEOM = IGeometryContainer.create();
 	
-	@Key("hello_world")
+	@RegistryName("hello_world")
 	PrintHelloWorldAction HELLO_WORLD_ACTION = new PrintHelloWorldAction();
 	
 	AnimationHolder BILLY_WALK = new AnimationHolder(BILLY_ANIM, "walk");

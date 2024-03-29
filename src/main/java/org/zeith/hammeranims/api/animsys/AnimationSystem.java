@@ -2,6 +2,8 @@ package org.zeith.hammeranims.api.animsys;
 
 import com.zeitheron.hammercore.net.*;
 import net.minecraft.nbt.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
@@ -45,15 +47,20 @@ public class AnimationSystem
 	
 	public void sync()
 	{
-		if(!owner.getAnimatedObjectWorld().isRemote && canSync) // if on server
-			HCNet.INSTANCE.sendToAllAroundTracking(
-					createSyncPacket(),
-					HCNet.point(
-							owner.getAnimatedObjectWorld(),
-							owner.getAnimatedObjectPosition(),
-							256
-					)
-			);
+		World world = owner.getAnimatedObjectWorld();
+		if(world.isRemote || !canSync) // if on server
+			return;
+		BlockPos pos = new BlockPos(owner.getAnimatedObjectPosition());
+		if(!world.isBlockLoaded(pos))
+			return;
+		HCNet.INSTANCE.sendToAllAroundTracking(
+				createSyncPacket(),
+				HCNet.point(
+						world,
+						owner.getAnimatedObjectPosition(),
+						256
+				)
+		);
 	}
 	
 	@Nullable

@@ -10,15 +10,14 @@ import net.minecraftforge.client.resource.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.HammerAnimationsApi;
+import org.zeith.hammeranims.api.*;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
+import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.client.render.tile.RenderTileBilly;
 import org.zeith.hammeranims.core.contents.blocks.TileBilly;
-import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
-import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
 import java.io.IOException;
@@ -72,7 +71,11 @@ public class ClientProxy
 			{
 				disposeModels.addAll(createdModels);
 				createdModels.clear();
-				reloadRegistries(wrapVanillaResources(resourceManager));
+				HammerAnimations.PROXY.reloadRegistries(
+						wrapVanillaResources(resourceManager),
+						Minecraft.getMinecraft()::addScheduledTask, McUtil.backgroundExecutor(),
+						true
+				);
 			}
 		});
 	}
@@ -87,7 +90,11 @@ public class ClientProxy
 	{
 		disposeModels.addAll(createdModels);
 		createdModels.clear();
-		HammerAnimations.PROXY.reloadRegistries(wrapVanillaResources(Minecraft.getMinecraft().getResourceManager()));
+		HammerAnimations.PROXY.reloadRegistries(
+				wrapVanillaResources(Minecraft.getMinecraft().getResourceManager()),
+				Minecraft.getMinecraft()::addScheduledTask, McUtil.backgroundExecutor(),
+				true
+		);
 	}
 	
 	public static IResourceProvider wrapVanillaResources(IResourceManager manager)

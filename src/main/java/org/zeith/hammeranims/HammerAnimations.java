@@ -1,8 +1,6 @@
 package org.zeith.hammeranims;
 
 import com.zeitheron.hammercore.HammerCore;
-import com.zeitheron.hammercore.internal.SimpleRegistration;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.*;
@@ -11,7 +9,6 @@ import net.minecraftforge.fml.common.event.*;
 import org.apache.logging.log4j.*;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
-import org.zeith.hammeranims.core.init.ContainersHA;
 import org.zeith.hammeranims.core.proxy.CommonProxy;
 
 import java.lang.annotation.Annotation;
@@ -57,7 +54,7 @@ public class HammerAnimations
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent e)
 	{
-		SimpleRegistration.registerFieldBlocksFrom(ContainersHA.class, MOD_ID, CreativeTabs.MISC);
+		HammerCore.registerKernelsForMod(MOD_ID);
 	}
 	
 	@Mod.EventHandler

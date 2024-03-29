@@ -44,6 +44,7 @@ public class TileBilly
 			animations.startAnimationAt(CommonLayerNames.LEGS, ContainersHA.BILLY_WALK.configure()
 					.speed(power / 15F)
 					.loopMode(LoopMode.ONCE)
+					.timeFunction(DefaultsHA.NORMALIZED_TIME.of(10))
 					.next(ContainersHA.BILLY_WALK.configure()
 							.speed(2F)
 							.loopMode(LoopMode.ONCE)

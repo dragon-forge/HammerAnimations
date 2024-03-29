@@ -4,7 +4,7 @@ import com.zeitheron.hammercore.HammerCore;
 import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
-import org.zeith.hammeranims.api.HammerAnimationsApi;
+import org.zeith.hammeranims.api.*;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 
 import java.io.*;
@@ -18,7 +18,7 @@ public class ServerProxy
 	{
 		if(server instanceof DedicatedServer)
 		{
-			reloadRegistries(wrapClassLoaderResources());
+			reloadRegistries(wrapClassLoaderResources(), server::addScheduledTask, McUtil.backgroundExecutor(), false);
 		}
 	}
 	

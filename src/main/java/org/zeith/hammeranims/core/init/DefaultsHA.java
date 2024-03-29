@@ -1,33 +1,33 @@
 package org.zeith.hammeranims.core.init;
 
+import com.zeitheron.hammercore.annotations.*;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
-import org.zeith.hammeranims.api.annotations.*;
 import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.core.contents.actions.EmptyAnimationAction;
 import org.zeith.hammeranims.core.contents.sources.*;
-import org.zeith.hammeranims.core.contents.time.LinearTimeFunction;
+import org.zeith.hammeranims.core.contents.time.*;
 
-@RegisterAnimationSourceTypes
-@RegisterAnimationActions
-@RegisterTimeFunctions
-@RegisterAnimations
+@SimplyRegister
 public interface DefaultsHA
 {
-	@Key("tile_entity")
+	@RegistryName("tile_entity")
 	TileAnimationSourceType TILE_TYPE = new TileAnimationSourceType();
 	
-	@Key("entity")
+	@RegistryName("entity")
 	EntityAnimationSourceType ENTITY_TYPE = new EntityAnimationSourceType();
 	
-	@Key("null")
+	@RegistryName("null")
 	IAnimationContainer NULL_ANIMATION = IAnimationContainer.create();
 	
-	@Key("linear")
+	@RegistryName("linear")
 	TimeFunction LINEAR_TIME = new LinearTimeFunction();
 	
-	@Key("empty")
+	@RegistryName("normalized")
+	NormalizedTimeFunction NORMALIZED_TIME = new NormalizedTimeFunction();
+	
+	@RegistryName("empty")
 	AnimationAction EMPTY_ACTION = new EmptyAnimationAction();
 	
 	AnimationHolder NULL_ANIM = NULL_ANIMATION.holder("null");
