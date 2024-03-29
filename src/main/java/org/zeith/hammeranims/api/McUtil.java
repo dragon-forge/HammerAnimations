@@ -19,39 +19,34 @@ public class McUtil
 		return BACKGROUND_EXECUTOR;
 	}
 	
-	private static ExecutorService makeExecutor(String pServiceName)
+	private static ExecutorService makeExecutor(String serviceName)
 	{
 		int i = MathHelper.clip(Runtime.getRuntime().availableProcessors() - 1, 1, getMaxThreads());
-		Object executorservice;
-		if(i <= 0)
-		{
-			executorservice = MoreExecutors.newDirectExecutorService();
-		} else
-		{
-			executorservice = new ForkJoinPool(i, (pool) ->
-			{
-				ForkJoinWorkerThread worker = new ForkJoinWorkerThread(pool)
-				{
-					@Override
-					protected void onTermination(Throwable p_211561_)
-					{
-						if(p_211561_ != null)
-						{
-							HammerAnimations.LOG.warn("{} died", this.getName(), p_211561_);
-						} else
-						{
-							HammerAnimations.LOG.debug("{} shutdown", this.getName());
-						}
-						
-						super.onTermination(p_211561_);
-					}
-				};
-				worker.setName("Worker-" + pServiceName + "-" + WORKER_COUNT.getAndIncrement());
-				return worker;
-			}, McUtil::onThreadException, true);
-		}
 		
-		return (ExecutorService) executorservice;
+		if(i <= 0)
+			return MoreExecutors.newDirectExecutorService();
+		
+		return new ForkJoinPool(i, pool ->
+		{
+			ForkJoinWorkerThread worker = new ForkJoinWorkerThread(pool)
+			{
+				@Override
+				protected void onTermination(Throwable err)
+				{
+					if(err != null)
+					{
+						HammerAnimations.LOG.warn("{} died", this.getName(), err);
+					} else
+					{
+						HammerAnimations.LOG.debug("{} shutdown", this.getName());
+					}
+					
+					super.onTermination(err);
+				}
+			};
+			worker.setName("Worker-" + serviceName + "-" + WORKER_COUNT.getAndIncrement());
+			return worker;
+		}, McUtil::onThreadException, true);
 	}
 	
 	private static int getMaxThreads()
