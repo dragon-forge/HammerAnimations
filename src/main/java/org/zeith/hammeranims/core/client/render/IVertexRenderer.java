@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.client.render;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import org.zeith.hammeranims.core.client.render.vertex.IVertexOperator;
 
 public interface IVertexRenderer
 {
@@ -14,5 +15,17 @@ public interface IVertexRenderer
 	static IVertexRenderer wrap(VertexConsumer bb)
 	{
 		return bb::vertex;
+	}
+	
+	default IVertexRenderer apply(IVertexOperator op)
+	{
+		return op.apply(this);
+	}
+	
+	default IVertexRenderer apply(IVertexOperator... ops)
+	{
+		IVertexRenderer r = this;
+		for(IVertexOperator op : ops) r = op.apply(r);
+		return r;
 	}
 }
