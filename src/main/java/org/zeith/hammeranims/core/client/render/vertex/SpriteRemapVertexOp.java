@@ -22,4 +22,12 @@ public class SpriteRemapVertexOp
 		return (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz) ->
 				renderer.vertex(x, y, z, red, green, blue, alpha, s.getU(u * 16F), s.getV(v * 16F), packedOverlay, packedLight, nx, ny, nz);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "SpriteRemapVertexOp{" +
+			   "sprite=" + sprite +
+			   '}';
+	}
 }
