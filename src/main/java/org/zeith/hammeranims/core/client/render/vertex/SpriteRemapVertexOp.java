@@ -26,4 +26,12 @@ public class SpriteRemapVertexOp
 			return v;
 		});
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "SpriteRemapVertexOp{" +
+			   "sprite=" + sprite +
+			   '}';
+	}
 }

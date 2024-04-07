@@ -20,7 +20,7 @@ public class HammerAnimationsApi
 {
 	public static final EventBus EVENT_BUS = new EventBus();
 	
-	private static List<IResourceProvider> AUXILIARY_RESOURCE_PROVIDERS = Lists.newArrayList();
+	private static final List<IResourceProvider> AUXILIARY_RESOURCE_PROVIDERS = Lists.newArrayList();
 	
 	private static IForgeRegistry<IAnimationContainer> ANIMATION_CONTAINERS;
 	private static IForgeRegistry<IGeometryContainer> GEOMETRY_CONTAINERS;

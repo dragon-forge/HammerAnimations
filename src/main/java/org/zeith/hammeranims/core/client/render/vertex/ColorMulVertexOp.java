@@ -33,4 +33,15 @@ public class ColorMulVertexOp
 			return vt;
 		});
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "ColorMulVertexOp{" +
+			   "r=" + r +
+			   ", g=" + g +
+			   ", b=" + b +
+			   ", a=" + a +
+			   '}';
+	}
 }
