@@ -65,6 +65,12 @@ public interface IPositionalModel
 		{
 			return false;
 		}
+		
+		@Override
+		public String toString()
+		{
+			return "IPositionalModel.EMPTY";
+		}
 	};
 	
 	/**

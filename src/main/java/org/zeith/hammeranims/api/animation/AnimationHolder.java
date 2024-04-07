@@ -1,6 +1,5 @@
 package org.zeith.hammeranims.api.animation;
 
-import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 
@@ -31,12 +30,18 @@ public class AnimationHolder
 	@Override
 	public AnimationLocation getLocation()
 	{
-		return new AnimationLocation(HammerAnimationsApi.animations().getKey(container), variant);
+		return new AnimationLocation(container.getRegistryKey(), variant);
 	}
 	
 	@Override
 	public ConfiguredAnimation configure()
 	{
 		return get().configure();
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "AnimationHolder{" + getLocation() + "}";
 	}
 }
