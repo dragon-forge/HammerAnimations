@@ -11,18 +11,19 @@ public class RenderData
 	
 	public int combinedLightIn = 0xF000D0, combinedOverlayIn;
 	public float red = 1, green = 1, blue = 1, alpha = 1;
-	public ResourceLocation texture = MISSING_TEXTURE;
+	public ResourceLocation texture;
 	public IVertexRenderer renderer = IVertexRenderer.DUMMY;
 	public PoseStack pose = new PoseStack();
 	
 	public RenderData(ResourceLocation texture)
 	{
 		this.texture = texture;
+		HammerAnimations.PROXY.initRD(this);
 	}
 	
 	public RenderData()
 	{
-		HammerAnimations.PROXY.initRD(this);
+		this(MISSING_TEXTURE);
 	}
 	
 	public void prepare()

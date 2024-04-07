@@ -24,7 +24,13 @@ public class ColorMulVertexOp
 	@Override
 	public IVertexRenderer apply(IVertexRenderer renderer)
 	{
-		return (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz) ->
-				renderer.vertex(x, y, z, red * r, green * g, blue * b, alpha * a, u, v, packedOverlay, packedLight, nx, ny, nz);
+		return renderer.transform((vt) ->
+		{
+			vt.red *= r;
+			vt.green *= g;
+			vt.blue *= b;
+			vt.alpha *= a;
+			return vt;
+		});
 	}
 }

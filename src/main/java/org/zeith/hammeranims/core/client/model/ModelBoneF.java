@@ -50,24 +50,20 @@ public class ModelBoneF
 	public void render(PoseStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
 		transformValid = true;
+		if(this.isHidden) return;
 		
-		if(!this.isHidden)
-		{
-			poseStackIn.pushPose();
-			
-			this.translateAndRotate(poseStackIn);
-			
-			poseStackIn.scale(scale.x(), scale.y(), scale.z());
-			
-			lastTransform = poseStackIn.last();
-			
-			this.renderCubes(poseStackIn.last(), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			
-			for(ModelBoneF part : this.children.values())
-				part.render(poseStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			
-			poseStackIn.popPose();
-		}
+		poseStackIn.pushPose();
+		
+		this.translateAndRotate(poseStackIn);
+		
+		lastTransform = poseStackIn.last();
+		
+		this.renderCubes(poseStackIn.last(), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		
+		for(ModelBoneF part : this.children.values())
+			part.render(poseStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		
+		poseStackIn.popPose();
 	}
 	
 	@Override

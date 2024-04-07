@@ -5,6 +5,7 @@ import com.zeitheron.hammercore.utils.java.tuples.*;
 import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.utils.EmbeddedLocation;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.*;
 import org.zeith.hammeranims.core.jomljson.*;
@@ -128,6 +129,7 @@ public class GsonGeometryDecoder
 		boolean neverRender = GsonHelper.getAsBoolean(bone, "neverRender", false);
 		String name = GsonHelper.getAsString(bone, "name");
 		String parentName = GsonHelper.getAsString(bone, "parent", "root");
+		VertexType boneVertexType = VertexType.byId(GsonHelper.getAsString(bone, "render_type", ""));
 		
 		List<ModelPartInfo> children = new ArrayList<>();
 		
@@ -143,8 +145,9 @@ public class GsonGeometryDecoder
 				UVDefinition uv = GSON.fromJson(cubeObject.get("uv"), UVDefinition.class);
 				boolean cubeMirror = GsonHelper.getAsBoolean(cubeObject, "mirror", mirror);
 				float inflate = GsonHelper.getAsFloat(cubeObject, "inflate", 0F);
+				VertexType vertexType = VertexType.byId(GsonHelper.getAsString(cubeObject, "render_type", null), boneVertexType);
 				
-				ModelCubeInfo cube = new ModelCubeInfo(origin, size, uv, inflate, cubeMirror);
+				ModelCubeInfo cube = new ModelCubeInfo(origin, size, uv, inflate, cubeMirror, vertexType);
 				
 				if(cubeObject.has("rotation"))
 				{

@@ -10,7 +10,6 @@ import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.contents.blocks.TileBilly;
-import org.zeith.hammeranims.core.init.ContainersHA;
 
 import javax.annotation.*;
 
@@ -23,8 +22,7 @@ public class RenderTileBilly
 	
 	public RenderTileBilly()
 	{
-		data = new RenderData();
-		data.texture = HammerAnimations.id("textures/entity/billy.png");
+		data = new RenderData(HammerAnimations.id("textures/entity/billy.png"));
 		HammerAnimationsApi.EVENT_BUS.register(this);
 	}
 	

@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.client.model;
 
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.client.render.vertex.*;
 import org.zeith.hammeranims.core.utils.*;
 import org.zeith.hammeranims.joml.*;
 
@@ -10,13 +11,15 @@ import java.util.*;
 public class ModelCubeF
 {
 	private final TexturedQuadF[] quads;
+	public final VertexType vType;
 	
-	private ModelCubeF(TexturedQuadF[] quads)
+	private ModelCubeF(TexturedQuadF[] quads, VertexType vType)
 	{
 		this.quads = quads;
+		this.vType = vType;
 	}
 	
-	public static ModelCubeF make(Vector3f origin, Vector3f size, CubeUVs uvResolver, float inflate, boolean mirror, int textureWidth, int textureHeight)
+	public static ModelCubeF make(Vector3f origin, Vector3f size, CubeUVs uvResolver, float inflate, boolean mirror, int textureWidth, int textureHeight, VertexType vType)
 	{
 		float width = size.x();
 		float height = size.y();
@@ -66,7 +69,7 @@ public class ModelCubeF
 			quads.add(makeQuad(v7, v3, v4, v6, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.UP));
 		}
 		
-		return new ModelCubeF(quads.toArray(new TexturedQuadF[0]));
+		return new ModelCubeF(quads.toArray(new TexturedQuadF[0]), vType);
 	}
 	
 	private static TexturedQuadF makeQuad(Vector3f pos1, Vector3f pos2, Vector3f pos3, Vector3f pos4, CubeUVs uvResolver, int textureWidth, int textureHeight, boolean mirror, EnumFacing direction)
@@ -107,22 +110,29 @@ public class ModelCubeF
 		{
 			Vector3f normal = no.transform(quad.normal, new Vector3f());
 			
-			for(VertexF vertex : quad.vertices)
+			RenderVertex[] vts = quad.renderedVertices;
+			VertexF[] vertices = quad.vertices;
+			
+			int l = vertices.length;
+			for(int i = 0; i < l; i++)
 			{
+				VertexF vertex = vertices[i];
 				float x = vertex.getPos().x() / 16.0F;
 				float y = vertex.getPos().y() / 16.0F;
 				float z = vertex.getPos().z() / 16.0F;
 				Vector3f pos = new Vector3f(x, y, z);
 				po.transformPosition(pos);
 				
-				vertexConsumer.vertex(
-						pos.x(), pos.y(), pos.z(),
+				vts[i] = new RenderVertex(
+						pos.x, pos.y, pos.z,
 						red, green, blue, alpha,
 						vertex.getU(), vertex.getV(),
 						packedOverlay, packedLight,
-						normal.x(), normal.y(), normal.z()
+						normal.x, normal.y, normal.z
 				);
 			}
+			
+			vertexConsumer.vertex(vType, vts);
 		}
 	}
 }

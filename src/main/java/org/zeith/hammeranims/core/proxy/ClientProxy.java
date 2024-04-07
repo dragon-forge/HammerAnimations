@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.proxy;
 
+import com.google.common.base.Suppliers;
 import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
@@ -15,13 +16,14 @@ import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
-import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.client.render.*;
 import org.zeith.hammeranims.core.client.render.tile.RenderTileBilly;
 import org.zeith.hammeranims.core.contents.blocks.TileBilly;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class ClientProxy
 		extends CommonProxy
@@ -80,10 +82,15 @@ public class ClientProxy
 		});
 	}
 	
+	/**
+	 * The one and only reference to the tessellator which also sorts all translucent vertices right after the upload method is called.
+	 */
+	public static Supplier<IVertexRenderer> SHARED_TESS_RENDERER = Suppliers.memoize(() -> new TessellatorVertexRenderer(Tessellator.getInstance()));
+	
 	@Override
 	public void initRD(RenderData data)
 	{
-		data.renderer = IVertexRenderer.wrap(Tessellator.getInstance().getBuffer());
+		data.renderer = SHARED_TESS_RENDERER.get();
 	}
 	
 	public static void performReload()

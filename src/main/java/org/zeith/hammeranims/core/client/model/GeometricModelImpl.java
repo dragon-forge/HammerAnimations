@@ -155,15 +155,15 @@ public class GeometricModelImpl
 	{
 		PoseStack pose = data.pose;
 		UtilsFX.bindTexture(data.texture);
-		Tessellator tess = Tessellator.getInstance();
-		BufferBuilder bb = tess.getBuffer();
-		bb.begin(GL11.GL_QUADS, POSITION_TEX_LMAP_COLOR);
+		
+		IVertexRenderer renderer = data.renderer;
+		renderer.begin(GL11.GL_QUADS, POSITION_TEX_LMAP_COLOR);
 		root.render(pose,
-				data.renderer,
+				renderer,
 				data.combinedLightIn, data.combinedOverlayIn,
 				data.red, data.green, data.blue, data.alpha
 		);
-		tess.draw();
+		renderer.upload();
 		pose.reset();
 	}
 	

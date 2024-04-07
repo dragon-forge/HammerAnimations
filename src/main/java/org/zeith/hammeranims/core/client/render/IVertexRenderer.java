@@ -1,21 +1,68 @@
 package org.zeith.hammeranims.core.client.render;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraftforge.fml.relauncher.*;
-import org.zeith.hammeranims.core.client.render.vertex.IVertexOperator;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import org.zeith.hammeranims.core.client.render.vertex.*;
+
+import java.util.function.UnaryOperator;
 
 public interface IVertexRenderer
+		extends IVertexOutput
 {
-	IVertexRenderer DUMMY = (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz) ->
+	IVertexRenderer DUMMY = new IVertexRenderer()
 	{
+		@Override
+		public void begin(int glMode, VertexFormat format)
+		{
+		}
+		
+		@Override
+		public void vertex(VertexType type, RenderVertex... vertex)
+		{
+		}
+		
+		@Override
+		public void upload()
+		{
+		}
+		
+		@Override
+		public String toString()
+		{
+			return "IVertexRenderer.DUMMY";
+		}
 	};
 	
-	void vertex(float x, float y, float z,// position
-				float red, float green, float blue, float alpha, // color
-				float u, float v, // tex
-				int packedOverlay, int packedLight, //
-				float nx, float ny, float nz // normal
-	);
+	void begin(int glMode, VertexFormat format);
+	
+	void upload();
+	
+	default IVertexRenderer transform(UnaryOperator<RenderVertex> out)
+	{
+		IVertexRenderer deez = this;
+		
+		return new IVertexRenderer()
+		{
+			@Override
+			public void begin(int glMode, VertexFormat format)
+			{
+				deez.begin(glMode, format);
+			}
+			
+			@Override
+			public void vertex(VertexType type, RenderVertex... vertex)
+			{
+				for(int i = 0; i < vertex.length; i++)
+					vertex[i] = out.apply(vertex[i]);
+				deez.vertex(type, vertex);
+			}
+			
+			@Override
+			public void upload()
+			{
+				deez.upload();
+			}
+		};
+	}
 	
 	default IVertexRenderer apply(IVertexOperator op)
 	{
@@ -27,41 +74,5 @@ public interface IVertexRenderer
 		IVertexRenderer r = this;
 		for(IVertexOperator op : ops) r = op.apply(r);
 		return r;
-	}
-	
-	@SideOnly(Side.CLIENT)
-	static IVertexRenderer wrap(BufferBuilder bb)
-	{
-		return (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz) ->
-		{
-			int k3 = packedLight >> 16 & 65535;
-			int l3 = packedLight & 65535;
-			
-			bb
-					.pos(x, y, z)
-//					.normal(nx, ny, nz)
-					.tex(u, v)
-					.lightmap(k3, l3)
-					.color(red, green, blue, alpha)
-					.endVertex();
-		};
-	}
-	
-	@SideOnly(Side.CLIENT)
-	static IVertexRenderer wrapWithNormals(BufferBuilder bb)
-	{
-		return (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz) ->
-		{
-			int k3 = packedLight >> 16 & 65535;
-			int l3 = packedLight & 65535;
-			
-			bb
-					.pos(x, y, z)
-					.normal(nx, ny, nz)
-					.tex(u, v)
-					.lightmap(k3, l3)
-					.color(red, green, blue, alpha)
-					.endVertex();
-		};
 	}
 }
