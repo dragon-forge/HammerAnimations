@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.client.model;
 
+import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.UVDefinition;
 import org.zeith.hammeranims.core.utils.EnumFacing;
 import org.joml.*;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 public interface CubeUVs
 {
+	@Nullable
 	SizedUV get(EnumFacing direction);
 	
 	class BoxUVResolver
@@ -26,37 +28,30 @@ public interface CubeUVs
 		@Override
 		public SizedUV get(EnumFacing direction)
 		{
-			switch(direction)
+			return switch(direction)
 			{
-				case EAST:
-					return SizedUV.fromFloats(uv.x(),
-							uv.y() + depth(), uv.x() + depth(), uv.y() + depth() + height()
-					);
-				case WEST:
-					return SizedUV.fromFloats(
-							uv.x() + depth() + width(),
-							uv.y() + depth(), uv.x() + depth() + width() + depth(), uv.y() + depth() + height()
-					);
-				case DOWN:
-					return SizedUV.fromFloats(
-							uv.x() + depth() + width(), uv.y() + depth(), uv.x() + depth() + width() + width(), uv.y());
-				case UP:
-					return SizedUV.fromFloats(
-							uv.x() + depth(), uv.y(), uv.x() + depth() + width(), uv.y() + depth());
-				case NORTH:
-					return SizedUV.fromFloats(
-							uv.x() + depth(),
-							uv.y() + depth(), uv.x() + depth() + width(), uv.y() + depth() + height()
-					);
-				case SOUTH:
-					return SizedUV.fromFloats(
-							uv.x() + depth() + width() + depth(),
-							uv.y() + depth(),
-							uv.x() + depth() + width() + depth() + width(), uv.y() + depth() + height()
-					);
-				default:
-					throw new IllegalStateException("Wtf?");
-			}
+				case EAST -> SizedUV.fromFloats(uv.x(),
+						uv.y() + depth(), uv.x() + depth(), uv.y() + depth() + height()
+				);
+				case WEST -> SizedUV.fromFloats(
+						uv.x() + depth() + width(),
+						uv.y() + depth(), uv.x() + depth() + width() + depth(), uv.y() + depth() + height()
+				);
+				case DOWN -> SizedUV.fromFloats(
+						uv.x() + depth() + width(), uv.y() + depth(), uv.x() + depth() + width() + width(), uv.y());
+				case UP -> SizedUV.fromFloats(
+						uv.x() + depth(), uv.y(), uv.x() + depth() + width(), uv.y() + depth());
+				case NORTH -> SizedUV.fromFloats(
+						uv.x() + depth(),
+						uv.y() + depth(), uv.x() + depth() + width(), uv.y() + depth() + height()
+				);
+				case SOUTH -> SizedUV.fromFloats(
+						uv.x() + depth() + width() + depth(),
+						uv.y() + depth(),
+						uv.x() + depth() + width() + depth() + width(), uv.y() + depth() + height()
+				);
+				default -> throw new IllegalStateException("Wtf?");
+			};
 		}
 		
 		public int width()
@@ -89,7 +84,7 @@ public interface CubeUVs
 		public SizedUV get(EnumFacing direction)
 		{
 			UVDefinition.FaceUVDefinition uvDefinition = mappings.get(direction);
-			if(uvDefinition == null) throw new IllegalStateException("???");
+			if(uvDefinition == null) return null;
 			
 			return new SizedUV(uvDefinition.uv().x(), uvDefinition.uv().y(),
 					uvDefinition.uv().x() + uvDefinition.size().x(), uvDefinition.uv().y() + uvDefinition.size().y()
