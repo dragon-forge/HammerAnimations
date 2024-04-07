@@ -4,11 +4,13 @@ import org.zeith.hammeranims.core.impl.api.geometry.decoder.UVDefinition;
 import org.zeith.hammeranims.core.utils.EnumFacing;
 import org.zeith.hammeranims.joml.*;
 
+import javax.annotation.Nullable;
 import java.lang.Math;
 import java.util.Map;
 
 public interface CubeUVs
 {
+	@Nullable
 	SizedUV get(EnumFacing direction);
 	
 	class BoxUVResolver
@@ -89,7 +91,7 @@ public interface CubeUVs
 		public SizedUV get(EnumFacing direction)
 		{
 			UVDefinition.FaceUVDefinition uvDefinition = mappings.get(direction);
-			if(uvDefinition == null) throw new IllegalStateException("???");
+			if(uvDefinition == null) return null;
 			
 			return new SizedUV(uvDefinition.uv().x(), uvDefinition.uv().y(),
 					uvDefinition.uv().x() + uvDefinition.size().x(), uvDefinition.uv().y() + uvDefinition.size().y()

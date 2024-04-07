@@ -93,15 +93,12 @@ public interface UVDefinition
 				
 				for(EnumFacing direction : DIRECTIONS)
 				{
-					FaceUVDefinition face = context.deserialize(json.get(direction.getName()), FaceUVDefinition.class);
+					if(!json.has(direction.getName())) continue;
 					
-					if(face == null)
-					{
-						face = new FaceUVDefinition(new Vector2i(), new Vector2i());
-					}
+					FaceUVDefinition face = context.deserialize(json.get(direction.getName()), FaceUVDefinition.class);
+					if(face == null) continue;
 					
 					map.put(direction, face);
-					
 				}
 				return new PerFace(map);
 			}
