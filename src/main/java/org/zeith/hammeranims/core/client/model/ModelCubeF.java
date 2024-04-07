@@ -50,28 +50,35 @@ public class ModelCubeF
 		
 		if(width != 0 && height != 0)
 		{
-			quads.add(makeQuad(v3, v2, v1, v4, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.NORTH));
-			quads.add(makeQuad(v6, v5, v8, v7, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.SOUTH));
+			addQuad(quads, v3, v2, v1, v4, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.NORTH);
+			addQuad(quads, v6, v5, v8, v7, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.SOUTH);
 		}
 		
 		if(depth != 0 && height != 0)
 		{
-			quads.add(makeQuad(v4, v1, v5, v6, uvResolver, textureWidth, textureHeight, mirror, mirror ? EnumFacing.EAST : EnumFacing.WEST));
-			quads.add(makeQuad(v7, v8, v2, v3, uvResolver, textureWidth, textureHeight, mirror, mirror ? EnumFacing.WEST : EnumFacing.EAST));
+			addQuad(quads, v4, v1, v5, v6, uvResolver, textureWidth, textureHeight, mirror, mirror ? EnumFacing.EAST : EnumFacing.WEST);
+			addQuad(quads, v7, v8, v2, v3, uvResolver, textureWidth, textureHeight, mirror, mirror ? EnumFacing.WEST : EnumFacing.EAST);
 		}
 		
 		if(width != 0 && depth != 0)
 		{
-			quads.add(makeQuad(v2, v8, v5, v1, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.DOWN));
-			quads.add(makeQuad(v7, v3, v4, v6, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.UP));
+			addQuad(quads, v2, v8, v5, v1, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.DOWN);
+			addQuad(quads, v7, v3, v4, v6, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.UP);
 		}
 		
 		return new ModelCubeF(quads.toArray(new TexturedQuadF[0]));
 	}
 	
+	private static void addQuad(List<TexturedQuadF> quads, Vector3f pos1, Vector3f pos2, Vector3f pos3, Vector3f pos4, CubeUVs uvResolver, int textureWidth, int textureHeight, boolean mirror, EnumFacing direction)
+	{
+		TexturedQuadF q = makeQuad(pos1, pos2, pos3, pos4, uvResolver, textureWidth, textureHeight, mirror, direction);
+		if(q != null) quads.add(q);
+	}
+	
 	private static TexturedQuadF makeQuad(Vector3f pos1, Vector3f pos2, Vector3f pos3, Vector3f pos4, CubeUVs uvResolver, int textureWidth, int textureHeight, boolean mirror, EnumFacing direction)
 	{
 		CubeUVs.SizedUV uv = uvResolver.get(direction);
+		if(uv == null) return null;
 		
 		float u1 = uv.u1() / (float) textureWidth;
 		float u2 = uv.u2() / (float) textureWidth;
