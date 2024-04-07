@@ -46,6 +46,12 @@ public interface IGeometryData
 			{
 				return container;
 			}
+			
+			@Override
+			public String toString()
+			{
+				return "IGeometryData.EMPTY(" + container.getRegistryKey() + ")";
+			}
 		};
 	}
 	

@@ -13,6 +13,11 @@ public class GeometryPose
 	protected final Map<String, GeometryTransforms> boneTransformsView = Collections.unmodifiableMap(boneTransforms);
 	protected final Predicate<String> availableBones;
 	
+	public GeometryPose()
+	{
+		this(b -> true);
+	}
+	
 	public GeometryPose(Predicate<String> availableBones)
 	{
 		this.availableBones = availableBones;
