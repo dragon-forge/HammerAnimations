@@ -2,11 +2,14 @@ package org.zeith.hammeranims.net;
 
 import com.zeitheron.hammercore.net.*;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.*;
+
+import java.io.IOException;
 
 public class PacketRequestAnimationSystemSync
 		implements IPacket
@@ -23,21 +26,21 @@ public class PacketRequestAnimationSystemSync
 	}
 	
 	@Override
-	public void writeToNBT(NBTTagCompound nbt)
+	public void write(PacketBuffer buf)
 	{
-		nbt.setTag("Src", source.writeSource());
-		nbt.setString("Type", source.getType().getRegistryKey().toString());
+		buf.writeCompoundTag(source.writeSource());
+		buf.writeResourceLocation(source.getType().getRegistryKey());
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void read(PacketBuffer buf)
+			throws IOException
 	{
-		AnimationSourceType type = HammerAnimationsApi.animationSources()
-				.getValue(new ResourceLocation(nbt.getString("Type")));
-		if(type != null)
-			source = type.readSource(nbt.getCompoundTag("Src"));
-		else
-			HammerAnimations.LOG.warn("Unable to find animation source {}", nbt.getString("Type"));
+		NBTTagCompound src = buf.readCompoundTag();
+		ResourceLocation typeKey = buf.readResourceLocation();
+		AnimationSourceType type = HammerAnimationsApi.animationSources().getValue(typeKey);
+		if(type != null) source = type.readSource(src);
+		else HammerAnimations.LOG.warn("Unable to find animation source {} sent by server.", typeKey);
 	}
 	
 	@Override
