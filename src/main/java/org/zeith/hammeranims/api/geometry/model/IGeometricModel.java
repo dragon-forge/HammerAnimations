@@ -74,6 +74,12 @@ public interface IGeometricModel
 		public void dispose()
 		{
 		}
+		
+		@Override
+		public String toString()
+		{
+			return "IGeometricModel.EMPTY";
+		}
 	};
 	
 	@Override
