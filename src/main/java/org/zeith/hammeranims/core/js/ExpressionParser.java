@@ -4,16 +4,19 @@ import net.minecraft.util.Mth;
 import org.openjdk.nashorn.api.scripting.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 
-import javax.script.*;
-import java.util.*;
+import javax.script.ScriptException;
+import java.util.Random;
 
 public class ExpressionParser
 {
+	public static final ClassFilter NO_JS_CLASSES = className -> false;
 	public static final MathJS MATH = new MathJS();
 	
 	public static InterpolatedDouble parse(String expression)
 	{
-		// Try parsing expression as contstant first.
+		expression = ExpressionFixer.fixExpression(expression);
+		
+		// Try parsing expression as constant first.
 		try
 		{
 			return InterpolatedDouble.constant(Double.parseDouble(expression));
@@ -21,7 +24,7 @@ public class ExpressionParser
 		{
 		}
 		
-		NashornScriptEngine js = (NashornScriptEngine) new NashornScriptEngineFactory().getScriptEngine();
+		NashornScriptEngine js = (NashornScriptEngine) new NashornScriptEngineFactory().getScriptEngine(NO_JS_CLASSES);
 		try
 		{
 			js.put("Java", null); // Prevent exploiting Java types.

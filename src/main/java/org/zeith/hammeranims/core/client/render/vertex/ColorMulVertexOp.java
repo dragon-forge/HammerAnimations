@@ -27,4 +27,15 @@ public class ColorMulVertexOp
 		return (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz) ->
 				renderer.vertex(x, y, z, red * r, green * g, blue * b, alpha * a, u, v, packedOverlay, packedLight, nx, ny, nz);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "ColorMulVertexOp{" +
+			   "r=" + r +
+			   ", g=" + g +
+			   ", b=" + b +
+			   ", a=" + a +
+			   '}';
+	}
 }

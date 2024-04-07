@@ -1,6 +1,8 @@
 package org.zeith.hammeranims.api;
 
 import com.google.common.collect.Lists;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.*;
@@ -19,6 +21,11 @@ import java.util.function.Supplier;
 public class HammerAnimationsApi
 {
 	public static final IEventBus EVENT_BUS = BusBuilder.builder().build();
+	
+	static
+	{
+		Keys.init();
+	}
 	
 	private static final List<IResourceProvider> AUXILIARY_RESOURCE_PROVIDERS = Lists.newArrayList();
 	
@@ -93,5 +100,22 @@ public class HammerAnimationsApi
 	public static IForgeRegistry<AnimationAction> animationActions()
 	{
 		return ANIMATION_ACTIONS.get();
+	}
+	
+	public static class Keys
+	{
+		public static final ResourceKey<Registry<IAnimationContainer>> ANIMATION_CONTAINERS = key("animations");
+		public static final ResourceKey<Registry<IGeometryContainer>> GEOMETRY_CONTAINERS = key("geometry");
+		public static final ResourceKey<Registry<TimeFunction>> TIME_FUNCTIONS = key("time_functions");
+		public static final ResourceKey<Registry<AnimationAction>> ANIMATION_ACTIONS = key("animation_actions");
+		
+		private static <T> ResourceKey<Registry<T>> key(String name)
+		{
+			return ResourceKey.createRegistryKey(HammerAnimations.id(name));
+		}
+		
+		private static void init()
+		{
+		}
 	}
 }
