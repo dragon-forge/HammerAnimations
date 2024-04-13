@@ -2,6 +2,7 @@ package org.zeith.hammeranims.api.animsys;
 
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 
 public interface IAnimatedObject
 {
@@ -9,7 +10,7 @@ public interface IAnimatedObject
 	
 	AnimationSystem getAnimationSystem();
 	
-	AnimationSource getAnimationSource();
+	IObjectSource<?> getAnimationSource();
 	
 	World getAnimatedObjectWorld();
 	

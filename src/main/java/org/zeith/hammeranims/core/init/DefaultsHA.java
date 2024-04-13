@@ -6,18 +6,11 @@ import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.core.contents.actions.EmptyAnimationAction;
-import org.zeith.hammeranims.core.contents.sources.*;
 import org.zeith.hammeranims.core.contents.time.*;
 
 @SimplyRegister
 public interface DefaultsHA
 {
-	@RegistryName("tile_entity")
-	TileAnimationSourceType TILE_TYPE = new TileAnimationSourceType();
-	
-	@RegistryName("entity")
-	EntityAnimationSourceType ENTITY_TYPE = new EntityAnimationSourceType();
-	
 	@RegistryName("null")
 	IAnimationContainer NULL_ANIMATION = IAnimationContainer.create();
 	

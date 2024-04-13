@@ -10,13 +10,14 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animsys.*;
+import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 
 import java.util.*;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class ClientHammerHooks
 {
-	private static final List<Tuple3.Mutable3<AnimationSource, NBTTagCompound, Integer>> QUEUED_SYSTEMS = new ArrayList<>();
+	private static final List<Tuple3.Mutable3<IObjectSource<?>, NBTTagCompound, Integer>> QUEUED_SYSTEMS = new ArrayList<>();
 	
 	@SubscribeEvent
 	public static void clientTick(TickEvent.ClientTickEvent e)
@@ -47,7 +48,7 @@ public class ClientHammerHooks
 	 * Apply animation system client-side for a given animation address with a given timeout.
 	 * This has a
 	 */
-	public static void applySystem(AnimationSource source, NBTTagCompound tag, int timeout)
+	public static void applySystem(IObjectSource<?> source, NBTTagCompound tag, int timeout)
 	{
 		if(source == null || tag == null)
 		{
@@ -59,9 +60,9 @@ public class ClientHammerHooks
 			QUEUED_SYSTEMS.add(Tuples.mutable(source, tag, timeout));
 	}
 	
-	private static boolean applyAnimationSystem(World world, AnimationSource source, NBTTagCompound tag)
+	private static boolean applyAnimationSystem(World world, IObjectSource<?> source, NBTTagCompound tag)
 	{
-		IAnimatedObject obj = source.get(world);
+		IAnimatedObject obj = source.get(IAnimatedObject.class, world).orElse(null);
 		if(obj == null) return false;
 		AnimationSystem sys = obj.getAnimationSystem();
 		if(sys == null) return true;
