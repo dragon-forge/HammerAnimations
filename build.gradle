@@ -149,6 +149,7 @@ curseforge {
 		releaseType = "${config.release_type}"
 		addGameVersion "${config.minecraft_version}"
 		addGameVersion "Forge"
+		addGameVersion "Java 8"
 		mainArtifact(jar) {
 		  displayName = "[${config.minecraft_version}] ${config.mod_name} - ${config.mod_version}"
 		}
