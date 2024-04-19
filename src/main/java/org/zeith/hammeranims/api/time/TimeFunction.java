@@ -56,7 +56,7 @@ public abstract class TimeFunction
 					case LOOP:
 						return duration > 0 ? duration - (time % duration) : 0;
 					case HOLD_ON_LAST_FRAME:
-						return Math.max(duration - time, 0);
+						return Math.max(duration - time, 1.0E-30);
 					case ONCE:
 						return duration - time;
 				}
