@@ -24,8 +24,6 @@ public class ExpressionParser
 		{
 		}
 		
-		final String expr0 = expression.toLowerCase(Locale.ROOT).replace("math.", "");
-		
 		ScriptEngine js = NashornRelay.tryCreateNashorn();
 		if(js == null) js = new ScriptEngineManager().getEngineByName("Nashorn");
 		
@@ -40,11 +38,12 @@ public class ExpressionParser
 			ScriptObjectMirror eval = (ScriptObjectMirror) js.eval(fun);
 			InterpolatedDouble id0 = eval.to(InterpolatedDouble.class);
 			
+			ScriptEngine jsf = js;
 			return query ->
 			{
 				try
 				{
-					query.putObjects(eval::setMember);
+					query.putObjects(jsf::put);
 					return id0.get(query);
 				} catch(RuntimeException e)
 				{

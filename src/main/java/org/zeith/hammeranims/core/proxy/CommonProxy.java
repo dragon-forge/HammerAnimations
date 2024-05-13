@@ -10,6 +10,7 @@ import org.zeith.hammeranims.api.event.ReloadHammerAnimationsEvent;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
 import org.zeith.hammeranims.api.geometry.model.*;
+import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
@@ -65,6 +66,10 @@ public class CommonProxy
 		HammerAnimations.LOG.info("Reloading {} models.", geometries.size());
 		queues.enqueue(geometries.stream().map((ctr) -> (Runnable) () -> ctr.reload(provider)), CompletableFuture::runAsync);
 		
+		Collection<IParticleContainer> particles = HammerAnimationsApi.particleContainers().getValues();
+		HammerAnimations.LOG.info("Reloading {} particles.", particles.size());
+		queues.enqueue(particles.stream().map((ctr) -> (Runnable) () -> ctr.reload(provider)), CompletableFuture::runAsync);
+		
 		HammerAnimationsApi.EVENT_BUS.post(queues);
 		
 		return CompletableFuture.allOf(tasks.build().toArray(CompletableFuture[]::new))
@@ -74,9 +79,9 @@ public class CommonProxy
 						HammerAnimationsApi.EVENT_BUS.post(new RefreshStaleModelsEvent());
 					
 					HammerAnimationsApi.EVENT_BUS.post(new ReloadHammerAnimationsEvent.Post(provider, clientSide));
-					HammerAnimations.LOG.info("{} registries reloaded in {} ms",
+					HammerAnimations.LOG.info("{} registries reloaded in {}",
 							HammerAnimations.MOD_NAME,
-							sw.stop().elapsed(TimeUnit.MILLISECONDS)
+							sw.stop()
 					);
 				}, gameExecutor);
 	}

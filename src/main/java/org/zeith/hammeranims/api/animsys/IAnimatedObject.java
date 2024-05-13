@@ -11,6 +11,21 @@ public interface IAnimatedObject
 		return 1F;
 	}
 	
+	default float getAnimatedObjectWidth()
+	{
+		return 1F;
+	}
+	
+	default float getAnimatedObjectHeight()
+	{
+		return 1F;
+	}
+	
+	default float getAnimatedObjectDepth()
+	{
+		return getAnimatedObjectWidth();
+	}
+	
 	void setupSystem(AnimationSystem.Builder builder);
 	
 	AnimationSystem getAnimationSystem();

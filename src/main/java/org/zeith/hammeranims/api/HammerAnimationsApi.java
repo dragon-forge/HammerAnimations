@@ -3,16 +3,21 @@ package org.zeith.hammeranims.api;
 import com.google.common.collect.Lists;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.*;
-import net.minecraftforge.registries.*;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.api.particles.components.IParticleComponentType;
 import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 @Mod.EventBusSubscriber
 public class HammerAnimationsApi
@@ -25,7 +30,11 @@ public class HammerAnimationsApi
 	private static IForgeRegistry<IGeometryContainer> GEOMETRY_CONTAINERS;
 	private static IForgeRegistry<TimeFunction> TIME_FUNCTIONS;
 	private static IForgeRegistry<AnimationAction> ANIMATION_ACTIONS;
+	private static IForgeRegistry<IParticleContainer> PARTICLE_CONTAINERS;
+	private static IForgeRegistry<IParticleComponentType> PARTICLE_COMPONENT_TYPES;
 	private static boolean hasInitialized = false;
+	
+	public static boolean LOG_RELOADS = !Boolean.parseBoolean(System.getProperty("hammeranims.silence"));
 	
 	@SubscribeEvent
 	public static void newRegistries(RegistryEvent.NewRegistry e)
@@ -53,6 +62,18 @@ public class HammerAnimationsApi
 				.setType(AnimationAction.class)
 				.setName(HammerAnimations.id("animation_actions"))
 				.setDefaultKey(HammerAnimations.id("empty"))
+				.disableSaving()
+				.create();
+		
+		PARTICLE_CONTAINERS = new RegistryBuilder<IParticleContainer>()
+				.setType(IParticleContainer.class)
+				.setName(HammerAnimations.id("particle_containers"))
+				.disableSaving()
+				.create();
+		
+		PARTICLE_COMPONENT_TYPES = new RegistryBuilder<IParticleComponentType>()
+				.setType(IParticleComponentType.class)
+				.setName(HammerAnimations.id("particle_component_types"))
 				.disableSaving()
 				.create();
 		
@@ -92,5 +113,15 @@ public class HammerAnimationsApi
 	public static IForgeRegistry<AnimationAction> animationActions()
 	{
 		return ANIMATION_ACTIONS;
+	}
+	
+	public static IForgeRegistry<IParticleContainer> particleContainers()
+	{
+		return PARTICLE_CONTAINERS;
+	}
+	
+	public static IForgeRegistry<IParticleComponentType> particleComponentTypes()
+	{
+		return PARTICLE_COMPONENT_TYPES;
 	}
 }

@@ -1,0 +1,562 @@
+package org.zeith.hammeranims.api.particles.emitter;
+
+import com.zeitheron.hammercore.client.utils.UtilsFX;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.world.World;
+import org.lwjgl.opengl.GL11;
+import org.zeith.hammeranims.HammerAnimations;
+import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
+import org.zeith.hammeranims.api.animsys.IAnimatedObject;
+import org.zeith.hammeranims.api.particles.ParticleEffect;
+import org.zeith.hammeranims.api.particles.components.itf.*;
+import org.zeith.hammeranims.api.particles.curve.ParticleCurve;
+import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
+import org.zeith.hammeranims.core.client.render.IVertexOutput;
+import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.impl.api.particles.components.appearance.ParcomCollisionAppearance;
+import org.zeith.hammeranims.core.init.ParticleComponentsHA;
+import org.zeith.hammeranims.core.proxy.ClientProxy;
+import org.zeith.hammeranims.joml.Vector3d;
+import org.zeith.hammeranims.joml.*;
+
+import java.lang.Math;
+import java.util.*;
+
+public class ParticleEmitter
+{
+	public ParticleEffect effect;
+	public List<BedrockParticle> particles = new ArrayList<>();
+	public List<BedrockParticle> splitParticles = new ArrayList<>();
+	
+	public final Map<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> variables = new HashMap<>();
+	public final Object2DoubleMap<String> initialValues = new Object2DoubleOpenHashMap<>();
+	
+	public boolean isRenderingGUI = false;
+	
+	public IAnimatedObject target;
+	public World world;
+	public boolean lit;
+	
+	public boolean added;
+	public int sanityTicks;
+	public boolean running = true;
+	private BedrockParticle guiParticle;
+	
+	/* Intermediate values */
+	public Vector3d lastGlobal = new Vector3d();
+	public Vector3d prevGlobal = new Vector3d();
+	public Matrix3f rotation = new Matrix3f(1, 0, 0, 0, 1, 0, 0, 0, 1);
+	public Matrix3f prevRotation = new Matrix3f(1, 0, 0, 0, 1, 0, 0, 0, 1);
+	public Vector3f angularVelocity = new Vector3f();
+	/**
+	 * Translation of immediate bodypart
+	 */
+	public Vector3d translation = new Vector3d();
+	
+	/* Runtime properties */
+	public int age;
+	public int lifetime;
+	public double spawnedParticles;
+	public boolean playing = true;
+	
+	public float random1 = (float) Math.random();
+	public float random2 = (float) Math.random();
+	public float random3 = (float) Math.random();
+	public float random4 = (float) Math.random();
+	
+	private MutableBlockPos blockPos = new MutableBlockPos();
+	
+	public double[] scale = { 1, 1, 1 };
+	
+	/* Camera properties */
+	public int perspective;
+	public float cYaw;
+	public float cPitch;
+	
+	public double cX;
+	public double cY;
+	public double cZ;
+	
+	public final ParticleVariables vars = new ParticleVariables();
+	
+	public boolean isFinished()
+	{
+		return !this.running && this.particles.isEmpty();
+	}
+	
+	public double getDistanceSq()
+	{
+		this.setupCameraProperties(0F);
+		
+		double dx = this.cX - this.lastGlobal.x;
+		double dy = this.cY - this.lastGlobal.y;
+		double dz = this.cZ - this.lastGlobal.z;
+		
+		return dx * dx + dy * dy + dz * dz;
+	}
+	
+	public double getAge()
+	{
+		return this.getAge(0);
+	}
+	
+	public double getAge(float partialTicks)
+	{
+		return (this.age + partialTicks) / 20.0;
+	}
+	
+	public void setTarget(IAnimatedObject target)
+	{
+		this.target = target;
+		this.world = target == null ? null : target.getAnimatedObjectWorld();
+	}
+	
+	public void setWorld(World world)
+	{
+		this.world = world;
+	}
+	
+	public void setEffect(ParticleEffect scheme)
+	{
+		this.setEffect(scheme, null);
+	}
+	
+	public void setEffect(ParticleEffect effect, Map<String, String> variables)
+	{
+		this.effect = effect;
+		
+		if(this.effect == null)
+		{
+			return;
+		}
+		
+		for(ParticleCurve curve : effect.curves)
+		{
+			registerVariable(curve.variable, curve);
+		}
+		
+		if(variables != null)
+		{
+			this.parseVariables(variables);
+		}
+		
+		this.lit = true;
+		this.stop();
+		this.start();
+		
+		this.setEmitterVariables(0);
+	}
+	
+	public void setParticleVariables(BedrockParticle particle, float partialTicks)
+	{
+		vars.particle_age = particle.getAge(partialTicks);
+		vars.particle_lifetime = particle.lifetime / 20.0;
+		vars.particle_random_1 = particle.random1;
+		vars.particle_random_2 = particle.random2;
+		vars.particle_random_3 = particle.random3;
+		vars.particle_random_4 = particle.random4;
+		
+		Vector3d relativePos = new Vector3d(particle.getGlobalPosition(this));
+		relativePos.sub(this.lastGlobal);
+		
+		vars.particle_pos.set(relativePos);
+		vars.particle_speed.set(particle.speed);
+		vars.particle_bounces = particle.bounces;
+		
+		for(Map.Entry<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> e : variables.entrySet())
+		{
+			vars.putUpdate(e.getKey(), e.getValue());
+		}
+	}
+	
+	public void setEmitterVariables(float partialTicks)
+	{
+		vars.emitter_age = this.getAge(partialTicks);
+		vars.emitter_lifetime = this.lifetime / 20.0;
+		vars.emitter_random_1 = this.random1;
+		vars.emitter_random_2 = this.random2;
+		vars.emitter_random_3 = this.random3;
+		vars.emitter_random_4 = this.random4;
+		
+		for(Map.Entry<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> e : variables.entrySet())
+		{
+			vars.putUpdate(e.getKey(), e.getValue());
+		}
+	}
+	
+	public void parseVariables(Map<String, String> variables)
+	{
+		for(Map.Entry<String, String> entry : variables.entrySet())
+		{
+			String name = entry.getKey(), expression = entry.getValue();
+			registerVariable(name, InterpolatedDouble.parse(expression));
+		}
+	}
+	
+	public void registerVariable(String name, InterpolatedDouble<ParticleVariables> expression)
+	{
+		if(!name.startsWith("variable."))
+		{
+			HammerAnimations.LOG.warn("Tried to registerVariable, the name '{}' does not start with 'variable.'", name);
+			return;
+		}
+		
+		this.variables.put(name, new InterpolatedDouble.NumberWrapped<>(expression));
+	}
+	
+	public void replaceVariables()
+	{
+	}
+	
+	public void start()
+	{
+		if(this.playing)
+		{
+			return;
+		}
+		
+		this.age = 0;
+		this.spawnedParticles = 0;
+		this.playing = true;
+		
+		for(IEmitterInitialize component : this.effect.emitterInitializes)
+			component.apply(this);
+	}
+	
+	public void stop()
+	{
+		if(!this.playing)
+			return;
+		
+		this.spawnedParticles = 0;
+		this.playing = false;
+		
+		this.random1 = (float) Math.random();
+		this.random2 = (float) Math.random();
+		this.random3 = (float) Math.random();
+		this.random4 = (float) Math.random();
+	}
+	
+	/**
+	 * Update this current emitter
+	 */
+	public void update()
+	{
+		if(this.effect == null)
+		{
+			return;
+		}
+		
+		this.setEmitterVariables(0);
+		
+		for(IEmitterUpdate component : this.effect.emitterUpdates)
+			component.update(this);
+		
+		this.setEmitterVariables(0);
+		this.updateParticles();
+		
+		this.age += 1;
+		this.sanityTicks += 1;
+		if(target != null) this.vars.entity_scale = target.getAnimatedObjectScale();
+	}
+	
+	/**
+	 * Update all particles
+	 */
+	private void updateParticles()
+	{
+		Iterator<BedrockParticle> it = this.particles.iterator();
+		
+		while(it.hasNext())
+		{
+			BedrockParticle particle = it.next();
+			
+			this.updateParticle(particle);
+			
+			if(particle.dead)
+			{
+				it.remove();
+			}
+		}
+		
+		if(!this.splitParticles.isEmpty())
+		{
+			this.particles.addAll(this.splitParticles);
+			this.splitParticles.clear();
+		}
+	}
+	
+	/**
+	 * Update a single particle
+	 */
+	private void updateParticle(BedrockParticle particle)
+	{
+		particle.update(this);
+		
+		this.setParticleVariables(particle, 0);
+		
+		for(IParticleUpdate component : this.effect.particleUpdates)
+			component.update(this, particle);
+	}
+	
+	/**
+	 * Spawn a particle
+	 */
+	public void spawnParticle()
+	{
+		if(!this.running)
+		{
+			return;
+		}
+		
+		this.particles.add(this.createParticle(false));
+	}
+	
+	/**
+	 * Create a new particle
+	 */
+	public BedrockParticle createParticle(boolean forceRelative)
+	{
+		BedrockParticle particle = new BedrockParticle(this);
+		
+		this.setParticleVariables(particle, 0);
+		particle.setupMatrix(this);
+		
+		for(IParticleInitialize component : this.effect.particleInitializes)
+			component.apply(this, particle);
+		
+		if(particle.relativePosition && !particle.relativeRotation)
+		{
+			Vector3d vec = new Vector3d(particle.position);
+			
+			particle.matrix.transform(vec);
+			
+			particle.position.x = vec.x;
+			particle.position.y = vec.y;
+			particle.position.z = vec.z;
+		}
+		
+		if(!(particle.relativePosition && particle.relativeRotation))
+		{
+			particle.position.add(this.lastGlobal);
+			particle.initialPosition.add(this.lastGlobal);
+		}
+		
+		particle.prevPosition.set(particle.position);
+		particle.rotation = particle.initialRotation;
+		particle.prevRotation = particle.rotation;
+		
+		return particle;
+	}
+	
+	/**
+	 * Render the particle on screen
+	 */
+	public void renderOnScreen(int x, int y, float scale)
+	{
+		if(this.effect == null) return;
+		
+		float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
+		
+		List<IParticleRender> listParticle = this.effect.particleRender;
+		
+		Matrix3f rotation = this.rotation;
+		
+		this.rotation = new Matrix3f();
+		
+		if(!listParticle.isEmpty())
+		{
+			Minecraft.getMinecraft().renderEngine.bindTexture(this.effect.texture);
+			
+			this.effect.material.beginGL();
+			GlStateManager.disableCull();
+			
+			if(this.guiParticle == null || this.guiParticle.dead)
+			{
+				this.guiParticle = this.createParticle(true);
+			}
+			
+			this.rotation.identity();
+			this.guiParticle.update(this);
+			this.setEmitterVariables(partialTicks);
+			this.setParticleVariables(this.guiParticle, partialTicks);
+			
+			for(IParticleRender render : listParticle)
+			{
+				render.renderOnScreen(vars, this.guiParticle, x, y, scale, partialTicks);
+			}
+			
+			this.effect.material.endGL();
+			GlStateManager.enableCull();
+		}
+		
+		this.rotation = rotation;
+	}
+	
+	/**
+	 * Render all the particles in this particle emitter
+	 */
+	public void render(float partialTicks)
+	{
+		if(this.effect == null)
+		{
+			return;
+		}
+		
+		this.setupCameraProperties(partialTicks);
+		
+		List<IParticleRender> renders = this.effect.particleRender;
+		
+		this.setupOpenGL(partialTicks);
+		
+		for(IParticlePreRender component : this.effect.particlePreRender)
+			component.preRender(this, partialTicks);
+		
+		if(!this.particles.isEmpty())
+		{
+			this.depthSorting();
+			
+			IVertexRenderer renderer = ClientProxy.SHARED_TESS_RENDERER.get();
+			
+			renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
+			UtilsFX.bindTexture(this.effect.texture);
+			this.renderParticles(renderer, renders, false, partialTicks);
+			renderer.upload();
+			
+			ParcomCollisionAppearance collisionAppearance = this.effect.get(ParcomCollisionAppearance.class, ParticleComponentsHA.PARTICLE_COLLISION_APPEARANCE);
+			
+			/* rendering the collided particles with an extra component */
+			if(collisionAppearance != null && collisionAppearance.texture != null)
+			{
+				renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
+				UtilsFX.bindTexture(collisionAppearance.texture);
+				this.renderParticles(renderer, renders, true, partialTicks);
+				renderer.upload();
+			}
+		}
+		
+		for(IParticlePostRender component : this.effect.particlePostRender)
+			component.postRender(this, partialTicks);
+		
+		this.endOpenGL();
+	}
+	
+	/**
+	 * This method renders the particles using the default bedrock billboards
+	 *
+	 * @param renderComponents
+	 * @param collided
+	 * @param partialTicks
+	 */
+	private void renderParticles(IVertexOutput builder, List<IParticleRender> renderComponents, boolean collided, float partialTicks)
+	{
+		for(BedrockParticle particle : this.particles)
+		{
+			boolean collisionStuff = particle.isCollisionTexture(this) || particle.isCollisionTinting(this);
+			
+			if(collisionStuff != collided)
+			{
+				continue;
+			}
+			
+			this.setEmitterVariables(partialTicks);
+			this.setParticleVariables(particle, partialTicks);
+			
+			for(IParticleRender component : renderComponents)
+			{
+				/* if collisionTexture or collisionTinting is true - means that those options are enabled
+				 * therefore the old Billboardappearance should not be called
+				 * because collisionAppearance.class is rendering
+				 */
+				if(!(collisionStuff && component.supportsCollissionRendering()))
+					component.render(vars, this, particle, builder, partialTicks);
+			}
+		}
+	}
+	
+	private void setupOpenGL(float partialTicks)
+	{
+		this.effect.material.beginGL();
+		
+		if(!isRenderingGUI)
+		{
+			Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
+			double playerX = camera.prevPosX + (camera.posX - camera.prevPosX) * (double) partialTicks;
+			double playerY = camera.prevPosY + (camera.posY - camera.prevPosY) * (double) partialTicks;
+			double playerZ = camera.prevPosZ + (camera.posZ - camera.prevPosZ) * (double) partialTicks;
+			
+			BufferBuilder builder = Tessellator.getInstance().getBuffer();
+			
+			builder.setTranslation(-playerX, -playerY, -playerZ);
+			
+			GlStateManager.disableCull();
+			GlStateManager.enableTexture2D();
+		}
+	}
+	
+	private void endOpenGL()
+	{
+		if(!isRenderingGUI)
+		{
+			Tessellator.getInstance().getBuffer().setTranslation(0, 0, 0);
+		}
+		
+		this.effect.material.endGL();
+	}
+	
+	
+	private void depthSorting()
+	{
+		this.particles.sort((a, b) ->
+		{
+			double ad = a.getDistanceSq(this);
+			double bd = b.getDistanceSq(this);
+			
+			if(ad < bd)
+			{
+				return 1;
+			} else if(ad > bd)
+			{
+				return -1;
+			}
+			
+			return 0;
+		});
+	}
+	
+	public void setupCameraProperties(float partialTicks)
+	{
+		if(this.world == null) return;
+		
+		Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
+		if(camera == null) return;
+		
+		this.perspective = Minecraft.getMinecraft().gameSettings.thirdPersonView;
+		this.cYaw = (float) (180 - ParticleCurve.lerp(camera.prevRotationYaw, camera.rotationYaw, partialTicks));
+		this.cPitch = (float) (180 - ParticleCurve.lerp(camera.prevRotationPitch, camera.rotationPitch, partialTicks));
+		this.cX = ParticleCurve.lerp(camera.prevPosX, camera.posX, partialTicks);
+		this.cY = ParticleCurve.lerp(camera.prevPosY, camera.posY, partialTicks) + camera.getEyeHeight();
+		this.cZ = ParticleCurve.lerp(camera.prevPosZ, camera.posZ, partialTicks);
+	}
+	
+	/**
+	 * Get brightness for the block
+	 */
+	public int getBrightnessForRender(float partialTicks, double x, double y, double z)
+	{
+		if(this.lit || this.world == null)
+		{
+			return 15728880;
+		}
+		
+		this.blockPos.setPos(x, y, z);
+		
+		return this.world.isBlockLoaded(this.blockPos) ? this.world.getCombinedLight(this.blockPos, 0) : 0;
+	}
+}

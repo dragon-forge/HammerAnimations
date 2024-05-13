@@ -18,6 +18,20 @@ public interface IAnimatedEntity
 	}
 	
 	@Override
+	default float getAnimatedObjectWidth()
+	{
+		Entity tile = Cast.cast(this);
+		return tile.width;
+	}
+	
+	@Override
+	default float getAnimatedObjectHeight()
+	{
+		Entity tile = Cast.cast(this);
+		return tile.height;
+	}
+	
+	@Override
 	default World getAnimatedObjectWorld()
 	{
 		Entity tile = Cast.cast(this);

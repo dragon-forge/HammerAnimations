@@ -1,7 +1,9 @@
 package org.zeith.hammeranims.core.utils;
 
 import net.minecraft.nbt.*;
-import net.minecraft.util.text.*;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 
 public class InstanceHelpers
 {
@@ -23,5 +25,10 @@ public class InstanceHelpers
 	public static NBTTagString newNBTString(String s)
 	{
 		return new NBTTagString(s);
+	}
+	
+	public static ResourceLocation tryParseLocation(String input)
+	{
+		return new ResourceLocation(input);
 	}
 }

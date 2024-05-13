@@ -11,6 +11,7 @@ import org.apache.logging.log4j.*;
 import org.zeith.hammeranims.core.contents.entity.EntityBilly;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
+import org.zeith.hammeranims.core.impl.api.particles.ParticleDecoder;
 import org.zeith.hammeranims.core.proxy.CommonProxy;
 
 import java.lang.annotation.Annotation;
@@ -33,6 +34,7 @@ public class HammerAnimations
 	{
 		AnimationDecoder.init();
 		GeometryDecoder.init();
+		ParticleDecoder.init();
 	}
 	
 	@Mod.EventHandler

@@ -5,17 +5,16 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
-import org.zeith.hammeranims.api.geometry.model.*;
-import org.zeith.hammeranims.api.utils.IResourceProvider;
+import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
+import org.zeith.hammeranims.api.utils.IHammerReloadable;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryContainerImpl;
 
 import javax.annotation.Nonnull;
 
 public interface IGeometryContainer
-		extends IForgeRegistryEntry<IGeometryContainer>
+		extends IHammerReloadable, IForgeRegistryEntry<IGeometryContainer>
 {
-	void reload(IResourceProvider provider);
-	
 	IGeometryData getGeometry();
 	
 	/**
