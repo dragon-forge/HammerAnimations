@@ -13,6 +13,7 @@ import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
+import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
 
 import java.util.Collection;
 import java.util.concurrent.*;
@@ -30,6 +31,11 @@ public class CommonProxy
 	
 	public void init()
 	{
+	}
+	
+	public ExtraParticleEffects getExtraParticles()
+	{
+		return null;
 	}
 	
 	public IGeometricModel createGeometryData(GeometryDataImpl def)

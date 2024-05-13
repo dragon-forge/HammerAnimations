@@ -6,40 +6,39 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
-import org.zeith.hammerlib.abstractions.sources.IObjectSource;
+import org.zeith.hammeranims.joml.Vector3d;
 
 import java.io.IOException;
 
 @MainThreaded
-public class PacketPlayParticleEffectAtObject
+public class PacketPlayParticleEffectAtPos
 		implements IPacket
 {
-	IObjectSource<?> source;
+	Vector3d source;
 	ResourceLocation container;
 	
-	public PacketPlayParticleEffectAtObject(IAnimatedObject object, IParticleContainer particle)
+	public PacketPlayParticleEffectAtPos(Vector3d object, IParticleContainer particle)
 	{
-		this.source = object.getAnimationSource();
+		this.source = new Vector3d(object);
 		this.container = particle.getRegistryKey();
 	}
 	
-	public PacketPlayParticleEffectAtObject(IAnimatedObject object, ResourceLocation particle)
+	public PacketPlayParticleEffectAtPos(Vector3d object, ResourceLocation particle)
 	{
-		this.source = object.getAnimationSource();
+		this.source = new Vector3d(object);
 		this.container = particle;
 	}
 	
-	public PacketPlayParticleEffectAtObject()
+	public PacketPlayParticleEffectAtPos()
 	{
 	}
 	
 	@Override
 	public void write(PacketBuffer buf)
 	{
-		IObjectSource.writeSource(source, buf);
+		buf.writeDouble(source.x).writeDouble(source.y).writeDouble(source.z);
 		buf.writeResourceLocation(container);
 	}
 	
@@ -47,7 +46,7 @@ public class PacketPlayParticleEffectAtObject
 	public void read(PacketBuffer buf)
 			throws IOException
 	{
-		this.source = IObjectSource.readSource(buf).orElse(null);
+		this.source = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
 		this.container = buf.readResourceLocation();
 	}
 	
@@ -60,10 +59,10 @@ public class PacketPlayParticleEffectAtObject
 		IParticleContainer container = IParticleContainer.byRegistryKey(this.container);
 		EntityPlayer player = net.getPlayer();
 		if(player == null || container == null) return;
-		IAnimatedObject obj = source.get(IAnimatedObject.class, player.world).orElse(null);
-		if(obj == null) return;
+		if(source == null) return;
 		ParticleWithEmitter pwe = new ParticleWithEmitter(
-				obj,
+				player.world,
+				source.x, source.y, source.z,
 				container
 		);
 		pwe.spawn();

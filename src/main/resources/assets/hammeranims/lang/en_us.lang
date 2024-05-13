@@ -1,2 +1,6 @@
 
 tile.hammeranims:billy.name=Billy [Test]
+
+command.hammeranims:particle_effect.nofx=Missing particle effect as first argument.
+command.hammeranims:particle_effect.nopos=Missing particle position.
+command.hammeranims:particle_effect.spawned=Spawned particle effect "%s".

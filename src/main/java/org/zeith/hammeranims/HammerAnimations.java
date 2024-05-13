@@ -7,7 +7,9 @@ import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import org.apache.logging.log4j.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.zeith.hammeranims.core.contents.commands.CommandSpawnParticleEffect;
 import org.zeith.hammeranims.core.contents.entity.EntityBilly;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
@@ -68,6 +70,12 @@ public class HammerAnimations
 	public void commonSetup(FMLInitializationEvent e)
 	{
 		PROXY.init();
+	}
+	
+	@Mod.EventHandler
+	public void serverStarting(FMLServerStartingEvent e)
+	{
+		e.registerServerCommand(new CommandSpawnParticleEffect());
 	}
 	
 	@Mod.EventHandler
