@@ -91,7 +91,8 @@ public class GeometryContainerImpl
 				bones.put(bone, new BoneConstraintsImpl());
 			constraints = new GeometryConstrainsImpl(bones.build());
 		}
-		HammerAnimations.LOG.debug("Loaded {} geometry with {} bones{}.",
+		
+		if(HammerAnimationsApi.LOG_RELOADS) HammerAnimations.LOG.debug("Loaded {} geometry with {} bones{}.",
 				key,
 				geometry.getBones().size(),
 				constraintsLoaded ? " and " + constraints.bones().size() + " constraints" : ""
