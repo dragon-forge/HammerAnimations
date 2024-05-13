@@ -7,6 +7,16 @@ public interface InterpolatedDouble<T extends IVariableAccess>
 {
 	double get(T query);
 	
+	static <T extends IVariableAccess> InterpolatedDouble<T> one()
+	{
+		return constant(1);
+	}
+	
+	static <T extends IVariableAccess> InterpolatedDouble<T> zero()
+	{
+		return constant(0);
+	}
+	
 	static <T extends IVariableAccess> InterpolatedDouble<T> constant(double d)
 	{
 		return query -> d;
@@ -29,5 +39,53 @@ public interface InterpolatedDouble<T extends IVariableAccess>
 			return parse(e.getAsString());
 		}
 		return null;
+	}
+	
+	class NumberWrapped<T extends IVariableAccess>
+			extends Number
+			implements InterpolatedDouble<T>
+	{
+		protected final InterpolatedDouble<T> id;
+		protected Double value = 0D;
+		
+		public NumberWrapped(InterpolatedDouble<T> id)
+		{
+			this.id = id;
+		}
+		
+		public void update(T access)
+		{
+			this.value = id.get(access);
+		}
+		
+		@Override
+		public int intValue()
+		{
+			return value.intValue();
+		}
+		
+		@Override
+		public long longValue()
+		{
+			return value.longValue();
+		}
+		
+		@Override
+		public float floatValue()
+		{
+			return value.floatValue();
+		}
+		
+		@Override
+		public double doubleValue()
+		{
+			return value;
+		}
+		
+		@Override
+		public double get(T query)
+		{
+			return id.get(query);
+		}
 	}
 }

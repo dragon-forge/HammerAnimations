@@ -7,6 +7,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.*;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
+import org.zeith.hammeranims.core.impl.api.particles.ParticleDecoder;
 import org.zeith.hammeranims.core.proxy.*;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.util.CommonMessages;
@@ -31,6 +32,7 @@ public class HammerAnimations
 		FMLJavaModLoadingContext.get().getModEventBus().register(this);
 		AnimationDecoder.init();
 		GeometryDecoder.init();
+		ParticleDecoder.init();
 		
 		LOG.info("{} is constructing.", MOD_NAME);
 		PROXY.construct();

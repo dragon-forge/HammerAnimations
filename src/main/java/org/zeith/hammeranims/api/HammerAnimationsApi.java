@@ -11,6 +11,8 @@ import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.api.particles.components.IParticleComponentType;
 import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 
@@ -35,7 +37,11 @@ public class HammerAnimationsApi
 	private static Supplier<IForgeRegistry<IGeometryContainer>> GEOMETRY_CONTAINERS;
 	private static Supplier<IForgeRegistry<TimeFunction>> TIME_FUNCTIONS;
 	private static Supplier<IForgeRegistry<AnimationAction>> ANIMATION_ACTIONS;
+	private static Supplier<IForgeRegistry<IParticleContainer>> PARTICLE_CONTAINERS;
+	private static Supplier<IForgeRegistry<IParticleComponentType>> PARTICLE_COMPONENT_TYPES;
 	private static boolean hasInitialized = false;
+	
+	public static boolean LOG_RELOADS = !Boolean.parseBoolean(System.getProperty("hammeranims.silence"));
 	
 	@SubscribeEvent
 	public static void newRegistries(RegistryEvent.NewRegistry e)
@@ -67,6 +73,20 @@ public class HammerAnimationsApi
 				.setName(HammerAnimations.id("animation_actions"))
 				.disableSaving()
 				.setDefaultKey(HammerAnimations.id("empty"))
+				.create()
+		);
+		
+		PARTICLE_CONTAINERS = constant(new RegistryBuilder<IParticleContainer>()
+				.setType(IParticleContainer.class)
+				.setName(HammerAnimations.id("particle_containers"))
+				.disableSaving()
+				.create()
+		);
+		
+		PARTICLE_COMPONENT_TYPES = constant(new RegistryBuilder<IParticleComponentType>()
+				.setType(IParticleComponentType.class)
+				.setName(HammerAnimations.id("particle_component_types"))
+				.disableSaving()
 				.create()
 		);
 		
@@ -108,12 +128,24 @@ public class HammerAnimationsApi
 		return ANIMATION_ACTIONS.get();
 	}
 	
+	public static IForgeRegistry<IParticleContainer> particleContainers()
+	{
+		return PARTICLE_CONTAINERS.get();
+	}
+	
+	public static IForgeRegistry<IParticleComponentType> particleComponentTypes()
+	{
+		return PARTICLE_COMPONENT_TYPES.get();
+	}
+	
 	public static class Keys
 	{
 		public static final RegistryKey<Registry<IAnimationContainer>> ANIMATION_CONTAINERS = key("animations");
 		public static final RegistryKey<Registry<IGeometryContainer>> GEOMETRY_CONTAINERS = key("geometry");
 		public static final RegistryKey<Registry<TimeFunction>> TIME_FUNCTIONS = key("time_functions");
 		public static final RegistryKey<Registry<AnimationAction>> ANIMATION_ACTIONS = key("animation_actions");
+		public static final RegistryKey<Registry<IParticleContainer>> PARTICLE_CONTAINERS = key("particle_containers");
+		public static final RegistryKey<Registry<IParticleComponentType>> PARTICLE_COMPONENT_TYPES = key("particle_component_types");
 		
 		private static <T> RegistryKey<Registry<T>> key(String name)
 		{

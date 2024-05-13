@@ -10,6 +10,8 @@ import org.zeith.hammeranims.api.event.ReloadHammerAnimationsEvent;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.api.particles.components.IParticleComponent;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammerlib.util.java.IOUtils;
@@ -53,6 +55,10 @@ public class CommonProxy
 		
 		Collection<IGeometryContainer> geometries = HammerAnimationsApi.geometries().getValues();
 		HammerAnimations.LOG.info("Reloading {} models.", geometries.size());
+		queues.enqueue(geometries.stream().map((ctr) -> (Runnable) () -> ctr.reload(provider)), CompletableFuture::runAsync);
+		
+		Collection<IParticleContainer> particles = HammerAnimationsApi.particleContainers().getValues();
+		HammerAnimations.LOG.info("Reloading {} particles.", particles.size());
 		queues.enqueue(geometries.stream().map((ctr) -> (Runnable) () -> ctr.reload(provider)), CompletableFuture::runAsync);
 		
 		HammerAnimationsApi.EVENT_BUS.post(queues);

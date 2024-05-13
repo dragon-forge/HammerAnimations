@@ -31,7 +31,7 @@ public class ExpressionParser
 			js.put("Math", MATH);
 			js.put("math", MATH);
 			
-			String fun = "function get() {\n\tvar q = query;\n\treturn " + expression + ";\n}";
+			String fun = "function get() {\n\treturn " + expression + ";\n}";
 			
 			ScriptObjectMirror bindings = (ScriptObjectMirror) js.createBindings();
 			js.eval(fun, bindings);

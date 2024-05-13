@@ -108,8 +108,9 @@ public class AnimationContainerImpl
 		else
 			defaultAnimation = DefaultsHA.NULL_ANIMATION_SYNTETIC;
 		
-		HammerAnimations.LOG.debug("Loaded {} animations in {}: {}", animations.getKeySet()
-				.size(), key, animations.getKeySet());
+		if(HammerAnimationsApi.LOG_RELOADS)
+			HammerAnimations.LOG.debug("Loaded {} animations in {}: {}", animations.getKeySet()
+					.size(), key, animations.getKeySet());
 	}
 	
 	@Override
