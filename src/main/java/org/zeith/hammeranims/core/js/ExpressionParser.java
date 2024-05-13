@@ -2,6 +2,7 @@ package org.zeith.hammeranims.core.js;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import net.minecraft.util.math.MathHelper;
+import org.zeith.hammeranims.api.animation.interp.IVariableAccess;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.core.utils.MinecraftHelper;
 
@@ -13,7 +14,7 @@ public class ExpressionParser
 {
 	public static final MathJS MATH = new MathJS();
 	
-	public static InterpolatedDouble parse(String expression)
+	public static <T extends IVariableAccess> InterpolatedDouble<T> parse(String expression)
 	{
 		// Try parsing expression as contstant first.
 		try
@@ -30,7 +31,7 @@ public class ExpressionParser
 			js.put("Math", MATH);
 			js.put("math", MATH);
 			
-			String fun = "function get(query) {\n\tvar q = query;\n\treturn " + expression + ";\n}";
+			String fun = "function get() {\n\tvar q = query;\n\treturn " + expression + ";\n}";
 			
 			ScriptObjectMirror bindings = (ScriptObjectMirror) js.createBindings();
 			js.eval(fun, bindings);
@@ -42,6 +43,7 @@ public class ExpressionParser
 			{
 				try
 				{
+					query.putObjects(js::put);
 					return id0.get(query);
 				} catch(RuntimeException e)
 				{
