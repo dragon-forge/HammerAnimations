@@ -1,7 +1,8 @@
 package org.zeith.hammeranims.core.proxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.*;
+import net.minecraft.resources.IFutureReloadListener;
+import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.Util;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -9,10 +10,13 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.utils.IExtendedResourceProvider;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
+import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ClientProxy
@@ -20,6 +24,14 @@ public class ClientProxy
 {
 	protected static final List<IGeometricModel> createdModels = new ArrayList<>();
 	protected static final List<IGeometricModel> disposeModels = new ArrayList<>();
+	
+	protected static ExtraParticleEffects extraEffects;
+	
+	@Override
+	public ExtraParticleEffects getExtraParticles()
+	{
+		return extraEffects;
+	}
 	
 	@Override
 	public void construct()
@@ -47,11 +59,8 @@ public class ClientProxy
 	public void registerReloaders(IReloadableResourceManager e)
 	{
 		e.registerReloadListener((preparationBarrier, resourceManager, profilerFiller, profilerFiller1, pBackgroundExecutor, pGameExecutor) ->
-		{
-			disposeModels.addAll(createdModels);
-			createdModels.clear();
-			return reloadRegistries(preparationBarrier, wrapVanillaResources(resourceManager), true, pGameExecutor, pBackgroundExecutor);
-		});
+				performReload(preparationBarrier)
+		);
 	}
 	
 	@Override
@@ -68,17 +77,25 @@ public class ClientProxy
 		return Minecraft.getInstance().level;
 	}
 	
-	public static void performReload()
+	public static CompletableFuture<Void> performReload()
+	{
+		return performReload(CompletableFuture::completedFuture);
+	}
+	
+	public static CompletableFuture<Void> performReload(IFutureReloadListener.IStage b)
 	{
 		disposeModels.addAll(createdModels);
 		createdModels.clear();
+		
 		Minecraft mc = Minecraft.getInstance();
+		IExtendedResourceProvider res = wrapVanillaResources(mc.getResourceManager());
 		
-		IFutureReloadListener.IStage b = CompletableFuture::completedFuture;
-		
-		HammerAnimations.PROXY.reloadRegistries(b, wrapVanillaResources(mc.getResourceManager()), true,
-				mc,
-				Util.backgroundExecutor()
+		return CompletableFuture.allOf(
+				ExtraParticleEffects.load(res, Util.backgroundExecutor()).thenAccept(fx -> extraEffects = fx),
+				HammerAnimations.PROXY.reloadRegistries(b, res, true,
+						mc,
+						Util.backgroundExecutor()
+				)
 		);
 	}
 }

@@ -85,7 +85,7 @@ public class ParticleWithEmitter
 		MatrixStack pose = new MatrixStack();
 		
 		Vector3d vec = pRenderInfo.getPosition();
-		pose.translate(vec.x, vec.y, vec.z);
+//		pose.translate(vec.x, vec.y, vec.z);
 		
 		emitter.render(buffers, pose, pPartialTicks);
 		buffers.endBatch();
@@ -123,5 +123,11 @@ public class ParticleWithEmitter
 	public IParticleRenderType getRenderType()
 	{
 		return RENDER_TYPE;
+	}
+	
+	@Override
+	public boolean shouldCull()
+	{
+		return false;
 	}
 }
