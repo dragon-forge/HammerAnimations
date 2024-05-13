@@ -4,10 +4,6 @@ start_git_commit=7c27035d2be7bd36b67b1739551ef2ff99bf126a
 git_commit=https://github.com/dragon-forge/HammerAnimations/commit/{{hash}}
 
 #Runtime info
-forge_version=14.23.5.2847
-minecraft_version=1.12.2
-mcp=stable_39
-hl_version=12.2.50
 jei_version=4.16.1.302
 # viveapi_version=12.1.1
 

@@ -33,8 +33,11 @@ public class CommandReloadHA
 		{
 			if(args[0].equalsIgnoreCase("reload"))
 			{
-				sender.sendMessage(InstanceHelpers.componentText("Reloading models and animations."));
-				ClientProxy.performReload();
+				sender.sendMessage(InstanceHelpers.componentText("Reloading models, animations and particles."));
+				ClientProxy.performReload().thenRun(() ->
+				{
+					sender.sendMessage(InstanceHelpers.componentText("Reload complete."));
+				});
 			}
 		}
 	}

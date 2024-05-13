@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.proxy;
 
 import com.google.common.base.Suppliers;
+import com.zeitheron.hammercore.client.HammerCoreClient;
 import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
@@ -15,6 +16,7 @@ import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.*;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
+import org.zeith.hammeranims.core.client.BuiltInResourcePack;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.client.render.*;
@@ -26,6 +28,7 @@ import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class ClientProxy
@@ -57,6 +60,14 @@ public class ClientProxy
 	public World getClientWorld()
 	{
 		return Minecraft.getMinecraft().world;
+	}
+	
+	@Override
+	public void construct()
+	{
+		if("@VERSION@".contains("@VERSION"))
+			HammerCoreClient.injectResourcePack(new BuiltInResourcePack(HammerAnimations.class, HammerAnimations.MOD_ID));
+		super.construct();
 	}
 	
 	@Override
@@ -104,11 +115,11 @@ public class ClientProxy
 		data.renderer = SHARED_TESS_RENDERER.get();
 	}
 	
-	public static void performReload()
+	public static CompletableFuture<?> performReload()
 	{
 		disposeModels.addAll(createdModels);
 		createdModels.clear();
-		HammerAnimations.PROXY.reloadRegistries(
+		return HammerAnimations.PROXY.reloadRegistries(
 				wrapVanillaResources(Minecraft.getMinecraft().getResourceManager()),
 				Minecraft.getMinecraft()::addScheduledTask, McUtil.backgroundExecutor(),
 				true
