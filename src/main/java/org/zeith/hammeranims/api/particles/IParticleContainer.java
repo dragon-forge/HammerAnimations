@@ -1,9 +1,13 @@
 package org.zeith.hammeranims.api.particles;
 
 import net.minecraft.resources.ResourceLocation;
+import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.utils.IHammerReloadable;
+import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
 import org.zeith.hammeranims.core.impl.api.particles.ParticleContainerImpl;
+
+import javax.annotation.Nullable;
 
 public interface IParticleContainer
 		extends IHammerReloadable
@@ -18,6 +22,8 @@ public interface IParticleContainer
 	{
 		return HammerAnimationsApi.particleContainers().getKey(this);
 	}
+	
+	boolean isDynamic();
 	
 	ParticleEffect getParticleEffect();
 	
@@ -39,5 +45,22 @@ public interface IParticleContainer
 	static IParticleContainer createNoSuffix()
 	{
 		return new ParticleContainerImpl(".json");
+	}
+	
+	/**
+	 * Retrieves a particle container that can be used to spawn particle emitter.
+	 * <p>
+	 * The returned container may be obtained from either forge registry, or a dynamic one provided by a resource pack.
+	 */
+	@Nullable
+	static IParticleContainer byRegistryKey(ResourceLocation id)
+	{
+		ExtraParticleEffects ep = HammerAnimations.PROXY.getExtraParticles();
+		if(ep != null)
+		{
+			IParticleContainer c = ep.resolve(id);
+			if(c != null) return c;
+		}
+		return HammerAnimationsApi.particleContainers().getValue(id);
 	}
 }

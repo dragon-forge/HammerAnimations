@@ -27,6 +27,12 @@ public class ParticleContainerImpl
 	}
 	
 	@Override
+	public boolean isDynamic()
+	{
+		return false;
+	}
+	
+	@Override
 	public ParticleEffect getParticleEffect()
 	{
 		return effect;

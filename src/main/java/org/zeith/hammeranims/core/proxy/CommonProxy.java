@@ -1,9 +1,10 @@
 package org.zeith.hammeranims.core.proxy;
 
 import com.google.common.base.Stopwatch;
-import net.minecraft.server.packs.resources.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
@@ -12,11 +13,14 @@ import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
-import org.zeith.hammeranims.api.particles.components.IParticleComponent;
+import org.zeith.hammeranims.api.utils.IExtendedResourceProvider;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
+import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
+import org.zeith.hammerlib.util.java.IOUtils;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Stream;
@@ -78,21 +82,47 @@ public class CommonProxy
 				}, gameExecutor);
 	}
 	
-	public static IResourceProvider wrapVanillaResources(ResourceManager manager)
+	public static IExtendedResourceProvider wrapVanillaResources(ResourceManager manager)
 	{
 		IResourceProvider aux = IResourceProvider.or(HammerAnimationsApi.getAuxiliaryResourceProviders());
-		return path ->
+		return new IExtendedResourceProvider()
 		{
-			Optional<Resource> res0 = manager.getResource(path);
-			var res = res0.orElse(null);
-			if(res != null)
-				try(var in = res.open())
+			@Override
+			public Optional<byte[]> read(ResourceLocation path)
+			{
+				try(var in = manager.getResource(path).orElseThrow(FileNotFoundException::new).open())
 				{
-					return Optional.of(in.readAllBytes());
+					return Optional.of(IOUtils.pipeOut(in));
 				} catch(IOException ignored)
 				{
 				}
-			return aux.read(path);
+				return aux.read(path);
+			}
+			
+			@Override
+			public List<byte[]> readAll(ResourceLocation path)
+			{
+				List<byte[]> all = new ArrayList<>(manager.getResourceStack(path).stream().map(r ->
+				{
+					try(var in = r.open())
+					{
+						return IOUtils.pipeOut(in);
+					} catch(IOException ignored)
+					{
+						return null;
+					}
+				}).filter(Objects::nonNull).toList());
+				
+				for(IResourceProvider provider : HammerAnimationsApi.getAuxiliaryResourceProviders())
+					provider.read(path).ifPresent(all::add);
+				
+				return all;
+			}
 		};
+	}
+	
+	public ExtraParticleEffects getExtraParticles()
+	{
+		return null;
 	}
 }
