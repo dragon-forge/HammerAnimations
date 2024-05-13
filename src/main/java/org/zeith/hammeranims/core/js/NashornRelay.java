@@ -1,41 +1,58 @@
 package org.zeith.hammeranims.core.js;
 
+import com.zeitheron.hammercore.utils.ReflectionUtil;
+import com.zeitheron.hammercore.utils.base.Cast;
 import jdk.nashorn.api.scripting.ClassFilter;
 import org.zeith.hammeranims.HammerAnimations;
 
 import javax.script.ScriptEngine;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.function.Supplier;
 
 public class NashornRelay
 {
-	private static boolean disabled = false;
+	private static boolean checked = false;
+	private static Supplier<ScriptEngine> theFactory = Cast.constant(null);
 	
 	public static ScriptEngine tryCreateNashorn()
 	{
-		if(disabled) return null;
+		if(checked) return theFactory.get();
+		checked = true;
 		
 		try
 		{
-			ClassLoader cl = NashornRelay.class.getClassLoader();
-			
-			Class<?> ClassFilter = cl.loadClass("jdk.nashorn.api.scripting.ClassFilter");
-			Class<?> NashornScriptEngineFactory = cl.loadClass("jdk.nashorn.api.scripting.NashornScriptEngineFactory");
-			Class<?> NoJSClasses = cl.loadClass(NashornRelay.class.getName() + "$NoJSClasses");
+			Class<?> ClassFilter = ReflectionUtil.fetchClass("jdk.nashorn.api.scripting.ClassFilter");
+			Class<?> NashornScriptEngineFactory = ReflectionUtil.fetchClass("jdk.nashorn.api.scripting.NashornScriptEngineFactory");
+			Class<?> NoJSClasses = ReflectionUtil.fetchClass(NashornRelay.class.getName() + "$NoJSClasses");
 			
 			Constructor<?> c = NoJSClasses.getDeclaredConstructor();
 			c.setAccessible(true);
 			
-			Object sef = NashornScriptEngineFactory.getDeclaredConstructor().newInstance();
+			Constructor<?> sefCt = NashornScriptEngineFactory.getDeclaredConstructor();
+			
+			Object sef = sefCt.newInstance();
 			Object filter = c.newInstance();
 			
-			return (ScriptEngine) NashornScriptEngineFactory.getMethod("getScriptEngine", ClassFilter).invoke(sef, filter);
+			theFactory = () ->
+			{
+				try
+				{
+					return (ScriptEngine) NashornScriptEngineFactory.getMethod("getScriptEngine", ClassFilter).invoke(sef, filter);
+				} catch(IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
+				{
+					throw new RuntimeException(e);
+				}
+			};
+			
+			return theFactory.get(); // verify we can create it at least once without crashing the game down the line!
 		} catch(Throwable e)
 		{
-			HammerAnimations.LOG.warn("Failed to use \"jdk.nashorn.api.scripting.NashornScriptEngineFactory\". Passing off to other built-in factory;");
-			e.printStackTrace();
-			disabled = true;
-			return null;
+			HammerAnimations.LOG.warn("Failed to use \"jdk.nashorn.api.scripting.NashornScriptEngineFactory\". Passing off to other built-in factory;", e);
+			theFactory = Cast.constant(null);
 		}
+		
+		return theFactory.get();
 	}
 	
 	private static class NoJSClasses
