@@ -12,7 +12,6 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
-        classpath 'org.spongepowered:mixingradle:0.7.+'
     }
 }
 
@@ -21,6 +20,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'net.minecraftforge.gradle' version '5.1.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
 }
 
 apply plugin: 'idea'
@@ -46,6 +46,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 mixin {
     add sourceSets.main, "mixins.${config.mod_id}.refmap.json"
+    config "mixins.${config.mod_id}.json"
 }
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
@@ -82,6 +83,9 @@ repositories {
         name = "Zeitheron Maven"
         url = "https://maven.zeith.org/"
     }
+    maven {
+        url = "https://jitpack.io"
+    }
     flatDir { dirs "libraries/${config.mc_version}/all" }
     flatDir { dirs "libraries/${config.mc_version}/classpathOnly" }
     flatDir { dirs "libraries/${config.mc_version}/runtimeOnly" }
@@ -92,6 +96,13 @@ dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
 	implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
+
+    ////// UTILITY STUFF //////
+    // implementation 'java-oo:javac-oo-plugin:0.5'
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+    compileOnly 'org.jetbrains:annotations:24.0.1'
+    ///////////////////////////
 
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
