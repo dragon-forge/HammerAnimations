@@ -2,10 +2,10 @@ package org.zeith.hammeranims.core.proxy;
 
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.packs.resources.*;
-import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.event.*;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -14,15 +14,25 @@ import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
+import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ClientProxy
 		extends CommonProxy
 {
 	protected static final List<IGeometricModel> createdModels = new ArrayList<>();
 	protected static final List<IGeometricModel> disposeModels = new ArrayList<>();
+	
+	protected static ExtraParticleEffects extraEffects;
+	
+	@Override
+	public ExtraParticleEffects getExtraParticles()
+	{
+		return extraEffects;
+	}
 	
 	@Override
 	public void construct()
@@ -56,11 +66,8 @@ public class ClientProxy
 	public void registerReloaders(RegisterClientReloadListenersEvent e)
 	{
 		e.registerReloadListener((preparationBarrier, resourceManager, profilerFiller, profilerFiller1, pBackgroundExecutor, pGameExecutor) ->
-		{
-			disposeModels.addAll(createdModels);
-			createdModels.clear();
-			return reloadRegistries(preparationBarrier, wrapVanillaResources(resourceManager), true, pGameExecutor, pBackgroundExecutor);
-		});
+				performReload(preparationBarrier)
+		);
 	}
 	
 	@Override
@@ -77,17 +84,25 @@ public class ClientProxy
 		return Minecraft.getInstance().level;
 	}
 	
-	public static void performReload()
+	public static CompletableFuture<Void> performReload()
+	{
+		return performReload(CompletableFuture::completedFuture);
+	}
+	
+	public static CompletableFuture<Void> performReload(PreparableReloadListener.PreparationBarrier b)
 	{
 		disposeModels.addAll(createdModels);
 		createdModels.clear();
-		var mc = Minecraft.getInstance();
 		
-		PreparableReloadListener.PreparationBarrier b = CompletableFuture::completedFuture;
+		Minecraft mc = Minecraft.getInstance();
+		var res = wrapVanillaResources(mc.getResourceManager());
 		
-		HammerAnimations.PROXY.reloadRegistries(b, wrapVanillaResources(mc.getResourceManager()), true,
-				mc,
-				Util.backgroundExecutor()
+		return CompletableFuture.allOf(
+				ExtraParticleEffects.load(res, Util.backgroundExecutor()).thenAccept(fx -> extraEffects = fx),
+				HammerAnimations.PROXY.reloadRegistries(b, res, true,
+						mc,
+						Util.backgroundExecutor()
+				)
 		);
 	}
 }

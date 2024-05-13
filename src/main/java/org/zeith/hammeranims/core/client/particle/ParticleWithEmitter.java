@@ -84,7 +84,7 @@ public class ParticleWithEmitter
 		var pose = new PoseStack();
 		
 		var vec = pRenderInfo.getPosition();
-		pose.translate(vec.x, vec.y, vec.z);
+//		pose.translate(vec.x, vec.y, vec.z);
 		
 		emitter.render(buffers, pose, pPartialTicks);
 		buffers.endBatch();
@@ -122,5 +122,11 @@ public class ParticleWithEmitter
 	public ParticleRenderType getRenderType()
 	{
 		return RENDER_TYPE;
+	}
+	
+	@Override
+	public boolean shouldCull()
+	{
+		return false;
 	}
 }
