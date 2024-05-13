@@ -4,6 +4,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.core.client.render.tile.RenderTileBilly;
 import org.zeith.hammeranims.core.contents.actions.PrintHelloWorldAction;
 import org.zeith.hammeranims.core.contents.blocks.*;
@@ -36,6 +37,9 @@ public interface ContainersHA
 	
 	@RegistryName("hello_world")
 	PrintHelloWorldAction HELLO_WORLD_ACTION = new PrintHelloWorldAction();
+	
+	@RegistryName("rainbow")
+	IParticleContainer RAINBOW_PARTICLES = IParticleContainer.create();
 	
 	AnimationHolder BILLY_WALK = new AnimationHolder(BILLY_ANIM, "walk");
 }

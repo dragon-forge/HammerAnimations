@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
-import org.zeith.hammeranims.api.utils.IResourceProvider;
+import org.zeith.hammeranims.api.utils.IHammerReloadable;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationContainerImpl;
 
 import javax.annotation.Nonnull;
@@ -19,18 +19,8 @@ import javax.annotation.Nonnull;
  * - Optionally perform static import for {@link IAnimationContainer#create()}.
  */
 public interface IAnimationContainer
-		extends IAnimationSource
+		extends IAnimationSource, IHammerReloadable
 {
-	/**
-	 * Reloads the animation container using the provided resource provider.
-	 * This is an internal function and should never be called externally.
-	 * Implementing it is fine.
-	 *
-	 * @param resources
-	 * 		The resource provider used to reload the animations.
-	 */
-	void reload(IResourceProvider resources);
-	
 	/**
 	 * Creates a new instance of an animation container.
 	 *

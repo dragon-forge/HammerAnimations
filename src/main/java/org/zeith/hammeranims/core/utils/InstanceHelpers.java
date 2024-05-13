@@ -2,6 +2,7 @@ package org.zeith.hammeranims.core.utils;
 
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 public class InstanceHelpers
 {
@@ -23,5 +24,10 @@ public class InstanceHelpers
 	public static StringTag newNBTString(String s)
 	{
 		return StringTag.valueOf(s);
+	}
+	
+	public static ResourceLocation tryParseLocation(String input)
+	{
+		return ResourceLocation.tryParse(input);
 	}
 }
