@@ -6,6 +6,11 @@ import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 
 public interface IAnimatedObject
 {
+	default float getAnimatedObjectScale()
+	{
+		return 1F;
+	}
+	
 	void setupSystem(AnimationSystem.Builder builder);
 	
 	AnimationSystem getAnimationSystem();
