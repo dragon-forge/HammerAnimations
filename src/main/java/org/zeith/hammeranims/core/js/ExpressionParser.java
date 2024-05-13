@@ -2,6 +2,7 @@ package org.zeith.hammeranims.core.js;
 
 import com.zeitheron.hammercore.utils.math.*;
 import jdk.nashorn.api.scripting.*;
+import org.zeith.hammeranims.api.animation.interp.IVariableAccess;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 
 import javax.script.*;
@@ -11,7 +12,7 @@ public class ExpressionParser
 {
 	public static final MathJS MATH = new MathJS();
 	
-	public static InterpolatedDouble parse(String expression)
+	public static <T extends IVariableAccess> InterpolatedDouble<T> parse(String expression)
 	{
 		expression = ExpressionFixer.fixExpression(expression);
 		
@@ -34,14 +35,16 @@ public class ExpressionParser
 			js.put("Math", MATH);
 			js.put("math", MATH);
 			
-			String fun = "function get(query) {\n\tvar q = query;\n\treturn " + expression + ";\n}";
+			String fun = "function get() {\n\treturn " + expression + ";\n}";
 			
-			InterpolatedDouble id0 = ((ScriptObjectMirror) js.eval(fun)).to(InterpolatedDouble.class);
+			ScriptObjectMirror eval = (ScriptObjectMirror) js.eval(fun);
+			InterpolatedDouble id0 = eval.to(InterpolatedDouble.class);
 			
 			return query ->
 			{
 				try
 				{
+					query.putObjects(eval::setMember);
 					return id0.get(query);
 				} catch(RuntimeException e)
 				{
@@ -54,16 +57,7 @@ public class ExpressionParser
 			throw new RuntimeException(e);
 		}
 		
-		return query ->
-		{
-			try
-			{
-				return ExpressionEvaluator.evaluateDouble(expr0.replace("query.anim_time", Double.toString(query.anim_time)));
-			} catch(RuntimeException e)
-			{
-				return 0;
-			}
-		};
+		return query -> 0;
 	}
 	
 	private static final Random rng = new Random();
