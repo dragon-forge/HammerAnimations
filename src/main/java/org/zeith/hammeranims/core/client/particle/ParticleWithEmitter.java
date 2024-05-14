@@ -16,6 +16,9 @@ import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 import java.util.Locale;
 import java.util.Objects;
 
+import lombok.Getter;
+
+@Getter
 public class ParticleWithEmitter
 		extends Particle
 {

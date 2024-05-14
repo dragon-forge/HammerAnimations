@@ -2,6 +2,7 @@ package org.zeith.hammeranims.api.utils;
 
 import com.google.common.collect.Lists;
 
+import java.util.Collections;
 import java.util.List;
 
 public class InstanceGatherer
@@ -12,7 +13,7 @@ public class InstanceGatherer
 		for(B component : base)
 			if(clazz.isAssignableFrom(component.getClass()))
 				list.add(clazz.cast(component));
-		return list;
+		return Collections.unmodifiableList(list);
 	}
 	
 	public static <B, T extends B> T get(Iterable<B> base, Class<T> clazz)
