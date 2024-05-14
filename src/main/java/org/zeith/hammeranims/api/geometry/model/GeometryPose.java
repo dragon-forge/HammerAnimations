@@ -2,6 +2,7 @@ package org.zeith.hammeranims.api.geometry.model;
 
 import org.zeith.hammeranims.api.animation.data.*;
 import org.zeith.hammeranims.api.animation.interp.*;
+import org.zeith.hammeranims.api.animsys.SerializableMask;
 import org.zeith.hammeranims.api.animsys.layer.ILayerMask;
 
 import java.util.*;
@@ -34,6 +35,17 @@ public class GeometryPose
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone)) continue;
+			boneTransforms.put(bone, entry.getValue().apply(query, mode, weight, boneTransforms.get(bone)));
+		}
+	}
+	
+	public void apply(SerializableMask animationMask, IAnimationData animation, ILayerMask mask, BlendMode mode, float weight, Query query)
+	{
+		Set<String> excludes = animationMask.getExcludes();
+		for(Map.Entry<String, BoneAnimation> entry : animation.getBoneAnimations().entrySet())
+		{
+			String bone = entry.getKey();
+			if(!availableBones.test(bone) || !mask.test(bone) || excludes.contains(bone)) continue;
 			boneTransforms.put(bone, entry.getValue().apply(query, mode, weight, boneTransforms.get(bone)));
 		}
 	}

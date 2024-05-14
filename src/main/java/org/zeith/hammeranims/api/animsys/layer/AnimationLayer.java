@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
 import net.minecraft.nbt.*;
+import lombok.Setter;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.*;
@@ -29,6 +30,7 @@ public class AnimationLayer
 	public double startTime;
 	public ActiveAnimation currentAnimation;
 	
+	@Setter
 	public float weight = 1F;
 	
 	public boolean frozen;
@@ -109,7 +111,10 @@ public class AnimationLayer
 							: (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime)
 			) * this.weight * lastAnimation.getWeight();
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
-			pose.apply(lastAnimation.config.getAnimation().getData(), mask, mode, weight, query);
+			
+			SerializableMask sm = lastAnimation.config.mask;
+			if(sm != null) pose.apply(sm, lastAnimation.config.getAnimation().getData(), mask, mode, weight, query);
+			else pose.apply(lastAnimation.config.getAnimation().getData(), mask, mode, weight, query);
 		}
 		
 		if(currentAnimation != null)
@@ -120,13 +125,11 @@ public class AnimationLayer
 							: (float) Math.min(sysTime - startTime, transitionTime) / transitionTime
 			) * this.weight * currentAnimation.getWeight();
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
-			pose.apply(currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
+			
+			SerializableMask sm = currentAnimation.config.mask;
+			if(sm != null) pose.apply(currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
+			else pose.apply(currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
 		}
-	}
-	
-	public void setWeight(float weight)
-	{
-		this.weight = weight;
 	}
 	
 	public void tick(double sysTime)
