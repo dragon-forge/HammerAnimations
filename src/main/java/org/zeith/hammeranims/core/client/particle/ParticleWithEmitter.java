@@ -25,6 +25,8 @@ import java.util.Objects;
 public class ParticleWithEmitter
 		extends Particle
 {
+	public static int MAX_EMITTER_GENERATIONS = 6;
+	
 	protected final ParticleEmitter emitter;
 	protected final String typeId;
 	
@@ -64,6 +66,12 @@ public class ParticleWithEmitter
 	@Override
 	public void tick()
 	{
+		if(emitter.generation >= MAX_EMITTER_GENERATIONS)
+		{
+			removed = true;
+			return;
+		}
+		
 		emitter.prevGlobal.set(emitter.lastGlobal);
 		emitter.lastGlobal.set(x, y, z);
 		
@@ -116,6 +124,13 @@ public class ParticleWithEmitter
 	public boolean shouldCull()
 	{
 		return false;
+	}
+	
+	public void spawn()
+	{
+		if(emitter.generation >= MAX_EMITTER_GENERATIONS) return;
+		Minecraft mc = Minecraft.getInstance();
+		mc.execute(() -> mc.particleEngine.add(this));
 	}
 	
 	private class DynamicParticleRenderType

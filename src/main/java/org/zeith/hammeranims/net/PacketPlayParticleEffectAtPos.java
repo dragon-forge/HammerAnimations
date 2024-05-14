@@ -1,7 +1,6 @@
 package org.zeith.hammeranims.net;
 
 import lombok.var;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -60,11 +59,10 @@ public class PacketPlayParticleEffectAtPos
 		var player = ColoredLightManager.getClientPlayer();
 		if(player == null || !(player.level instanceof ClientWorld) || container == null) return;
 		if(source == null) return;
-		ParticleWithEmitter pwe = new ParticleWithEmitter(
+		new ParticleWithEmitter(
 				(ClientWorld) player.level,
 				source.x, source.y, source.z,
 				container
-		);
-		Minecraft.getInstance().particleEngine.add(pwe);
+		).spawn();
 	}
 }
