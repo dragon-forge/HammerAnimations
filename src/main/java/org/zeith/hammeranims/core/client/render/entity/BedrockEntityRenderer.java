@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.RenderData;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
@@ -22,6 +23,12 @@ public abstract class BedrockEntityRenderer<T extends EntityLivingBase & IAnimat
 		addProcessors(this.model);
 	}
 	
+	// 1.12.2 stub, is replaced with a proper render type in 1.16+
+	protected ResourceLocation getRenderType(ResourceLocation texture)
+	{
+		return texture;
+	}
+	
 	@Override
 	protected void renderModel(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor)
 	{
@@ -32,7 +39,7 @@ public abstract class BedrockEntityRenderer<T extends EntityLivingBase & IAnimat
 		
 		RenderData data = model.renderData;
 		data.prepare();
-		data.texture = getEntityTexture(entity);
+		data.texture = getRenderType(getEntityTexture(entity));
 		data.combinedLightIn = entity.getBrightnessForRender();
 		
 		model.entity = entity;
