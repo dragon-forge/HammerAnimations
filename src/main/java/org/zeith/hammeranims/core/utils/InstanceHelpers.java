@@ -11,6 +11,11 @@ public class InstanceHelpers
 		return Component.literal(text);
 	}
 	
+	public static Component componentTranslate(String text, Object... args)
+	{
+		return Component.translatable(text, args);
+	}
+	
 	public static CompoundTag newNBTCompound()
 	{
 		return new CompoundTag();

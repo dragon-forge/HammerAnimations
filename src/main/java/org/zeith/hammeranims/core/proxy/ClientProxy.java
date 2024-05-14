@@ -15,6 +15,8 @@ import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
+import org.zeith.hammeranims.net.PacketProvideCustomParticleEffectList;
+import org.zeith.hammerlib.net.Network;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +105,13 @@ public class ClientProxy
 						mc,
 						Util.backgroundExecutor()
 				)
+		).thenRun(() ->
+				Minecraft.getInstance().execute(() ->
+				{
+					var net = Minecraft.getInstance().getConnection();
+					if(net == null || Minecraft.getInstance().level == null) return;
+					Network.sendToServer(new PacketProvideCustomParticleEffectList.PacketResetList());
+				})
 		);
 	}
 }
