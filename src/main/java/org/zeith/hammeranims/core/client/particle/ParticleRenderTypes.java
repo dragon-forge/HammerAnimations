@@ -1,7 +1,5 @@
 package org.zeith.hammeranims.core.client.particle;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.Util;
@@ -12,48 +10,14 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class ParticleRenderTypes
+		extends RenderStateShard
 {
-	protected static final RenderStateShard.LightmapStateShard LIGHTMAP = new RenderStateShard.LightmapStateShard(true);
-	protected static final RenderStateShard.LightmapStateShard NO_LIGHTMAP = new RenderStateShard.LightmapStateShard(false);
-	protected static final RenderStateShard.CullStateShard NO_CULL = new RenderStateShard.CullStateShard(false);
-	protected static final RenderStateShard.ShaderStateShard RENDERTYPE_ENTITY_SOLID_SHADER = new RenderStateShard.ShaderStateShard(GameRenderer::getParticleShader);
-	protected static final RenderStateShard.ShaderStateShard RENDERTYPE_ENTITY_CUTOUT_NO_CULL_SHADER = new RenderStateShard.ShaderStateShard(GameRenderer::getParticleShader);
-	protected static final RenderStateShard.ShaderStateShard RENDERTYPE_ENTITY_TRANSLUCENT_SHADER = new RenderStateShard.ShaderStateShard(GameRenderer::getParticleShader);
-	
-	protected static final RenderStateShard.TransparencyStateShard NO_TRANSPARENCY = new RenderStateShard.TransparencyStateShard("no_transparency", () ->
-	{
-		RenderSystem.disableBlend();
-	}, () ->
-	{
-	});
-	
-	protected static final RenderStateShard.TransparencyStateShard TRANSLUCENT_TRANSPARENCY = new RenderStateShard.TransparencyStateShard("translucent_transparency", () ->
-	{
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(
-				GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-				GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
-		);
-	}, () ->
-	{
-		RenderSystem.disableBlend();
-		RenderSystem.defaultBlendFunc();
-	});
-	
-	protected static final RenderStateShard.TransparencyStateShard ADDITIVE_TRANSPARENCY = new RenderStateShard.TransparencyStateShard("additive_transparency", () ->
-	{
-		RenderSystem.enableBlend();
-		RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-	}, () ->
-	{
-		RenderSystem.disableBlend();
-		RenderSystem.defaultBlendFunc();
-	});
+	protected static final ShaderStateShard RENDERTYPE_PARTICLE_SHADER = new ShaderStateShard(GameRenderer::getParticleShader);
 	
 	private static final Function<ResourceLocation, RenderType> PARTICLE_SOLID = Util.memoize((texture) ->
 	{
 		RenderType.CompositeState state = RenderType.CompositeState.builder()
-				.setShaderState(RENDERTYPE_ENTITY_SOLID_SHADER)
+				.setShaderState(RENDERTYPE_PARTICLE_SHADER)
 				.setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
 				.setTransparencyState(NO_TRANSPARENCY)
 				.setLightmapState(LIGHTMAP)
@@ -69,7 +33,7 @@ public class ParticleRenderTypes
 	private static final BiFunction<ResourceLocation, Boolean, RenderType> PARTICLE_CUTOUT_NO_CULL = Util.memoize((texture, outline) ->
 	{
 		RenderType.CompositeState state = RenderType.CompositeState.builder()
-				.setShaderState(RENDERTYPE_ENTITY_CUTOUT_NO_CULL_SHADER)
+				.setShaderState(RENDERTYPE_PARTICLE_SHADER)
 				.setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
 				.setTransparencyState(NO_TRANSPARENCY)
 				.setCullState(NO_CULL)
@@ -86,7 +50,7 @@ public class ParticleRenderTypes
 	private static final BiFunction<ResourceLocation, Boolean, RenderType> PARTICLE_TRANSLUCENT = Util.memoize((texture, outline) ->
 	{
 		RenderType.CompositeState state = RenderType.CompositeState.builder()
-				.setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+				.setShaderState(RENDERTYPE_PARTICLE_SHADER)
 				.setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setCullState(NO_CULL)
@@ -103,7 +67,7 @@ public class ParticleRenderTypes
 	private static final BiFunction<ResourceLocation, Boolean, RenderType> PARTICLE_ADDITIVE = Util.memoize((texture, outline) ->
 	{
 		RenderType.CompositeState state = RenderType.CompositeState.builder()
-				.setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+				.setShaderState(RENDERTYPE_PARTICLE_SHADER)
 				.setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
 				.setTransparencyState(ADDITIVE_TRANSPARENCY)
 				.setCullState(NO_CULL)
@@ -150,5 +114,10 @@ public class ParticleRenderTypes
 	public static RenderType particleAdditive(ResourceLocation texture)
 	{
 		return particleAdditive(texture, true);
+	}
+	
+	private ParticleRenderTypes(String pName, Runnable pSetupState, Runnable pClearState)
+	{
+		super(pName, pSetupState, pClearState);
 	}
 }
