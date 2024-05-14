@@ -30,6 +30,8 @@ public class ConfiguredAnimation
 	public boolean important = false;
 	public LoopMode loopMode = LoopMode.ONCE;
 	
+	public SerializableMask mask = null;
+	
 	public ConfiguredAnimation next;
 	
 	public final List<AnimationActionInstance> onFinish = new ArrayList<>();
@@ -67,6 +69,7 @@ public class ConfiguredAnimation
 			   && this.startTime == other.startTime
 			   && this.transitionTime == other.transitionTime
 			   && this.timeFunction.equals(other.timeFunction)
+			   && Objects.equals(this.mask, other.mask)
 			   && this.reverse == other.reverse
 			   && this.animation == other.animation;
 	}
@@ -77,6 +80,12 @@ public class ConfiguredAnimation
 		
 		this.animation = animation;
 		this.loopMode = animation.getData().getLoopMode();
+	}
+	
+	public ConfiguredAnimation mask(SerializableMask mask)
+	{
+		this.mask = mask;
+		return this;
 	}
 	
 	public ConfiguredAnimation weight(float weight)
@@ -193,6 +202,9 @@ public class ConfiguredAnimation
 	public CompoundNBT serializeNBT()
 	{
 		var tag = InstanceHelpers.newNBTCompound();
+		
+		if(mask != null) tag.put("Mask", mask.serializeNBT());
+		
 		tag.put("Time", timeFunction.serializeNBT());
 		tag.putString("Animation", animation.getLocation().toString());
 		tag.putFloat("Weight", weight);
@@ -218,6 +230,8 @@ public class ConfiguredAnimation
 	public void deserializeNBT(CompoundNBT tag)
 	{
 		this.timeFunction = TimeFunctionInstance.of(tag.getCompound("Time"));
+		
+		this.mask = tag.contains("Mask", Constants.NBT.TAG_COMPOUND) ? new SerializableMask(tag.getCompound("Mask")) : null;
 		
 		this.setAnimation(new AnimationLocation(tag.getString("Animation")).resolve().orElse(null));
 		this.weight = tag.getFloat("Weight");
