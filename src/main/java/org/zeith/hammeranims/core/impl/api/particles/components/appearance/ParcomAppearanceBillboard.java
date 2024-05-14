@@ -232,7 +232,7 @@ public class ParcomAppearanceBillboard
 				.uv(u1, v1)
 				.overlayCoords(OverlayTexture.NO_OVERLAY)
 				.uv2(light)
-				.normal(np, 0, 0, 0)
+				.normal(np, 0, 1, 0)
 				.endVertex();
 		
 		builder.vertex(lp, this.vertices[1].x, this.vertices[1].y, this.vertices[1].z)
@@ -240,7 +240,7 @@ public class ParcomAppearanceBillboard
 				.uv(u2, v1)
 				.overlayCoords(OverlayTexture.NO_OVERLAY)
 				.uv2(light)
-				.normal(np, 0, 0, 0)
+				.normal(np, 0, 1, 0)
 				.endVertex();
 		
 		builder.vertex(lp, this.vertices[2].x, this.vertices[2].y, this.vertices[2].z)
@@ -248,7 +248,7 @@ public class ParcomAppearanceBillboard
 				.uv(u2, v2)
 				.overlayCoords(OverlayTexture.NO_OVERLAY)
 				.uv2(light)
-				.normal(np, 0, 0, 0)
+				.normal(np, 0, 1, 0)
 				.endVertex();
 		
 		builder.vertex(lp, this.vertices[3].x, this.vertices[3].y, this.vertices[3].z)
@@ -256,7 +256,7 @@ public class ParcomAppearanceBillboard
 				.uv(u1, v2)
 				.overlayCoords(OverlayTexture.NO_OVERLAY)
 				.uv2(light)
-				.normal(np, 0, 0, 0)
+				.normal(np, 0, 1, 0)
 				.endVertex();
 	}
 	

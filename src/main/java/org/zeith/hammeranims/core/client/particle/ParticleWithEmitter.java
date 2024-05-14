@@ -3,17 +3,22 @@ package org.zeith.hammeranims.core.client.particle;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import lombok.var;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.vector.Vector3d;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.api.particles.ParticleMaterial;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class ParticleWithEmitter
 		extends Particle
@@ -61,6 +66,7 @@ public class ParticleWithEmitter
 		emitter.lastGlobal.set(x, y, z);
 		
 		emitter.update();
+		
 		if(emitter.lifetime >= 0 && emitter.age >= emitter.lifetime)
 			emitter.running = false;
 		if(emitter.isFinished())
@@ -79,25 +85,50 @@ public class ParticleWithEmitter
 	@Override
 	public void render(IVertexBuilder pBuffer, ActiveRenderInfo pRenderInfo, float pPartialTicks)
 	{
-		if(emitter.isFinished()) return;
+		Entity viewEntity = pRenderInfo.getEntity();
+		if(emitter.isFinished() || viewEntity == null) return;
 		
-		IRenderTypeBuffer.Impl buffers = IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuilder());
-		MatrixStack pose = new MatrixStack();
+		Vector3d vector3d = pRenderInfo.getPosition();
 		
-		Vector3d vec = pRenderInfo.getPosition();
-//		pose.translate(vec.x, vec.y, vec.z);
+		Vector3d camPos = viewEntity.getPosition(pPartialTicks);
 		
-		emitter.render(buffers, pose, pPartialTicks);
+		// This is usually zero, unless player is in 3P.
+		var thirdPersonDelta = camPos.subtract(vector3d);
+		
+		IRenderTypeBuffer.Impl buffers = Minecraft.getInstance().renderBuffers().bufferSource();
+		MatrixStack mat = new MatrixStack();
+		mat.translate(thirdPersonDelta.x, thirdPersonDelta.y, thirdPersonDelta.z); // Accounts for 3P
+		emitter.render(pRenderInfo, buffers, mat, pPartialTicks);
 		buffers.endBatch();
 	}
 	
-	IParticleRenderType RENDER_TYPE = new IParticleRenderType()
+	IParticleRenderType RENDER_TYPE = new DynamicParticleRenderType();
+	
+	@Override
+	public IParticleRenderType getRenderType()
+	{
+		return RENDER_TYPE;
+	}
+	
+	@Override
+	public boolean shouldCull()
+	{
+		return false;
+	}
+	
+	private class DynamicParticleRenderType
+			implements IParticleRenderType
 	{
 		@Override
 		public void begin(BufferBuilder pBuilder, TextureManager pTextureManager)
 		{
-			RenderSystem.enableBlend();
-			RenderSystem.defaultBlendFunc();
+			if(emitter.effect.material == ParticleMaterial.OPAQUE)
+				RenderSystem.disableBlend();
+			else
+			{
+				RenderSystem.enableBlend();
+				RenderSystem.defaultBlendFunc();
+			}
 			RenderSystem.depthMask(true);
 		}
 		
@@ -117,17 +148,17 @@ public class ParticleWithEmitter
 		{
 			return typeId.hashCode();
 		}
-	};
-	
-	@Override
-	public IParticleRenderType getRenderType()
-	{
-		return RENDER_TYPE;
-	}
-	
-	@Override
-	public boolean shouldCull()
-	{
-		return false;
+		
+		public String getTypeId()
+		{
+			return typeId;
+		}
+		
+		@Override
+		public boolean equals(Object obj)
+		{
+			return obj instanceof DynamicParticleRenderType
+				   && Objects.equals(((DynamicParticleRenderType) obj).getTypeId(), getTypeId());
+		}
 	}
 }

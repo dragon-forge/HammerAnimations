@@ -11,7 +11,7 @@ import java.util.function.Function;
 public enum ParticleMaterial
 {
 	OPAQUE("particles_opaque", RenderType::entitySolid),
-	ALPHA("particles_alpha", RenderType::entityCutoutNoCull),
+	ALPHA("particles_alpha", RenderType::entityCutout),
 	BLEND("particles_blend", RenderType::entityTranslucent),
 	ADDITIVE("particles_add", RenderType::eyes);
 	

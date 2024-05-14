@@ -5,7 +5,7 @@
 			"identifier": "snowstorm:rainbow",
 			"basic_render_parameters": {
 				"material": "particles_alpha",
-				"texture": "textures/particle/particles"
+				"texture": "hammeranims:textures/particle/particles"
 			}
 		},
 		"curves": {
