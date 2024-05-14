@@ -3,7 +3,9 @@ package org.zeith.hammeranims.core.proxy;
 import com.google.common.base.Suppliers;
 import com.zeitheron.hammercore.client.HammerCoreClient;
 import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
+import com.zeitheron.hammercore.net.HCNet;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.*;
 import net.minecraft.util.ResourceLocation;
@@ -31,6 +33,7 @@ import org.zeith.hammeranims.core.contents.blocks.TileBilly;
 import org.zeith.hammeranims.core.contents.entity.EntityBilly;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
+import org.zeith.hammeranims.net.PacketProvideCustomParticleEffectList;
 
 import java.io.IOException;
 import java.util.*;
@@ -148,6 +151,13 @@ public class ClientProxy
 						Minecraft.getMinecraft()::addScheduledTask, McUtil.backgroundExecutor(),
 						true
 				)
+		).thenRun(() ->
+				Minecraft.getMinecraft().addScheduledTask(() ->
+				{
+					NetHandlerPlayClient net = Minecraft.getMinecraft().getConnection();
+					if(net == null || Minecraft.getMinecraft().world == null) return;
+					HCNet.INSTANCE.sendToServer(new PacketProvideCustomParticleEffectList.PacketResetList());
+				})
 		);
 	}
 	
