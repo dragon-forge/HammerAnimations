@@ -30,7 +30,7 @@ public class ParticleRenderTypes
 				.setCullState(NO_CULL)
 				.setLightmapState(LIGHTMAP)
 				.createCompositeState(outline);
-		return RenderType.create("particle_cutout_no_cull", DefaultVertexFormats.NEW_ENTITY, 7, 256, true, false, state);
+		return RenderType.create("particle_cutout_no_cull", DefaultVertexFormats.PARTICLE, 7, 256, true, false, state);
 	}
 	
 	public static RenderType particleCutout(ResourceLocation texture)
@@ -48,7 +48,7 @@ public class ParticleRenderTypes
 				.setCullState(NO_CULL)
 				.setLightmapState(LIGHTMAP)
 				.createCompositeState(outline);
-		return RenderType.create("particle_translucent", DefaultVertexFormats.NEW_ENTITY, 7, 256, true, true, state);
+		return RenderType.create("particle_translucent", DefaultVertexFormats.PARTICLE, 7, 256, true, true, state);
 	}
 	
 	public static RenderType particleTranslucent(ResourceLocation texture)
@@ -66,7 +66,7 @@ public class ParticleRenderTypes
 				.setCullState(NO_CULL)
 				.setLightmapState(LIGHTMAP)
 				.createCompositeState(outline);
-		return RenderType.create("particle_translucent_additive", DefaultVertexFormats.NEW_ENTITY, 7, 256, true, true, state);
+		return RenderType.create("particle_translucent_additive", DefaultVertexFormats.PARTICLE, 7, 256, true, true, state);
 	}
 	
 	public static RenderType particleAdditive(ResourceLocation texture)
