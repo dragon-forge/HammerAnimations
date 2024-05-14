@@ -2,20 +2,22 @@ package org.zeith.hammeranims.core.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.entity.*;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.client.render.entity.proc.HeadLookProcessor;
-import org.zeith.hammeranims.core.init.ContainersHA;
 
 public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEntity>
 		extends LivingEntityRenderer<T, BedrockModelWrapper<T>>
 {
-	public BedrockEntityRenderer(EntityRendererProvider.Context pContext)
+	public BedrockEntityRenderer(EntityRendererProvider.Context pContext, IGeometryContainer geometry, float shadowSize)
 	{
-		super(pContext, new BedrockModelWrapper<>(RenderType::entitySolid, ContainersHA.BILLY_GEOM), 0.5F);
+		super(pContext, new BedrockModelWrapper<>(RenderType::entitySolid, geometry), shadowSize);
 		addProcessors(model);
 	}
 	
