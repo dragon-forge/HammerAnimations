@@ -12,8 +12,21 @@ mod_id=hammeranims
 mod_id_fancy=HammerAnimations
 mod_name=HammerAnimations
 mod_version=12.2.30
+
+# Project ID on CurseForge
+modrinth_project=C7cTlgwS
 cf_project=899883
 release_type=release
+
+# List of mods separated by ;
+# If a specific mod for one platform is needed, @m: or @c: prefixes are used.
+# Example for adding Hammer Lib for both Modrinth & CurseForge:
+# @m:PlkSuVtM;@c:hammer-lib;
+# Which can be simplified to be just "hammer-lib" since the slug is the same on both platforms.
+required_mods=hammer-lib;
+optional_mods=
+incompatible_mods=
+embedded_mods=
 
 # Maven
 maven_group=org.zeith.hammeranims
