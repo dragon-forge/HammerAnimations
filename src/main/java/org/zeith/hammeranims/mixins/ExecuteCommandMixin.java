@@ -5,17 +5,17 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.*;
+import net.minecraft.command.arguments.ResourceLocationArgument;
 import net.minecraft.command.impl.ExecuteCommand;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.CachedBlockInfo;
 import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.core.contents.commands.CommandParticle;
 
 import java.util.Set;
@@ -43,8 +43,11 @@ public abstract class ExecuteCommandMixin
 							Entity entity = filter.getSource().getEntity();
 							if(entity instanceof ServerPlayerEntity)
 							{
+								ResourceLocation id = ResourceLocationArgument.getId(filter, "bedrock_particle_type");
+								if(HammerAnimationsApi.particleContainers().containsKey(id))
+									return true;
 								CompletableFuture<Set<ResourceLocation>> f = CommandParticle.getOrRequest(filter.getSource().getPlayerOrException());
-								return f.isDone() && f.join().contains(ResourceLocationArgument.getId(filter, "bedrock_particle_type"));
+								return f.isDone() && f.join().contains(id);
 							}
 							return false;
 						}
