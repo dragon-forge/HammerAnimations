@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.core.contents.commands.CommandParticle;
 
 @Mixin(ExecuteCommand.class)
@@ -36,8 +37,11 @@ public abstract class ExecuteCommandMixin
 							var entity = filter.getSource().getEntity();
 							if(entity instanceof ServerPlayer sp)
 							{
+								var id = ResourceLocationArgument.getId(filter, "bedrock_particle_type");
+								if(HammerAnimationsApi.particleContainers().containsKey(id))
+									return true;
 								var f = CommandParticle.getOrRequest(sp);
-								return f.isDone() && f.join().contains(ResourceLocationArgument.getId(filter, "bedrock_particle_type"));
+								return f.isDone() && f.join().contains(id);
 							}
 							return false;
 						}
