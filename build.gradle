@@ -186,6 +186,8 @@ jar {
         exclude 'LICENSE.txt', 'META-INF/MANIFSET.MF', 'META-INF/maven/**', 'META-INF/*.RSA', 'META-INF/*.SF'
     }
 
+    exclude "net/**"
+
     manifest {
         attributes([
                 "ForceLoadAsMod"             : "true",
@@ -223,6 +225,7 @@ signJar.finalizedBy('cleanReplaces')
 
 task deobfJar(type: Jar) {
     from sourceSets.main.output
+    exclude "net/**"
     classifier = 'deobf'
     manifest {
         attributes([
@@ -244,6 +247,7 @@ task deobfJar(type: Jar) {
 
 task srcJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
+    exclude "net/**"
     classifier = 'sources'
     manifest {
         attributes([
@@ -317,4 +321,22 @@ afterEvaluate {
     tasks['downloadAssets'].dependsOn.add('copyDepsToRuntime')
 
     tasks['downloadAssets'].dependsOn.add('fixupForgeJars')
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = config.maven_group
+            artifactId = config.mod_id_fancy + "-" + minecraft_version
+
+            artifact jar
+            artifact srcJar
+            artifact deobfJar
+        }
+    }
+    repositories {
+        maven {
+            url config.maven_url
+        }
+    }
 }

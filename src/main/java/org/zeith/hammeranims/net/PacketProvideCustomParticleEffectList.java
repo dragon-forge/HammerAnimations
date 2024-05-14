@@ -3,7 +3,6 @@ package org.zeith.hammeranims.net;
 import com.google.common.collect.ImmutableSet;
 import com.zeitheron.hammercore.net.*;
 import com.zeitheron.hammercore.net.transport.NetTransport;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
@@ -66,19 +65,5 @@ public class PacketProvideCustomParticleEffectList
 		PacketProvideCustomParticleEffectList p = new PacketProvideCustomParticleEffectList();
 		p.all = allFX;
 		return NetTransport.wrap(p).createPacket();
-	}
-	
-	@MainThreaded
-	public static class PacketResetList
-			implements IPacket
-	{
-		@Override
-		public void executeOnServer2(PacketContext ctx)
-		{
-			EntityPlayerMP s = ctx.getSender();
-			if(s == null) return;
-			CompletableFuture<Set<ResourceLocation>> f = CommandParticle.PLAYER_CUSTOM_MAP.remove(s.getUniqueID());
-			if(f != null && !f.isDone()) f.complete(ImmutableSet.of());
-		}
 	}
 }

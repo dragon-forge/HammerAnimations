@@ -56,15 +56,27 @@ public class ClientProxy
 		return extraEffects;
 	}
 	
+	private boolean inWorld;
+	
 	@SubscribeEvent
 	public void clientTick(TickEvent.ClientTickEvent e)
 	{
-		if(e.phase == TickEvent.Phase.END && !disposeModels.isEmpty())
+		if(e.phase != TickEvent.Phase.END) return;
+		
+		if(!disposeModels.isEmpty())
 		{
 			HammerAnimations.LOG.info("Disposing {} OpenGL models.", disposeModels.size());
 			while(!disposeModels.isEmpty())
 				disposeModels.remove(0).dispose();
 			HammerAnimations.LOG.info("All previous models disposed.");
+		}
+		
+		Minecraft mc = Minecraft.getMinecraft();
+		boolean inWorldRN = mc.world != null && mc.getConnection() != null;
+		if(inWorldRN != inWorld)
+		{
+			inWorld = inWorldRN;
+			if(inWorldRN) PacketProvideCustomParticleEffectList.toServer();
 		}
 	}
 	
@@ -156,7 +168,7 @@ public class ClientProxy
 				{
 					NetHandlerPlayClient net = Minecraft.getMinecraft().getConnection();
 					if(net == null || Minecraft.getMinecraft().world == null) return;
-					HCNet.INSTANCE.sendToServer(new PacketProvideCustomParticleEffectList.PacketResetList());
+					PacketProvideCustomParticleEffectList.toServer();
 				})
 		);
 	}
