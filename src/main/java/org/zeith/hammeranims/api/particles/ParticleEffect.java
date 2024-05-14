@@ -73,12 +73,13 @@ public class ParticleEffect
 		return Cast.cast(components.get(type), base);
 	}
 	
+	public static final ResourceLocation LOCATION_BLOCKS_TEXTURE = new ResourceLocation("textures/atlas/blocks.png");
 	public static class Builder
 	{
 		protected final Map<IParticleComponentType, IParticleComponent> components = new HashMap<>();
 		protected final List<ParticleCurve> curves = new ArrayList<>();
 		protected ParticleMaterial material = ParticleMaterial.OPAQUE;
-		protected ResourceLocation texture = TextureMap.LOCATION_BLOCKS_TEXTURE;
+		protected ResourceLocation texture = LOCATION_BLOCKS_TEXTURE;
 		
 		public Builder material(ParticleMaterial material)
 		{

@@ -1,6 +1,8 @@
 package org.zeith.hammeranims.api.particles;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 public enum ParticleMaterial
@@ -25,11 +27,12 @@ public enum ParticleMaterial
 		return OPAQUE;
 	}
 	
-	private ParticleMaterial(String id)
+	ParticleMaterial(String id)
 	{
 		this.id = id;
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public void beginGL()
 	{
 		switch(this)
@@ -61,6 +64,7 @@ public enum ParticleMaterial
 		}
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public void endGL()
 	{
 		switch(this)
