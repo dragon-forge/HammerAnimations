@@ -6,6 +6,7 @@ import net.minecraft.command.Commands;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
 
 @Mod.EventBusSubscriber
@@ -16,6 +17,12 @@ public class CommandBedrock
 	{
 		e.getDispatcher().register(register());
 		e.getDispatcher().register(CommandReloadHA.command());
+	}
+	
+	@SubscribeEvent
+	public static void serverShutdown(FMLServerStoppingEvent e)
+	{
+		CommandParticle.PLAYER_CUSTOM_MAP.clear();
 	}
 	
 	public static LiteralArgumentBuilder<CommandSource> register()
