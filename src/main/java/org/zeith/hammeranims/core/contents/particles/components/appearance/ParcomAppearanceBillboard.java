@@ -237,7 +237,7 @@ public class ParcomAppearanceBillboard
 				particle.r, particle.g, particle.b, particle.a,
 				u1, v1,
 				lightX, lightY,
-				0, 0, 0,
+				0, 1, 0,
 				vt
 		);
 		
@@ -246,7 +246,7 @@ public class ParcomAppearanceBillboard
 				particle.r, particle.g, particle.b, particle.a,
 				u2, v1,
 				lightX, lightY,
-				0, 0, 0,
+				0, 1, 0,
 				vt
 		);
 		
@@ -255,7 +255,7 @@ public class ParcomAppearanceBillboard
 				particle.r, particle.g, particle.b, particle.a,
 				u2, v2,
 				lightX, lightY,
-				0, 0, 0,
+				0, 1, 0,
 				vt
 		);
 		
@@ -264,7 +264,7 @@ public class ParcomAppearanceBillboard
 				particle.r, particle.g, particle.b, particle.a,
 				u1, v2,
 				lightX, lightY,
-				0, 0, 0,
+				0, 1, 0,
 				vt
 		);
 	}

@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.api.animsys;
 
 import com.zeitheron.hammercore.net.*;
+import lombok.Setter;
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -29,6 +30,7 @@ public class AnimationSystem
 	
 	protected boolean hasTicked = false;
 	
+	@Setter
 	protected double time;
 	
 	public boolean canSync = true, autoSync = false;
