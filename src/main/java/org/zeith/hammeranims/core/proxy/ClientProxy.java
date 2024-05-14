@@ -49,14 +49,26 @@ public class ClientProxy
 		forgeBus.addListener(this::registerClientCommand);
 	}
 	
+	private boolean inWorld;
+	
 	private void clientTick(TickEvent.ClientTickEvent e)
 	{
-		if(e.phase == TickEvent.Phase.END && !disposeModels.isEmpty())
+		if(e.phase != TickEvent.Phase.END) return;
+		
+		if(!disposeModels.isEmpty())
 		{
 			HammerAnimations.LOG.info("Disposing {} OpenGL models.", disposeModels.size());
 			while(!disposeModels.isEmpty())
 				disposeModels.remove(0).dispose();
 			HammerAnimations.LOG.info("All previous models disposed.");
+		}
+		
+		Minecraft mc = Minecraft.getInstance();
+		boolean inWorldRN = mc.level != null && mc.getConnection() != null;
+		if(inWorldRN != inWorld)
+		{
+			inWorld = inWorldRN;
+			if(inWorldRN) PacketProvideCustomParticleEffectList.toServer();
 		}
 	}
 	
@@ -110,7 +122,7 @@ public class ClientProxy
 				{
 					var net = Minecraft.getInstance().getConnection();
 					if(net == null || Minecraft.getInstance().level == null) return;
-					Network.sendToServer(new PacketProvideCustomParticleEffectList.PacketResetList());
+					PacketProvideCustomParticleEffectList.toServer();
 				})
 		);
 	}
