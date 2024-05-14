@@ -19,7 +19,7 @@ import org.zeith.hammeranims.api.particles.curve.ParticleCurve;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
-import org.zeith.hammeranims.core.impl.api.particles.components.appearance.ParcomCollisionAppearance;
+import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionAppearance;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
 import org.zeith.hammeranims.core.proxy.ClientProxy;
 import org.zeith.hammeranims.joml.Vector3d;
@@ -47,6 +47,25 @@ public class ParticleEmitter
 	public int sanityTicks;
 	public boolean running = true;
 	private BedrockParticle guiParticle;
+	
+	/**
+	 * The generation of the emitter.
+	 * Should be used to prevent infinitely recursive emitter spawning.
+	 * When spawned by an emitter, the new emitter should inherit its generation.
+	 */
+	public int generation;
+	public ParticleEmitter parent;
+	
+	/**
+	 * Call this when spawning a new emitter from within existing emitter.
+	 */
+	public void setParent(ParticleEmitter parent)
+	{
+		this.parent = parent;
+		if(parent != null && parent != this)
+			this.generation = parent.generation + 1;
+		else this.generation = 0;
+	}
 	
 	/* Intermediate values */
 	public Vector3d lastGlobal = new Vector3d();

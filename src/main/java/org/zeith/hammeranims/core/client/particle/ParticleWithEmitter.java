@@ -1,12 +1,14 @@
 package org.zeith.hammeranims.core.client.particle;
 
 import com.zeitheron.hammercore.client.particle.api.SimpleParticle;
+import lombok.Getter;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 
+@Getter
 public class ParticleWithEmitter
 		extends SimpleParticle
 {
