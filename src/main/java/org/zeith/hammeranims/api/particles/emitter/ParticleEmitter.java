@@ -3,13 +3,15 @@ package org.zeith.hammeranims.api.particles.emitter;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import lombok.Setter;
-import net.minecraft.client.CameraType;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.*;
+import net.minecraft.client.renderer.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
@@ -86,17 +88,6 @@ public class ParticleEmitter
 	public boolean isFinished()
 	{
 		return !this.running && this.particles.isEmpty();
-	}
-	
-	public double getDistanceSq()
-	{
-		this.setupCameraProperties(0F);
-		
-		double dx = this.cX - this.lastGlobal.x;
-		double dy = this.cY - this.lastGlobal.y;
-		double dz = this.cZ - this.lastGlobal.z;
-		
-		return dx * dx + dy * dy + dz * dz;
 	}
 	
 	public double getAge()
@@ -253,6 +244,7 @@ public class ParticleEmitter
 		
 		this.setEmitterVariables(0);
 		this.updateParticles();
+		this.brightnessCache.clear(); // Reset lighting cache
 		
 		this.age += 1;
 		this.sanityTicks += 1;
@@ -395,14 +387,14 @@ public class ParticleEmitter
 	/**
 	 * Render all the particles in this particle emitter
 	 */
-	public void render(MultiBufferSource buffers, PoseStack pose, float partialTicks)
+	public void render(Camera info, MultiBufferSource buffers, PoseStack pose, float partialTicks)
 	{
 		if(this.effect == null)
 		{
 			return;
 		}
 		
-		this.setupCameraProperties(partialTicks);
+		this.setupCameraProperties(info, partialTicks);
 		
 		List<IParticleRender> renders = this.effect.particleRender;
 		
@@ -520,7 +512,7 @@ public class ParticleEmitter
 		});
 	}
 	
-	public void setupCameraProperties(float partialTicks)
+	public void setupCameraProperties(Camera info, float partialTicks)
 	{
 		if(this.world == null) return;
 		
@@ -528,14 +520,16 @@ public class ParticleEmitter
 		if(camera == null) return;
 		
 		this.perspective = Minecraft.getInstance().options.getCameraType();
-		this.cYaw = 180 - camera.getViewYRot(partialTicks);
-		this.cPitch = 180 - camera.getViewXRot(partialTicks);
+		this.cYaw = 180 - info.getYRot();
+		this.cPitch = 180 - info.getXRot();
 		
-		var cpos = camera.getPosition(partialTicks);
+		var cpos = info.getPosition();
 		this.cX = cpos.x;
 		this.cY = cpos.y + camera.getEyeHeight();
 		this.cZ = cpos.z;
 	}
+	
+	Long2IntMap brightnessCache = new Long2IntOpenHashMap();
 	
 	/**
 	 * Get brightness for the block
@@ -543,12 +537,26 @@ public class ParticleEmitter
 	public int getBrightnessForRender(float partialTicks, double x, double y, double z)
 	{
 		if(this.lit || this.world == null)
-		{
-			return 15728880;
-		}
-		
+			return 0xf000f0; // full-brightness
 		this.blockPos.set(x, y, z);
-		
-		return this.world.isLoaded(this.blockPos) ? this.world.getLightEmission(this.blockPos) : 0;
+		return getBrightnessCached(this.blockPos);
+	}
+	
+	private int getBrightnessCached(BlockPos pos)
+	{
+		return brightnessCache.computeIfAbsent(pos.asLong(), l ->
+		{
+			BlockPos ipos = pos.immutable();
+			int max = LevelRenderer.getLightColor(world, ipos);
+			for(var dir : Direction.values())
+			{
+				int cur = LevelRenderer.getLightColor(world, ipos.relative(dir));
+				max = LightTexture.pack(
+						Math.max(LightTexture.block(max), LightTexture.block(cur)),
+						Math.max(LightTexture.sky(max), LightTexture.sky(cur))
+				);
+			}
+			return max;
+		});
 	}
 }
