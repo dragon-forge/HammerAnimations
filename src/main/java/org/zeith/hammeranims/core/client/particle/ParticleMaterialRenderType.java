@@ -27,14 +27,11 @@ public class ParticleMaterialRenderType
 	@Override
 	public void begin(BufferBuilder pBuilder, TextureManager pTextureManager)
 	{
-		material.beginGL();
-		RenderSystem.depthMask(true);
 	}
 	
 	@Override
 	public void end(Tesselator pTesselator)
 	{
-		material.endGL();
 	}
 	
 	@Override

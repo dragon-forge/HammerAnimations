@@ -378,9 +378,6 @@ public class ParticleEmitter
 		{
 			var buf = buffers.getBuffer(effect.material.renderType.get().apply(effect.texture));
 			
-			this.effect.material.beginGL();
-			RenderSystem.disableCull();
-			
 			if(this.guiParticle == null || this.guiParticle.dead)
 			{
 				this.guiParticle = this.createParticle(true);
@@ -395,9 +392,6 @@ public class ParticleEmitter
 			{
 				render.renderOnScreen(vars, this.guiParticle, buf, pose, x, y, scale, partialTicks);
 			}
-			
-			this.effect.material.endGL();
-			RenderSystem.enableCull();
 		}
 		
 		this.rotation = rotation;
@@ -483,8 +477,6 @@ public class ParticleEmitter
 	
 	private void setupOpenGL(float partialTicks, PoseStack pose)
 	{
-		this.effect.material.beginGL();
-		
 		if(!isRenderingGUI)
 		{
 			var camera = Minecraft.getInstance().getCameraEntity();
@@ -509,8 +501,6 @@ public class ParticleEmitter
 		{
 			pose.popPose();
 		}
-		
-		this.effect.material.endGL();
 	}
 	
 	

@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.CameraType;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleRender;
@@ -224,38 +225,29 @@ public class ParcomAppearanceBillboard
 		float v2 = this.v2 / (float) this.textureHeight;
 		
 		var lp = pose.last().pose();
-		var np = pose.last().normal();
 		
 		builder.vertex(lp, this.vertices[0].x, this.vertices[0].y, this.vertices[0].z)
-				.color(particle.r, particle.g, particle.b, particle.a)
 				.uv(u1, v1)
-				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.color(particle.r, particle.g, particle.b, particle.a)
 				.uv2(light)
-				.normal(np, 0, 1, 0)
 				.endVertex();
 		
 		builder.vertex(lp, this.vertices[1].x, this.vertices[1].y, this.vertices[1].z)
-				.color(particle.r, particle.g, particle.b, particle.a)
 				.uv(u2, v1)
-				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.color(particle.r, particle.g, particle.b, particle.a)
 				.uv2(light)
-				.normal(np, 0, 1, 0)
 				.endVertex();
 		
 		builder.vertex(lp, this.vertices[2].x, this.vertices[2].y, this.vertices[2].z)
-				.color(particle.r, particle.g, particle.b, particle.a)
 				.uv(u2, v2)
-				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.color(particle.r, particle.g, particle.b, particle.a)
 				.uv2(light)
-				.normal(np, 0, 1, 0)
 				.endVertex();
 		
 		builder.vertex(lp, this.vertices[3].x, this.vertices[3].y, this.vertices[3].z)
-				.color(particle.r, particle.g, particle.b, particle.a)
 				.uv(u1, v2)
-				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.color(particle.r, particle.g, particle.b, particle.a)
 				.uv2(light)
-				.normal(np, 0, 1, 0)
 				.endVertex();
 	}
 	
@@ -573,10 +565,10 @@ public class ParcomAppearanceBillboard
 		float v2 = this.v2 / (float) this.textureHeight;
 		
 		var lp = pose.last().pose();
-		builder.vertex(lp, this.vertices[0].x, this.vertices[0].y, this.vertices[0].z).uv(u1, v1).color(particle.r, particle.g, particle.b, particle.a).endVertex();
-		builder.vertex(lp, this.vertices[1].x, this.vertices[1].y, this.vertices[1].z).uv(u2, v1).color(particle.r, particle.g, particle.b, particle.a).endVertex();
-		builder.vertex(lp, this.vertices[2].x, this.vertices[2].y, this.vertices[2].z).uv(u2, v2).color(particle.r, particle.g, particle.b, particle.a).endVertex();
-		builder.vertex(lp, this.vertices[3].x, this.vertices[3].y, this.vertices[3].z).uv(u1, v2).color(particle.r, particle.g, particle.b, particle.a).endVertex();
+		builder.vertex(lp, this.vertices[0].x, this.vertices[0].y, this.vertices[0].z).uv(u1, v1).color(particle.r, particle.g, particle.b, particle.a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+		builder.vertex(lp, this.vertices[1].x, this.vertices[1].y, this.vertices[1].z).uv(u2, v1).color(particle.r, particle.g, particle.b, particle.a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+		builder.vertex(lp, this.vertices[2].x, this.vertices[2].y, this.vertices[2].z).uv(u2, v2).color(particle.r, particle.g, particle.b, particle.a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+		builder.vertex(lp, this.vertices[3].x, this.vertices[3].y, this.vertices[3].z).uv(u1, v2).color(particle.r, particle.g, particle.b, particle.a).uv2(LightTexture.FULL_BRIGHT).endVertex();
 	}
 	
 	public void calculateUVs(ParticleVariables vars, BedrockParticle particle, float partialTicks)
