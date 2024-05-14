@@ -11,6 +11,7 @@ import org.zeith.hammeranims.net.*;
 import org.zeith.hammerlib.net.*;
 
 import javax.annotation.*;
+import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -93,6 +94,11 @@ public class AnimationSystem
 	}
 	
 	public boolean stopAnimation(String layer, float transitionTime)
+	{
+		return startAnimationAt(layer, ConfiguredAnimation.noAnimation().transitionTime(transitionTime));
+	}
+	
+	public boolean stopAnimation(String layer, Duration transitionTime)
 	{
 		return startAnimationAt(layer, ConfiguredAnimation.noAnimation().transitionTime(transitionTime));
 	}

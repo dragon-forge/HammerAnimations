@@ -12,6 +12,7 @@ import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
 
 import javax.annotation.*;
+import java.time.Duration;
 import java.util.Objects;
 
 public class AnimationLayer
@@ -109,7 +110,7 @@ public class AnimationLayer
 			float weight = (transitionTime <= 0
 							? 0F
 							: (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime)
-			) * this.weight * lastAnimation.getWeight();
+						   ) * this.weight * lastAnimation.getWeight();
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
 			
 			SerializableMask sm = lastAnimation.config.mask;
@@ -123,11 +124,11 @@ public class AnimationLayer
 			float weight = (transitionTime <= 0
 							? 1F
 							: (float) Math.min(sysTime - startTime, transitionTime) / transitionTime
-			) * this.weight * currentAnimation.getWeight();
+						   ) * this.weight * currentAnimation.getWeight();
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
 			
 			SerializableMask sm = currentAnimation.config.mask;
-			if(sm != null) pose.apply(currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
+			if(sm != null) pose.apply(sm, currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
 			else pose.apply(currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
 		}
 	}
@@ -148,8 +149,8 @@ public class AnimationLayer
 			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : 0.25F;
 			float weight = transitionTime <= 0 ? 0F :
 						   (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime) *
-								   this.weight *
-								   lastAnimation.config.weight;
+						   this.weight *
+						   lastAnimation.config.weight;
 			if(weight <= 0)
 				lastAnimation = null;
 		}
@@ -171,6 +172,16 @@ public class AnimationLayer
 	public boolean stopAnimation()
 	{
 		return startAnimation(ConfiguredAnimation.noAnimation());
+	}
+	
+	public boolean stopAnimation(float transitionTime)
+	{
+		return startAnimation(ConfiguredAnimation.noAnimation().transitionTime(transitionTime));
+	}
+	
+	public boolean stopAnimation(Duration transitionTime)
+	{
+		return startAnimation(ConfiguredAnimation.noAnimation().transitionTime(transitionTime));
 	}
 	
 	@Override
