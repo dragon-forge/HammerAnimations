@@ -1,22 +1,16 @@
 package org.zeith.hammeranims.core.client.particle;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import lombok.Getter;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.texture.TextureManager;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
-import org.zeith.hammeranims.api.particles.ParticleMaterial;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-
-import java.util.Locale;
-import java.util.Objects;
-
-import lombok.Getter;
 
 @Getter
 public class ParticleWithEmitter
@@ -25,13 +19,11 @@ public class ParticleWithEmitter
 	public static int MAX_EMITTER_GENERATIONS = 6;
 	
 	protected final ParticleEmitter emitter;
-	protected final String typeId;
 	
 	public ParticleWithEmitter(ClientLevel worldIn, double posXIn, double posYIn, double posZIn, IParticleContainer container)
 	{
 		super(worldIn, posXIn, posYIn, posZIn);
 		this.emitter = createEmitter(container);
-		this.typeId = "BEDROCK_PARTICLE_" + emitter.effect.container.getRegistryKey().toString().replace(':', '_').toUpperCase(Locale.ROOT);
 		
 		emitter.lastGlobal.set(x, y, z);
 		emitter.prevGlobal.set(emitter.lastGlobal);
@@ -45,7 +37,6 @@ public class ParticleWithEmitter
 				object.getAnimatedObjectPosition().z
 		);
 		this.emitter = createEmitter(container);
-		this.typeId = "BEDROCK_PARTICLE_" + emitter.effect.container.getRegistryKey().toString().replace(':', '_').toUpperCase(Locale.ROOT);
 		emitter.setTarget(object);
 		
 		emitter.lastGlobal.set(x, y, z);
@@ -109,12 +100,10 @@ public class ParticleWithEmitter
 		buffers.endBatch();
 	}
 	
-	ParticleRenderType RENDER_TYPE = new DynamicParticleRenderType();
-	
 	@Override
 	public ParticleRenderType getRenderType()
 	{
-		return RENDER_TYPE;
+		return ParticleMaterialRenderType.BUILTIN[emitter.effect.material.ordinal()];
 	}
 	
 	@Override
@@ -128,51 +117,5 @@ public class ParticleWithEmitter
 		if(emitter.generation >= MAX_EMITTER_GENERATIONS) return;
 		Minecraft mc = Minecraft.getInstance();
 		mc.execute(() -> mc.particleEngine.add(this));
-	}
-	
-	public class DynamicParticleRenderType
-			implements ParticleRenderType
-	{
-		@Override
-		public void begin(BufferBuilder pBuilder, TextureManager pTextureManager)
-		{
-			if(emitter.effect.material == ParticleMaterial.OPAQUE)
-				RenderSystem.disableBlend();
-			else
-			{
-				RenderSystem.enableBlend();
-				RenderSystem.defaultBlendFunc();
-			}
-			RenderSystem.depthMask(true);
-		}
-		
-		@Override
-		public void end(Tesselator tesselator)
-		{
-		}
-		
-		@Override
-		public String toString()
-		{
-			return typeId;
-		}
-		
-		@Override
-		public int hashCode()
-		{
-			return typeId.hashCode();
-		}
-		
-		public String getTypeId()
-		{
-			return typeId;
-		}
-		
-		@Override
-		public boolean equals(Object obj)
-		{
-			return obj instanceof DynamicParticleRenderType
-				   && Objects.equals(((DynamicParticleRenderType) obj).getTypeId(), getTypeId());
-		}
 	}
 }

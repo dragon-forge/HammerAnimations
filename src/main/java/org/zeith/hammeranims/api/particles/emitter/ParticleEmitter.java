@@ -376,7 +376,7 @@ public class ParticleEmitter
 		
 		if(!listParticle.isEmpty())
 		{
-			var buf = buffers.getBuffer(effect.material.renderType.apply(effect.texture));
+			var buf = buffers.getBuffer(effect.material.renderType.get().apply(effect.texture));
 			
 			this.effect.material.beginGL();
 			RenderSystem.disableCull();
@@ -426,7 +426,9 @@ public class ParticleEmitter
 		{
 			this.depthSorting();
 			
-			var renderer = buffers.getBuffer(effect.material.renderType.apply(effect.texture));
+			var type = effect.material.renderType.get();
+			
+			var renderer = buffers.getBuffer(type.apply(effect.texture));
 			this.renderParticles(renderer, pose, renders, false, partialTicks);
 			
 			ParcomCollisionAppearance collisionAppearance = this.effect.get(ParcomCollisionAppearance.class, ParticleComponentsHA.PARTICLE_COLLISION_APPEARANCE);
@@ -434,7 +436,7 @@ public class ParticleEmitter
 			/* rendering the collided particles with an extra component */
 			if(collisionAppearance != null && collisionAppearance.texture != null)
 			{
-				renderer = buffers.getBuffer(effect.material.renderType.apply(collisionAppearance.texture));
+				renderer = buffers.getBuffer(type.apply(collisionAppearance.texture));
 				this.renderParticles(renderer, pose, renders, true, partialTicks);
 			}
 		}
