@@ -18,7 +18,7 @@ public class RenderEntityBilly
 	
 	public RenderEntityBilly(EntityRendererProvider.Context pContext)
 	{
-		super(pContext);
+		super(pContext, ContainersHA.BILLY_GEOM, 0.5F);
 	}
 	
 	@SubscribeEvent

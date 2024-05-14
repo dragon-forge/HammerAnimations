@@ -1,16 +1,22 @@
 package org.zeith.hammeranims.api.animsys;
 
+import lombok.Setter;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.*;
-import org.zeith.hammeranims.api.animation.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import org.zeith.hammeranims.api.animation.AnimationLocation;
+import org.zeith.hammeranims.api.animation.IAnimationSource;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
-import org.zeith.hammeranims.net.*;
-import org.zeith.hammerlib.net.*;
+import org.zeith.hammeranims.net.PacketRequestAnimationSystemSync;
+import org.zeith.hammeranims.net.PacketSyncAnimationSystem;
+import org.zeith.hammerlib.net.IPacket;
+import org.zeith.hammerlib.net.Network;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
@@ -25,6 +31,7 @@ public class AnimationSystem
 	@Nonnull
 	public final IAnimatedObject owner;
 	
+	@Setter
 	protected double time;
 	
 	protected boolean hasTicked = false;
