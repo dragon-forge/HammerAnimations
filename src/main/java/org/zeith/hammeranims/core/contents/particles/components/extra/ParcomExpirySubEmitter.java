@@ -3,6 +3,7 @@ package org.zeith.hammeranims.core.contents.particles.components.extra;
 import com.google.gson.*;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Vector3d;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleExpiry;
@@ -12,7 +13,6 @@ import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
 import org.zeith.hammeranims.core.utils.GsonHelper;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
-import org.zeith.hammeranims.joml.Vector3d;
 import org.zeith.hammerlib.util.java.Cast;
 
 public class ParcomExpirySubEmitter

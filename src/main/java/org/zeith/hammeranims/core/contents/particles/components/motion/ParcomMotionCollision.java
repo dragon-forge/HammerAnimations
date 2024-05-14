@@ -4,6 +4,8 @@ import com.google.gson.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleUpdate;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
@@ -11,8 +13,6 @@ import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 import org.zeith.hammeranims.core.utils.EntityTransformationUtils;
 import org.zeith.hammeranims.core.utils.EnumFacing;
-import org.zeith.hammeranims.joml.Vector3d;
-import org.zeith.hammeranims.joml.Vector3f;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;

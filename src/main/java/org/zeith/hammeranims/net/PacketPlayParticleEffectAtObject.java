@@ -59,8 +59,8 @@ public class PacketPlayParticleEffectAtObject
 		if(container == null) return;
 		IParticleContainer container = IParticleContainer.byRegistryKey(this.container);
 		var player = ColoredLightManager.getClientPlayer();
-		if(player == null || !(player.level instanceof ClientLevel cl) || container == null) return;
-		IAnimatedObject obj = source.get(IAnimatedObject.class, player.level).orElse(null);
+		if(player == null || !(player.level() instanceof ClientLevel cl) || container == null) return;
+		IAnimatedObject obj = source.get(IAnimatedObject.class, cl).orElse(null);
 		if(obj == null) return;
 		ParticleWithEmitter pwe = new ParticleWithEmitter(
 				cl,

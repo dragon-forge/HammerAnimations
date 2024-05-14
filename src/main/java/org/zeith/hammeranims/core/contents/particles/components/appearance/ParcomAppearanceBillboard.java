@@ -5,13 +5,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import org.joml.*;
+import org.joml.Math;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleRender;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
-import org.zeith.hammeranims.joml.Math;
-import org.zeith.hammeranims.joml.*;
 
 public class ParcomAppearanceBillboard
 		implements IParticleRender
@@ -211,7 +211,7 @@ public class ParcomAppearanceBillboard
 		
 		this.calculateFacing(vars, emitter, particle, px, py, pz);
 		
-		this.rotation.identity().rotateZ(angle / 180 * Math.PI_f);
+		this.rotation.identity().rotateZ(angle / 180 * org.zeith.hammeranims.joml.Math.PI_f);
 		this.transform.mul(this.rotation);
 		this.transform.setTranslation(new Vector3f((float) px, (float) py, (float) pz));
 		
@@ -561,7 +561,7 @@ public class ParcomAppearanceBillboard
 		this.transform.scale(scale * 2.75F);
 		this.transform.setTranslation(new Vector3f(x, y - scale / 2, 0));
 		
-		this.rotation.identity().rotateZ(angle / 180 * Math.PI_f);
+		this.rotation.identity().rotateZ(angle / 180 * org.zeith.hammeranims.joml.Math.PI_f);
 		this.transform.mul(this.rotation);
 		
 		for(Vector4f vertex : this.vertices)

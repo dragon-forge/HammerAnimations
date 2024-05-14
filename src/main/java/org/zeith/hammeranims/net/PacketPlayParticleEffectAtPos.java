@@ -5,9 +5,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Vector3d;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
-import org.zeith.hammeranims.joml.Vector3d;
 import org.zeith.hammerlib.api.lighting.ColoredLightManager;
 import org.zeith.hammerlib.net.*;
 
@@ -56,7 +56,7 @@ public class PacketPlayParticleEffectAtPos
 		if(container == null) return;
 		IParticleContainer container = IParticleContainer.byRegistryKey(this.container);
 		var player = ColoredLightManager.getClientPlayer();
-		if(player == null || !(player.level instanceof ClientLevel cl) || container == null) return;
+		if(player == null || !(player.level() instanceof ClientLevel cl) || container == null) return;
 		if(source == null) return;
 		new ParticleWithEmitter(
 				cl,

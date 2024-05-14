@@ -11,7 +11,6 @@ buildscript {
     }
     dependencies {
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.+"
-        classpath 'org.spongepowered:mixingradle:0.7.+'
     }
 }
 
@@ -19,6 +18,7 @@ plugins {
     id "com.modrinth.minotaur" version "2.+"
     id 'net.neoforged.gradle' version '[6.0.13, 6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
 }
 
 apply plugin: 'idea'
@@ -46,6 +46,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 mixin {
     add sourceSets.main, "mixins.${config.mod_id}.refmap.json"
+    config "mixins.${config.mod_id}.json"
 }
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
@@ -143,6 +144,9 @@ repositories {
         name = "Jared's maven"
         url = "https://maven.blamejared.com/" // location of the maven that hosts JEI files since January 2023
     }
+    maven {
+        url = "https://jitpack.io"
+    }
     flatDir { dirs "libraries/${config.mc_version}/all" }
     flatDir { dirs "libraries/${config.mc_version}/classpathOnly" }
     flatDir { dirs "libraries/${config.mc_version}/runtimeOnly" }
@@ -152,9 +156,14 @@ repositories {
 dependencies {
     minecraft "net.neoforged:forge:${config.mc_version}-${config.forge_version}"
 
-    if (hasConfig("hl_version") && !config.hl_version.isEmpty()) {
-        implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
-    }
+    implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
+
+    ////// UTILITY STUFF //////
+    // implementation 'java-oo:javac-oo-plugin:0.5'
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+    compileOnly 'org.jetbrains:annotations:24.0.1'
+    ///////////////////////////
 
     if (hasConfig("jei_version") && !config.jei_version.isEmpty()) {
         compileOnly fg.deobf("mezz.jei:jei-${config.mc_version}-common-api:${config.jei_version}")

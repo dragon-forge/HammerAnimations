@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.api.particles.variables;
 
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.zeith.hammeranims.api.animation.interp.IVariableAccess;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
-import org.zeith.hammeranims.joml.Vector3d;
-import org.zeith.hammeranims.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.function.BiConsumer;

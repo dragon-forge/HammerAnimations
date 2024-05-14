@@ -2,6 +2,7 @@ package org.zeith.hammeranims.core.impl.api.particles;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.joml.*;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.particles.ParticleEffect;
 import org.zeith.hammeranims.api.particles.event.DecodeParticleEffectEvent;

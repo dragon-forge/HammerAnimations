@@ -2,11 +2,11 @@ package org.zeith.hammeranims.core.contents.particles.components.shape;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.joml.Vector3f;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
-import org.zeith.hammeranims.joml.Vector3f;
 
 public class ParcomShapeSphere
 		extends ParcomShapeBase

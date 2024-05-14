@@ -10,9 +10,9 @@ import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import org.joml.Vector3d;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
-import org.zeith.hammeranims.joml.Vector3d;
 import org.zeith.hammeranims.net.PacketPlayParticleEffectAtPos;
 import org.zeith.hammeranims.net.PacketProvideCustomParticleEffectList;
 import org.zeith.hammerlib.net.Network;
@@ -63,9 +63,9 @@ public class CommandParticle
 									ResourceLocation id = ResourceLocationArgument.getId(cs, "effect");
 									var mcpos = cs.getSource().getPosition();
 									
-									Vector3d pos = new Vector3d(mcpos.x, mcpos.y, mcpos.z);
+									var pos = new Vector3d(mcpos.x, mcpos.y, mcpos.z);
 									
-									var chunk = cs.getSource().getLevel().getChunkAt(new BlockPos(mcpos));
+									var chunk = cs.getSource().getLevel().getChunkAt(BlockPos.containing(mcpos));
 									Network.sendToTracking(new PacketPlayParticleEffectAtPos(pos, id), chunk);
 									
 									return 1;
@@ -78,7 +78,7 @@ public class CommandParticle
 											
 											Vector3d pos = new Vector3d(mcpos.x, mcpos.y, mcpos.z);
 											
-											var chunk = cs.getSource().getLevel().getChunkAt(new BlockPos(mcpos));
+											var chunk = cs.getSource().getLevel().getChunkAt(BlockPos.containing(mcpos));
 											Network.sendToTracking(new PacketPlayParticleEffectAtPos(pos, id), chunk);
 											
 											return 1;
@@ -100,7 +100,7 @@ public class CommandParticle
 													.filter(s -> s.contains(id))
 													.count();
 											if(has > 0)
-												cs.getSource().sendSuccess(InstanceHelpers.componentTranslate("command.hammeranims:has_particle_effect", has, id), true);
+												cs.getSource().sendSuccess(() -> InstanceHelpers.componentTranslate("command.hammeranims:has_particle_effect", has, id), true);
 											else
 												cs.getSource().sendFailure(InstanceHelpers.componentTranslate("command.hammeranims:has_particle_effect", has, id));
 											return has;

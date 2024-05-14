@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.core.contents.particles.components.shape;
 
 import com.google.gson.*;
+import org.joml.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
-import org.zeith.hammeranims.joml.*;
 
 import java.lang.Math;
 

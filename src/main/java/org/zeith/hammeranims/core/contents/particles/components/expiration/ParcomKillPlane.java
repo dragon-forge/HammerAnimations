@@ -2,10 +2,10 @@ package org.zeith.hammeranims.core.contents.particles.components.expiration;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import org.joml.Vector3d;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleUpdate;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-import org.zeith.hammeranims.joml.Vector3d;
 
 public class ParcomKillPlane
 		implements IParticleUpdate

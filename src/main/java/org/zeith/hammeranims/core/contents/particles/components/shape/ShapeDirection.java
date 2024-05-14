@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.core.contents.particles.components.shape;
 
+import org.joml.Vector3d;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
-import org.zeith.hammeranims.joml.Vector3d;
 
 public abstract class ShapeDirection
 {

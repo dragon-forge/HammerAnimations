@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
@@ -22,7 +23,6 @@ import org.zeith.hammeranims.api.particles.curve.ParticleCurve;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionAppearance;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
-import org.zeith.hammeranims.joml.*;
 
 import java.lang.Math;
 import java.util.*;
@@ -497,7 +497,7 @@ public class ParticleEmitter
 			pose.translate(-playerX, -playerY, -playerZ);
 			
 			RenderSystem.disableCull();
-			RenderSystem.enableTexture();
+//			RenderSystem.enableTexture();
 		}
 	}
 	

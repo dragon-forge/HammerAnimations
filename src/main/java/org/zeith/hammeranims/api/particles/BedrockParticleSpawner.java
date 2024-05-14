@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.net.PacketPlayParticleEffectAtObject;
 import org.zeith.hammeranims.net.PacketPlayParticleEffectAtPos;
@@ -18,10 +19,10 @@ public class BedrockParticleSpawner
 	
 	public static void spawnAt(ServerLevel world, Vec3 pos, ResourceLocation effect)
 	{
-		var bpos = new BlockPos(pos);
+		var bpos = BlockPos.containing(pos);
 		if(!world.isLoaded(bpos)) return;
 		Network.sendToTracking(world.getChunkAt(bpos),
-				new PacketPlayParticleEffectAtPos(new org.zeith.hammeranims.joml.Vector3d(pos.x, pos.y, pos.z), effect)
+				new PacketPlayParticleEffectAtPos(new Vector3d(pos.x, pos.y, pos.z), effect)
 		);
 	}
 	
@@ -34,7 +35,7 @@ public class BedrockParticleSpawner
 	{
 		var world = pos.getAnimatedObjectWorld();
 		if(world.isClientSide()) return;
-		BlockPos bpos = new BlockPos(pos.getAnimatedObjectPosition());
+		BlockPos bpos = BlockPos.containing(pos.getAnimatedObjectPosition());
 		if(!world.isLoaded(bpos)) return;
 		Network.sendToTracking(world.getChunkAt(bpos),
 				new PacketPlayParticleEffectAtObject(pos, effect)

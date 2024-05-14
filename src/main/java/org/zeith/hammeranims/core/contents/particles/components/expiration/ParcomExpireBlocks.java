@@ -9,7 +9,6 @@ import org.zeith.hammeranims.api.particles.components.IParticleComponent;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
-import org.zeith.hammeranims.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,7 @@ public class ParcomExpireBlocks
 	public Block getBlock(ParticleEmitter emitter, BedrockParticle particle)
 	{
 		if(emitter.world == null) return Blocks.AIR;
-		Vector3d position = particle.getGlobalPosition(emitter);
+		var position = particle.getGlobalPosition(emitter);
 		this.pos.set(position.x(), position.y(), position.z());
 		return emitter.world.getBlockState(this.pos).getBlock();
 	}

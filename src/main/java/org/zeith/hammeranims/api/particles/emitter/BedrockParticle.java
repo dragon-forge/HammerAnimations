@@ -1,12 +1,12 @@
 package org.zeith.hammeranims.api.particles.emitter;
 
 import net.minecraft.world.entity.Entity;
+import org.joml.*;
 import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionAppearance;
 import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionTinting;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
-import org.zeith.hammeranims.joml.*;
+import org.zeith.hammeranims.joml.Math;
 
-import java.lang.Math;
 import java.util.HashMap;
 import java.util.Map;
 
