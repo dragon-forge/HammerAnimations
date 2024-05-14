@@ -28,13 +28,11 @@ public class ParticleWithEmitter
 	public static int MAX_EMITTER_GENERATIONS = 6;
 	
 	protected final ParticleEmitter emitter;
-	protected final String typeId;
 	
 	public ParticleWithEmitter(ClientWorld worldIn, double posXIn, double posYIn, double posZIn, IParticleContainer container)
 	{
 		super(worldIn, posXIn, posYIn, posZIn);
 		this.emitter = createEmitter(container);
-		this.typeId = "BEDROCK_PARTICLE_" + emitter.effect.container.getRegistryKey().toString().replace(':', '_').toUpperCase(Locale.ROOT);
 		
 		emitter.lastGlobal.set(x, y, z);
 		emitter.prevGlobal.set(emitter.lastGlobal);
@@ -48,7 +46,6 @@ public class ParticleWithEmitter
 				object.getAnimatedObjectPosition().z
 		);
 		this.emitter = createEmitter(container);
-		this.typeId = "BEDROCK_PARTICLE_" + emitter.effect.container.getRegistryKey().toString().replace(':', '_').toUpperCase(Locale.ROOT);
 		emitter.setTarget(object);
 		
 		emitter.lastGlobal.set(x, y, z);
@@ -112,12 +109,10 @@ public class ParticleWithEmitter
 		buffers.endBatch();
 	}
 	
-	IParticleRenderType RENDER_TYPE = new DynamicParticleRenderType();
-	
 	@Override
 	public IParticleRenderType getRenderType()
 	{
-		return RENDER_TYPE;
+		return ParticleMaterialRenderType.BUILTIN[emitter.effect.material.ordinal()];
 	}
 	
 	@Override
@@ -131,51 +126,5 @@ public class ParticleWithEmitter
 		if(emitter.generation >= MAX_EMITTER_GENERATIONS) return;
 		Minecraft mc = Minecraft.getInstance();
 		mc.execute(() -> mc.particleEngine.add(this));
-	}
-	
-	private class DynamicParticleRenderType
-			implements IParticleRenderType
-	{
-		@Override
-		public void begin(BufferBuilder pBuilder, TextureManager pTextureManager)
-		{
-			if(emitter.effect.material == ParticleMaterial.OPAQUE)
-				RenderSystem.disableBlend();
-			else
-			{
-				RenderSystem.enableBlend();
-				RenderSystem.defaultBlendFunc();
-			}
-			RenderSystem.depthMask(true);
-		}
-		
-		@Override
-		public void end(Tessellator pTesselator)
-		{
-		}
-		
-		@Override
-		public String toString()
-		{
-			return typeId;
-		}
-		
-		@Override
-		public int hashCode()
-		{
-			return typeId.hashCode();
-		}
-		
-		public String getTypeId()
-		{
-			return typeId;
-		}
-		
-		@Override
-		public boolean equals(Object obj)
-		{
-			return obj instanceof DynamicParticleRenderType
-				   && Objects.equals(((DynamicParticleRenderType) obj).getTypeId(), getTypeId());
-		}
 	}
 }

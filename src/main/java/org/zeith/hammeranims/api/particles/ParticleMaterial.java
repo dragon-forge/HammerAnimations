@@ -7,16 +7,17 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public enum ParticleMaterial
 {
-	OPAQUE("particles_opaque", RenderType::entitySolid),
-	ALPHA("particles_alpha", RenderType::entityCutout),
-	BLEND("particles_blend", RenderType::entityTranslucent),
-	ADDITIVE("particles_add", RenderType::eyes);
+	OPAQUE("particles_opaque", () -> RenderType::entitySolid),
+	ALPHA("particles_alpha", () -> RenderType::entityCutoutNoCull),
+	BLEND("particles_blend", () -> RenderType::entityTranslucent),
+	ADDITIVE("particles_add", () -> RenderType::eyes);
 	
 	public final String id;
-	public final Function<ResourceLocation, RenderType> renderType;
+	public final Supplier<Function<ResourceLocation, RenderType>> renderType;
 	
 	public static ParticleMaterial fromString(String material)
 	{
@@ -31,7 +32,7 @@ public enum ParticleMaterial
 		return OPAQUE;
 	}
 	
-	ParticleMaterial(String id, Function<ResourceLocation, RenderType> renderType)
+	ParticleMaterial(String id, Supplier<Function<ResourceLocation, RenderType>> renderType)
 	{
 		this.id = id;
 		this.renderType = renderType;
