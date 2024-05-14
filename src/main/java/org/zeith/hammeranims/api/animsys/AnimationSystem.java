@@ -13,6 +13,8 @@ import org.zeith.hammerlib.net.*;
 import javax.annotation.*;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.zeith.hammeranims.core.utils.InstanceHelpers.*;
 
@@ -208,6 +210,12 @@ public class AnimationSystem
 		public Builder addLayers(AnimationLayer.Builder... layers)
 		{
 			this.layers.addAll(Arrays.asList(layers));
+			return this;
+		}
+		
+		public Builder addLayers(String... names)
+		{
+			this.layers.addAll(Stream.of(names).map(AnimationLayer::builder).collect(Collectors.toList()));
 			return this;
 		}
 		
