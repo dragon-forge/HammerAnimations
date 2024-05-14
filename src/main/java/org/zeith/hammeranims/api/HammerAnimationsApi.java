@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class HammerAnimationsApi
 {
+	public static final float APPROX_ZERO = 1.0E-30F;
 	public static final IEventBus EVENT_BUS = BusBuilder.builder().build();
 	
 	static

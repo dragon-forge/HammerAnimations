@@ -7,7 +7,8 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "EntityMixin",
-    "Matrix4fAccessor"
+    "Matrix4fAccessor",
+    "ExecuteCommandMixin"
   ],
   "client": [
   ],
