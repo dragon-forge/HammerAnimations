@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.animsys;
 
+import lombok.Setter;
 import lombok.var;
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
@@ -27,6 +28,7 @@ public class AnimationSystem
 	@Nonnull
 	public final IAnimatedObject owner;
 	
+	@Setter
 	protected double time;
 	
 	protected boolean hasTicked = false;

@@ -16,7 +16,7 @@ public class RenderEntityBilly
 	
 	public RenderEntityBilly(EntityRendererManager pContext)
 	{
-		super(pContext);
+		super(pContext, ContainersHA.BILLY_GEOM, 0.5F);
 	}
 	
 	@Override

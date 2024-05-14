@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.entity.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.vector.Vector3f;
 import org.jetbrains.annotations.NotNull;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.client.render.entity.proc.HeadLookProcessor;
 import org.zeith.hammeranims.core.init.ContainersHA;
@@ -13,9 +14,9 @@ import org.zeith.hammeranims.core.init.ContainersHA;
 public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEntity>
 		extends LivingRenderer<T, BedrockModelWrapper<T>>
 {
-	public BedrockEntityRenderer(EntityRendererManager pContext)
+	public BedrockEntityRenderer(EntityRendererManager pContext, IGeometryContainer geometry, float shadowSize)
 	{
-		super(pContext, new BedrockModelWrapper<>(RenderType::entitySolid, ContainersHA.BILLY_GEOM), 0.5F);
+		super(pContext, new BedrockModelWrapper<>(RenderType::entitySolid, geometry), shadowSize);
 		addProcessors(model);
 	}
 	
