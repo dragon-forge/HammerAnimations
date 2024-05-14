@@ -12,6 +12,8 @@ import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 public class ParticleWithEmitter
 		extends SimpleParticle
 {
+	public static int MAX_EMITTER_GENERATIONS = 6;
+	
 	protected final ParticleEmitter emitter;
 	
 	public ParticleWithEmitter(World worldIn, double posXIn, double posYIn, double posZIn, IParticleContainer container)
@@ -48,6 +50,12 @@ public class ParticleWithEmitter
 	@Override
 	public void onUpdate()
 	{
+		if(emitter.generation >= MAX_EMITTER_GENERATIONS)
+		{
+			isExpired = true;
+			return;
+		}
+		
 		emitter.prevGlobal.set(emitter.lastGlobal);
 		emitter.lastGlobal.set(posX, posY, posZ);
 		
@@ -65,6 +73,13 @@ public class ParticleWithEmitter
 				isExpired = true;
 			}
 		}
+	}
+	
+	@Override
+	public void spawn()
+	{
+		if(emitter.generation >= MAX_EMITTER_GENERATIONS) return;
+		super.spawn();
 	}
 	
 	@Override

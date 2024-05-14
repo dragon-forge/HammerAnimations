@@ -5,6 +5,7 @@ import com.zeitheron.hammercore.annotations.SimplyRegister;
 import org.zeith.hammeranims.api.particles.components.IParticleComponentType;
 import org.zeith.hammeranims.core.contents.particles.components.appearance.*;
 import org.zeith.hammeranims.core.contents.particles.components.expiration.*;
+import org.zeith.hammeranims.core.contents.particles.components.extra.ParcomExpirySubEmitter;
 import org.zeith.hammeranims.core.contents.particles.components.lifetime.*;
 import org.zeith.hammeranims.core.contents.particles.components.motion.*;
 import org.zeith.hammeranims.core.contents.particles.components.shape.*;
@@ -112,5 +113,10 @@ public interface ParticleComponentsHA
 
 	@RegistryName("particle_motion_parametric")
 	IParticleComponentType PARTICLE_MOTION_PARAMETRIC = IParticleComponentType.create(ParcomMotionParametric::new);
+	//</editor-fold>
+	
+	//<editor-fold desc="HammerAnimations EXTRAS">
+	@RegistryName("particle_expiry_sub_emitter")
+	IParticleComponentType PARTICLE_EXPIRY_SUB_EMITTER = IParticleComponentType.create(ParcomExpirySubEmitter::new);
 	//</editor-fold>
 }
