@@ -66,16 +66,4 @@ public class PacketProvideCustomParticleEffectList
 		p.all = allFX;
 		return NetTransport.wrap(p).createPacket();
 	}
-	
-	@MainThreaded
-	public static class PacketResetList
-			implements IPacket
-	{
-		@Override
-		public void serverExecute(PacketContext ctx)
-		{
-			CompletableFuture<Set<ResourceLocation>> f = CommandParticle.PLAYER_CUSTOM_MAP.remove(ctx.getSender().getUUID());
-			if(f != null && !f.isDone()) f.complete(ImmutableSet.of());
-		}
-	}
 }
