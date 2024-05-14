@@ -105,7 +105,10 @@ public class ParcomMotionCollision
 			return;
 		}
 		
-		var aabb = new AABB(prev.x - r, prev.y - r, prev.z - r, prev.x + r, prev.y + r, prev.z + r);
+		var aabb = new AABB(
+				prev.x - r, prev.y - r, prev.z - r,
+				prev.x + r, prev.y + r, prev.z + r
+		);
 		
 		double d0 = y;
 		double origX = x;
@@ -115,8 +118,15 @@ public class ParcomMotionCollision
 		HashMap<Entity, AABB> entityAABBs = new HashMap<>();
 		HashMap<Entity, CollisionOffset> staticEntityAABBs = new HashMap<>(); //for newtons first law
 		
-		/* for own hitbox implementation: check for hitbox expanded for the previous position - prevent fast moving tunneling */
-		List<AABB> list = BlockPos.betweenClosedStream(aabb.inflate(x, y, z)).flatMap(pos -> emitter.world.getBlockState(pos).getCollisionShape(emitter.world, pos).move(pos.getX(), pos.getY(), pos.getZ()).toAabbs().stream()).collect(Collectors.toList());
+		var list = BlockPos.betweenClosedStream(aabb.inflate(x, y, z))
+				.flatMap(pos ->
+						emitter.world.getBlockState(pos)
+								.getCollisionShape(emitter.world, pos)
+								.move(pos.getX(), pos.getY(), pos.getZ())
+								.toAabbs()
+								.stream()
+				)
+				.collect(Collectors.toList());
 		
 		if((!list.isEmpty() || (!entities.isEmpty() && this.entityCollision)) && !particle.intersected)
 		{
@@ -238,7 +248,7 @@ public class ParcomMotionCollision
 			}
 			
 			
-			for(HashMap.Entry<Entity, AABB> entry : entityAABBs.entrySet())
+			for(var entry : entityAABBs.entrySet())
 			{
 				AABB entityAABB = entry.getValue();
 				Entity entity = entry.getKey();
