@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
@@ -15,10 +16,26 @@ import org.zeith.hammeranims.core.client.render.entity.proc.HeadLookProcessor;
 public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEntity>
 		extends LivingEntityRenderer<T, BedrockModelWrapper<T>>
 {
+	private static class SelfRef<T extends LivingEntity & IAnimatedEntity>
+	{
+		BedrockEntityRenderer<T> self;
+	}
+	
 	public BedrockEntityRenderer(EntityRendererProvider.Context pContext, IGeometryContainer geometry, float shadowSize)
 	{
-		super(pContext, new BedrockModelWrapper<>(RenderType::entitySolid, geometry), shadowSize);
+		this(pContext, geometry, shadowSize, new SelfRef<>());
+	}
+	
+	private BedrockEntityRenderer(EntityRendererProvider.Context pContext, IGeometryContainer geometry, float shadowSize, SelfRef<T> ref)
+	{
+		super(pContext, new BedrockModelWrapper<>(t -> ref.self.getRenderType(t), geometry), shadowSize);
+		ref.self = this;
 		addProcessors(model);
+	}
+	
+	protected RenderType getRenderType(ResourceLocation texture)
+	{
+		return RenderType.entitySolid(texture);
 	}
 	
 	@Override
