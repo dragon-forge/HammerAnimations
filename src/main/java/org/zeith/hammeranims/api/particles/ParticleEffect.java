@@ -33,6 +33,7 @@ public class ParticleEffect
 	public final List<IParticleRender> particleRender;
 	public final List<IParticlePreRender> particlePreRender;
 	public final List<IParticlePostRender> particlePostRender;
+	public final List<IParticleExpiry> particleExpiry;
 	
 	public ParticleEffect(IParticleContainer container, ParticleMaterial material, ResourceLocation texture, List<ParticleCurve> curves, ImmutableMap.Builder<IParticleComponentType, IParticleComponent> components)
 	{
@@ -51,6 +52,7 @@ public class ParticleEffect
 		this.particleRender = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticleRender.class));
 		this.particlePreRender = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticlePreRender.class));
 		this.particlePostRender = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticlePostRender.class));
+		this.particleExpiry = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticleExpiry.class));
 	}
 	
 	public static ParticleEffect empty(IParticleContainer container)

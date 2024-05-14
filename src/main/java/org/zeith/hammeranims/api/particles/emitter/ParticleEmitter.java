@@ -256,17 +256,17 @@ public class ParticleEmitter
 	 */
 	private void updateParticles()
 	{
-		Iterator<BedrockParticle> it = this.particles.iterator();
-		
-		while(it.hasNext())
+		for(int i = 0; i < this.particles.size(); i++)
 		{
-			BedrockParticle particle = it.next();
-			
+			BedrockParticle particle = this.particles.get(i);
 			this.updateParticle(particle);
 			
 			if(particle.dead)
 			{
-				it.remove();
+				this.particles.remove(i);
+				--i;
+				for(IParticleExpiry component : this.effect.particleExpiry)
+					component.expire(this, particle);
 			}
 		}
 		
