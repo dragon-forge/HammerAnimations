@@ -1,12 +1,17 @@
 package org.zeith.hammeranims.api.animsys;
 
 import com.zeitheron.hammercore.utils.base.Cast;
-import net.minecraft.nbt.*;
+import lombok.var;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
-import org.zeith.hammeranims.api.animsys.actions.*;
-import org.zeith.hammeranims.api.animsys.layer.*;
-import org.zeith.hammeranims.api.time.*;
+import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
+import org.zeith.hammeranims.api.animsys.actions.AnimationActionInstance;
+import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
+import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
+import org.zeith.hammeranims.api.time.TimeFunction;
+import org.zeith.hammeranims.api.time.TimeFunctionInstance;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
@@ -28,6 +33,8 @@ public class ConfiguredAnimation
 	public TimeFunctionInstance timeFunction = TimeFunctionInstance.EMPTY;
 	public boolean important = false;
 	public LoopMode loopMode = LoopMode.ONCE;
+	
+	public SerializableMask mask = null;
 	
 	public ConfiguredAnimation next;
 	
@@ -66,6 +73,7 @@ public class ConfiguredAnimation
 			   && this.startTime == other.startTime
 			   && this.transitionTime == other.transitionTime
 			   && this.timeFunction.equals(other.timeFunction)
+			   && Objects.equals(this.mask, other.mask)
 			   && this.reverse == other.reverse
 			   && this.animation == other.animation;
 	}
@@ -76,6 +84,12 @@ public class ConfiguredAnimation
 		
 		this.animation = animation;
 		this.loopMode = animation.getData().getLoopMode();
+	}
+	
+	public ConfiguredAnimation mask(SerializableMask mask)
+	{
+		this.mask = mask;
+		return this;
 	}
 	
 	public ConfiguredAnimation weight(float weight)
@@ -190,7 +204,10 @@ public class ConfiguredAnimation
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		NBTTagCompound tag = InstanceHelpers.newNBTCompound();
+		var tag = InstanceHelpers.newNBTCompound();
+		
+		if(mask != null) tag.setTag("Mask", mask.serializeNBT());
+		
 		tag.setTag("Time", timeFunction.serializeNBT());
 		tag.setString("Animation", animation.getLocation().toString());
 		tag.setFloat("Weight", weight);
@@ -216,6 +233,8 @@ public class ConfiguredAnimation
 	public void deserializeNBT(NBTTagCompound tag)
 	{
 		this.timeFunction = TimeFunctionInstance.of(tag.getCompoundTag("Time"));
+		
+		this.mask = tag.hasKey("Mask", Constants.NBT.TAG_COMPOUND) ? new SerializableMask(tag.getCompoundTag("Mask")) : null;
 		
 		this.setAnimation(new AnimationLocation(tag.getString("Animation")).resolve().orElse(null));
 		this.weight = tag.getFloat("Weight");
