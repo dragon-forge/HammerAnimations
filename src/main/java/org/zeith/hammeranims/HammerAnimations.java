@@ -86,7 +86,7 @@ public class HammerAnimations
 	}
 	
 	@Mod.EventHandler
-	public void startStop(FMLServerStoppingEvent e)
+	public void stopServer(FMLServerStoppingEvent e)
 	{
 		CommandParticle.PLAYER_CUSTOM_MAP.clear();
 	}
