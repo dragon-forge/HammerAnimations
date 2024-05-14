@@ -42,11 +42,12 @@ public class GeometryPose
 	public void apply(SerializableMask animationMask, IAnimationData animation, ILayerMask mask, BlendMode mode, float weight, Query query)
 	{
 		Set<String> excludes = animationMask.getExcludes();
+		SerializableMask.WeightFunction weightFun = animationMask.getBoneWeight();
 		for(Map.Entry<String, BoneAnimation> entry : animation.getBoneAnimations().entrySet())
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone) || excludes.contains(bone)) continue;
-			boneTransforms.put(bone, entry.getValue().apply(query, mode, weight, boneTransforms.get(bone)));
+			boneTransforms.put(bone, entry.getValue().apply(query, mode, weight * weightFun.get(bone), boneTransforms.get(bone)));
 		}
 	}
 	

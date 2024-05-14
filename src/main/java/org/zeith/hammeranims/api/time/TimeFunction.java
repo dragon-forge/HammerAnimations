@@ -10,6 +10,8 @@ import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
 
 import javax.annotation.Nonnull;
 
+import static org.zeith.hammeranims.api.HammerAnimationsApi.APPROX_ZERO;
+
 public abstract class TimeFunction
 		extends IForgeRegistryEntry.Impl<TimeFunction>
 {
@@ -56,7 +58,7 @@ public abstract class TimeFunction
 					case LOOP:
 						return duration > 0 ? duration - (time % duration) : 0;
 					case HOLD_ON_LAST_FRAME:
-						return Math.max(duration - time, 1.0E-30);
+						return Math.max(duration - time, APPROX_ZERO);
 					case ONCE:
 						return duration - time;
 				}

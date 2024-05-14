@@ -22,6 +22,7 @@ import java.util.List;
 @Mod.EventBusSubscriber
 public class HammerAnimationsApi
 {
+	public static final float APPROX_ZERO = 1.0E-30F;
 	public static final EventBus EVENT_BUS = new EventBus();
 	
 	private static final List<IResourceProvider> AUXILIARY_RESOURCE_PROVIDERS = Lists.newArrayList();
