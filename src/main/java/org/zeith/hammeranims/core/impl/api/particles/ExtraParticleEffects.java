@@ -27,6 +27,11 @@ public class ExtraParticleEffects
 		this.extraEffects = extraEffects;
 	}
 	
+	public Set<ResourceLocation> getKeys()
+	{
+		return extraEffects.keySet();
+	}
+	
 	public IParticleContainer resolve(ResourceLocation id)
 	{
 		return extraEffects.get(id);

@@ -11,6 +11,11 @@ public class InstanceHelpers
 		return new StringTextComponent(text);
 	}
 	
+	public static ITextComponent componentTranslate(String text, Object... args)
+	{
+		return new TranslationTextComponent(text, args);
+	}
+	
 	public static CompoundNBT newNBTCompound()
 	{
 		return new CompoundNBT();

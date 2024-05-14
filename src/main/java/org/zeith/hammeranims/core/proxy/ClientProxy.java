@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.proxy;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.play.ClientPlayNetHandler;
 import net.minecraft.resources.IFutureReloadListener;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.Util;
@@ -14,6 +15,8 @@ import org.zeith.hammeranims.api.utils.IExtendedResourceProvider;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
+import org.zeith.hammeranims.net.PacketProvideCustomParticleEffectList;
+import org.zeith.hammerlib.net.Network;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +99,13 @@ public class ClientProxy
 						mc,
 						Util.backgroundExecutor()
 				)
+		).thenRun(() ->
+				Minecraft.getInstance().execute(() ->
+				{
+					ClientPlayNetHandler net = Minecraft.getInstance().getConnection();
+					if(net == null || Minecraft.getInstance().level == null) return;
+					Network.sendToServer(new PacketProvideCustomParticleEffectList.PacketResetList());
+				})
 		);
 	}
 }
