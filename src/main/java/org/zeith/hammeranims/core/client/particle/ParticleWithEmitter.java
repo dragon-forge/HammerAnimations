@@ -10,9 +10,11 @@ import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.texture.TextureManager;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.api.particles.ParticleMaterial;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class ParticleWithEmitter
 		extends Particle
@@ -60,6 +62,7 @@ public class ParticleWithEmitter
 		emitter.lastGlobal.set(x, y, z);
 		
 		emitter.update();
+		
 		if(emitter.lifetime >= 0 && emitter.age >= emitter.lifetime)
 			emitter.running = false;
 		if(emitter.isFinished())
@@ -78,25 +81,50 @@ public class ParticleWithEmitter
 	@Override
 	public void render(VertexConsumer pBuffer, Camera pRenderInfo, float pPartialTicks)
 	{
-		if(emitter.isFinished()) return;
+		var viewEntity = pRenderInfo.getEntity();
+		if(emitter.isFinished() || viewEntity == null) return;
+		
+		var vector3d = pRenderInfo.getPosition();
+		
+		var camPos = viewEntity.getPosition(pPartialTicks);
+		
+		// This is usually zero, unless player is in 3P.
+		var thirdPersonDelta = camPos.subtract(vector3d);
 		
 		var buffers = Minecraft.getInstance().renderBuffers().bufferSource();
 		var pose = new PoseStack();
-		
-		var vec = pRenderInfo.getPosition();
-//		pose.translate(vec.x, vec.y, vec.z);
-		
-		emitter.render(buffers, pose, pPartialTicks);
+		pose.translate(thirdPersonDelta.x, thirdPersonDelta.y, thirdPersonDelta.z); // Accounts for 3P
+		emitter.render(pRenderInfo, buffers, pose, pPartialTicks);
 		buffers.endBatch();
 	}
 	
-	ParticleRenderType RENDER_TYPE = new ParticleRenderType()
+	ParticleRenderType RENDER_TYPE = new DynamicParticleRenderType();
+	
+	@Override
+	public ParticleRenderType getRenderType()
+	{
+		return RENDER_TYPE;
+	}
+	
+	@Override
+	public boolean shouldCull()
+	{
+		return false;
+	}
+	
+	public class DynamicParticleRenderType
+			implements ParticleRenderType
 	{
 		@Override
 		public void begin(BufferBuilder pBuilder, TextureManager pTextureManager)
 		{
-			RenderSystem.enableBlend();
-			RenderSystem.defaultBlendFunc();
+			if(emitter.effect.material == ParticleMaterial.OPAQUE)
+				RenderSystem.disableBlend();
+			else
+			{
+				RenderSystem.enableBlend();
+				RenderSystem.defaultBlendFunc();
+			}
 			RenderSystem.depthMask(true);
 		}
 		
@@ -116,17 +144,17 @@ public class ParticleWithEmitter
 		{
 			return typeId.hashCode();
 		}
-	};
-	
-	@Override
-	public ParticleRenderType getRenderType()
-	{
-		return RENDER_TYPE;
-	}
-	
-	@Override
-	public boolean shouldCull()
-	{
-		return false;
+		
+		public String getTypeId()
+		{
+			return typeId;
+		}
+		
+		@Override
+		public boolean equals(Object obj)
+		{
+			return obj instanceof DynamicParticleRenderType
+				   && Objects.equals(((DynamicParticleRenderType) obj).getTypeId(), getTypeId());
+		}
 	}
 }

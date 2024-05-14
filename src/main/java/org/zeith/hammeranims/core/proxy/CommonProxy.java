@@ -63,7 +63,7 @@ public class CommonProxy
 		
 		Collection<IParticleContainer> particles = HammerAnimationsApi.particleContainers().getValues();
 		HammerAnimations.LOG.info("Reloading {} particles.", particles.size());
-		queues.enqueue(geometries.stream().map((ctr) -> (Runnable) () -> ctr.reload(provider)), CompletableFuture::runAsync);
+		queues.enqueue(particles.stream().map((ctr) -> (Runnable) () -> ctr.reload(provider)), CompletableFuture::runAsync);
 		
 		HammerAnimationsApi.EVENT_BUS.post(queues);
 		
