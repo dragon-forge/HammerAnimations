@@ -76,6 +76,6 @@ public class ParticleContainerImpl
 		})).orElseGet(() -> ParticleEffect.empty(this));
 		
 		if(HammerAnimationsApi.LOG_RELOADS)
-			HammerAnimations.LOG.debug("Loaded {} particles container.", key);
+			HammerAnimations.LOG.debug("Loaded {} particles container with blend type {}.", key, effect.material.id);
 	}
 }
