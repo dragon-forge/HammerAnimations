@@ -1,8 +1,8 @@
 package org.zeith.hammeranims.api.particles.emitter;
 
 import net.minecraft.entity.Entity;
-import org.zeith.hammeranims.core.impl.api.particles.components.appearance.ParcomCollisionAppearance;
-import org.zeith.hammeranims.core.impl.api.particles.components.appearance.ParcomCollisionTinting;
+import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionAppearance;
+import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionTinting;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
 import org.zeith.hammeranims.joml.*;
 

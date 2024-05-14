@@ -1,15 +1,15 @@
 package org.zeith.hammeranims.core.init;
 
 import org.zeith.hammeranims.api.particles.components.IParticleComponentType;
-import org.zeith.hammeranims.core.impl.api.particles.components.appearance.*;
-import org.zeith.hammeranims.core.impl.api.particles.components.expiration.*;
-import org.zeith.hammeranims.core.impl.api.particles.components.lifetime.*;
-import org.zeith.hammeranims.core.impl.api.particles.components.meta.ParcomInitialization;
-import org.zeith.hammeranims.core.impl.api.particles.components.meta.ParcomLocalSpace;
-import org.zeith.hammeranims.core.impl.api.particles.components.motion.*;
-import org.zeith.hammeranims.core.impl.api.particles.components.rate.ParcomRateInstant;
-import org.zeith.hammeranims.core.impl.api.particles.components.rate.ParcomRateSteady;
-import org.zeith.hammeranims.core.impl.api.particles.components.shape.*;
+import org.zeith.hammeranims.core.contents.particles.components.appearance.*;
+import org.zeith.hammeranims.core.contents.particles.components.expiration.*;
+import org.zeith.hammeranims.core.contents.particles.components.lifetime.*;
+import org.zeith.hammeranims.core.contents.particles.components.motion.*;
+import org.zeith.hammeranims.core.contents.particles.components.shape.*;
+import org.zeith.hammeranims.core.contents.particles.components.meta.ParcomInitialization;
+import org.zeith.hammeranims.core.contents.particles.components.meta.ParcomLocalSpace;
+import org.zeith.hammeranims.core.contents.particles.components.rate.ParcomRateInstant;
+import org.zeith.hammeranims.core.contents.particles.components.rate.ParcomRateSteady;
 import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.hammerlib.annotations.SimplyRegister;
 

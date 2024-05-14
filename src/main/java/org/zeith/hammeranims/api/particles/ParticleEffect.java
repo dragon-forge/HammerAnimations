@@ -17,6 +17,8 @@ import org.zeith.hammerlib.util.java.Cast;
 
 import java.util.*;
 
+import static org.zeith.hammeranims.api.utils.InstanceGatherer.getComponents;
+
 public class ParticleEffect
 {
 	public final IParticleContainer container;
@@ -46,14 +48,14 @@ public class ParticleEffect
 		this.components = components.build();
 		
 		Collection<IParticleComponent> coms = this.components.values();
-		this.emitterInitializes = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IEmitterInitialize.class));
-		this.emitterUpdates = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IEmitterUpdate.class));
-		this.particleInitializes = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticleInitialize.class));
-		this.particleUpdates = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticleUpdate.class));
-		this.particleRender = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticleRender.class));
-		this.particlePreRender = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticlePreRender.class));
-		this.particlePostRender = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticlePostRender.class));
-		this.particleExpiry = Collections.unmodifiableList(InstanceGatherer.getComponents(coms, IParticleExpiry.class));
+		this.emitterInitializes = getComponents(coms, IEmitterInitialize.class);
+		this.emitterUpdates = getComponents(coms, IEmitterUpdate.class);
+		this.particleInitializes = getComponents(coms, IParticleInitialize.class);
+		this.particleUpdates = getComponents(coms, IParticleUpdate.class);
+		this.particleRender = getComponents(coms, IParticleRender.class);
+		this.particlePreRender = getComponents(coms, IParticlePreRender.class);
+		this.particlePostRender = getComponents(coms, IParticlePostRender.class);
+		this.particleExpiry = getComponents(coms, IParticleExpiry.class);
 	}
 	
 	public static ParticleEffect empty(IParticleContainer container)

@@ -3,6 +3,7 @@ package org.zeith.hammeranims.core.client.particle;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import lombok.Getter;
 import lombok.var;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleRenderType;
@@ -20,6 +21,7 @@ import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 import java.util.Locale;
 import java.util.Objects;
 
+@Getter
 public class ParticleWithEmitter
 		extends Particle
 {
