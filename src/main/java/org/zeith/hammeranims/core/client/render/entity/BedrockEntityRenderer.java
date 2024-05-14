@@ -1,23 +1,41 @@
 package org.zeith.hammeranims.core.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.entity.*;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.client.render.entity.proc.HeadLookProcessor;
-import org.zeith.hammeranims.core.init.ContainersHA;
 
 public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEntity>
 		extends LivingRenderer<T, BedrockModelWrapper<T>>
 {
+	private static class SelfRef<T extends LivingEntity & IAnimatedEntity>
+	{
+		BedrockEntityRenderer<T> self;
+	}
+	
 	public BedrockEntityRenderer(EntityRendererManager pContext, IGeometryContainer geometry, float shadowSize)
 	{
-		super(pContext, new BedrockModelWrapper<>(RenderType::entitySolid, geometry), shadowSize);
+		this(pContext, geometry, shadowSize, new SelfRef<>());
+	}
+	
+	private BedrockEntityRenderer(EntityRendererManager pContext, IGeometryContainer geometry, float shadowSize, SelfRef<T> ref)
+	{
+		super(pContext, new BedrockModelWrapper<>(t -> ref.self.getRenderType(t), geometry), shadowSize);
+		ref.self = this;
 		addProcessors(model);
+	}
+	
+	protected RenderType getRenderType(ResourceLocation texture)
+	{
+		return RenderType.entitySolid(texture);
 	}
 	
 	@Override
