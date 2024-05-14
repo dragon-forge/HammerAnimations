@@ -105,7 +105,10 @@ public class ParcomMotionCollision
 			return;
 		}
 		
-		AxisAlignedBB aabb = new AxisAlignedBB(prev.x - r, prev.y - r, prev.z - r, prev.x + r, prev.y + r, prev.z + r);
+		AxisAlignedBB aabb = new AxisAlignedBB(
+				prev.x - r, prev.y - r, prev.z - r,
+				prev.x + r, prev.y + r, prev.z + r
+		);
 		
 		double d0 = y;
 		double origX = x;
@@ -115,8 +118,15 @@ public class ParcomMotionCollision
 		HashMap<Entity, AxisAlignedBB> entityAABBs = new HashMap<>();
 		HashMap<Entity, CollisionOffset> staticEntityAABBs = new HashMap<>(); //for newtons first law
 		
-		/* for own hitbox implementation: check for hitbox expanded for the previous position - prevent fast moving tunneling */
-		List<AxisAlignedBB> list = BlockPos.betweenClosedStream(aabb.inflate(x, y, z)).flatMap(pos -> emitter.world.getBlockState(pos).getCollisionShape(emitter.world, pos).move(pos.getX(), pos.getY(), pos.getZ()).toAabbs().stream()).collect(Collectors.toList());
+		List<AxisAlignedBB> list = BlockPos.betweenClosedStream(aabb.inflate(x, y, z))
+				.flatMap(pos ->
+						emitter.world.getBlockState(pos)
+								.getCollisionShape(emitter.world, pos)
+								.move(pos.getX(), pos.getY(), pos.getZ())
+								.toAabbs()
+								.stream()
+				)
+				.collect(Collectors.toList());
 		
 		if((!list.isEmpty() || (!entities.isEmpty() && this.entityCollision)) && !particle.intersected)
 		{
