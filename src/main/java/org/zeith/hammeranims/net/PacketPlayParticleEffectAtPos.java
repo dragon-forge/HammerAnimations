@@ -1,6 +1,5 @@
 package org.zeith.hammeranims.net;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -59,11 +58,10 @@ public class PacketPlayParticleEffectAtPos
 		var player = ColoredLightManager.getClientPlayer();
 		if(player == null || !(player.level instanceof ClientLevel cl) || container == null) return;
 		if(source == null) return;
-		ParticleWithEmitter pwe = new ParticleWithEmitter(
+		new ParticleWithEmitter(
 				cl,
 				source.x, source.y, source.z,
 				container
-		);
-		Minecraft.getInstance().particleEngine.add(pwe);
+		).spawn();
 	}
 }
