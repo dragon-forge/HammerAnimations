@@ -145,6 +145,20 @@ public class PositionalModelImpl
 		return true;
 	}
 	
+	@Override
+	public boolean applyBoneTransforms(@Nonnull Matrix4d base, String bone)
+	{
+		List<PositionalBone> tree = parentTree.get(bone);
+		if(tree == null || tree.isEmpty()) return false;
+		
+		for(PositionalBone f : tree)
+		{
+			f.applyTransforms(base);
+		}
+		
+		return true;
+	}
+	
 	public static class PositionalBone
 			implements IBone
 	{
@@ -225,6 +239,18 @@ public class PositionalModelImpl
 		}
 		
 		public void applyTransforms(Matrix4f pose)
+		{
+			pose.translate(-offset.x() / 16F, -offset.y() / 16F, offset.z() / 16F);
+			pose.translate(this.offsetX / 16.0F, this.offsetY / 16.0F, this.offsetZ / 16.0F);
+			
+			if(this.rotation.x() != 0.0F || this.rotation.y() != 0.0F || this.rotation.z() != 0.0F)
+				pose.rotate(new Quaternionf().rotateZYX(rotation.z(), rotation.y(), rotation.x()));
+			
+			if(this.scale.x() != 1.0F || this.scale.y() != 1.0F || this.scale.z() != 1.0F)
+				pose.scale(scale.x(), scale.y(), scale.z());
+		}
+		
+		public void applyTransforms(Matrix4d pose)
 		{
 			pose.translate(-offset.x() / 16F, -offset.y() / 16F, offset.z() / 16F);
 			pose.translate(this.offsetX / 16.0F, this.offsetY / 16.0F, this.offsetZ / 16.0F);

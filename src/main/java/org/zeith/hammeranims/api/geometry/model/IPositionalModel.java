@@ -1,5 +1,7 @@
 package org.zeith.hammeranims.api.geometry.model;
 
+import org.jetbrains.annotations.NotNull;
+import org.zeith.hammeranims.joml.Matrix4d;
 import org.zeith.hammeranims.joml.Matrix4f;
 
 import javax.annotation.*;
@@ -67,6 +69,12 @@ public interface IPositionalModel
 		}
 		
 		@Override
+		public boolean applyBoneTransforms(@NotNull Matrix4d base, String bone)
+		{
+			return false;
+		}
+		
+		@Override
 		public String toString()
 		{
 			return "IPositionalModel.EMPTY";
@@ -85,4 +93,17 @@ public interface IPositionalModel
 	 * @return true when the bone is found.
 	 */
 	boolean applyBoneTransforms(@Nonnull Matrix4f base, String bone);
+	
+	/**
+	 * Applies bone transforms to the given matrix.
+	 * If there is no bone, no transforms will happen.
+	 *
+	 * @param base
+	 * 		The matrix to be transformed.
+	 * @param bone
+	 * 		The bone to calculate transforms of.
+	 *
+	 * @return true when the bone is found.
+	 */
+	boolean applyBoneTransforms(@Nonnull Matrix4d base, String bone);
 }

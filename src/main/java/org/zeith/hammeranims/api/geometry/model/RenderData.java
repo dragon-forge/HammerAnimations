@@ -3,6 +3,7 @@ package org.zeith.hammeranims.api.geometry.model;
 import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.client.render.vertex.IVertexOperator;
 import org.zeith.hammeranims.core.utils.PoseStack;
 
 public class RenderData
@@ -29,5 +30,11 @@ public class RenderData
 	public void prepare()
 	{
 		pose.reset();
+	}
+	
+	public void apply(IVertexOperator... operators)
+	{
+		HammerAnimations.PROXY.initRD(this);
+		renderer = renderer.apply(operators);
 	}
 }
