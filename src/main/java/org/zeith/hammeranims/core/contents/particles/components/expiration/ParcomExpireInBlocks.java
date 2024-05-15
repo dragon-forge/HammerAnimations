@@ -9,16 +9,16 @@ public class ParcomExpireInBlocks
 		extends ParcomExpireBlocks
 		implements IParticleUpdate
 {
-	public ParcomExpireInBlocks(JsonElement element)
+	public ParcomExpireInBlocks(JsonElement elem)
 	{
-		super(element);
+		super(elem);
 	}
 	
 	@Override
 	public void update(ParticleEmitter emitter, BedrockParticle particle)
 	{
 		if(particle.dead || emitter.world == null) return;
-		var current = this.getBlock(emitter, particle);
-		if(this.blocks.contains(current)) particle.dead = true;
+		var current = getBlockState(emitter, particle);
+		if(matches(current)) particle.dead = true;
 	}
 }
