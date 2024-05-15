@@ -1,8 +1,11 @@
 package org.zeith.hammeranims.core.client.render.vertex;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class SpriteRemapVertexOp
@@ -13,6 +16,16 @@ public class SpriteRemapVertexOp
 	public SpriteRemapVertexOp(Supplier<TextureAtlasSprite> sprite)
 	{
 		this.sprite = sprite;
+	}
+	
+	public SpriteRemapVertexOp(ResourceLocation atlas, ResourceLocation sprite)
+	{
+		this(Minecraft.getInstance().getTextureAtlas(atlas), sprite);
+	}
+	
+	public SpriteRemapVertexOp(Function<ResourceLocation, TextureAtlasSprite> atlas, ResourceLocation sprite)
+	{
+		this(() -> atlas.apply(sprite));
 	}
 	
 	@Override
@@ -27,7 +40,7 @@ public class SpriteRemapVertexOp
 	public String toString()
 	{
 		return "SpriteRemapVertexOp{" +
-			   "sprite=" + sprite +
+			   "sprite=" + (sprite != null ? sprite.get() : null) +
 			   '}';
 	}
 }

@@ -3,9 +3,9 @@ package org.zeith.hammeranims.core.client.model;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.*;
 import org.jetbrains.annotations.Nullable;
-import org.zeith.hammeranims.api.geometry.constrains.*;
+import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
+import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
 import org.zeith.hammeranims.api.geometry.model.*;
-import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.utils.MinecraftHelper;
 
@@ -122,7 +122,7 @@ public class GeometricModelImpl
 	@OnlyIn(Dist.CLIENT)
 	public void renderModel(RenderData data)
 	{
-		root.render(data.pose, IVertexRenderer.wrap(data.buffer), data.lighting, data.overlay, data.red, data.green, data.blue, data.alpha);
+		root.render(data.pose, data.getOutput(), data.lighting, data.overlay, data.red, data.green, data.blue, data.alpha);
 	}
 	
 	@Override
