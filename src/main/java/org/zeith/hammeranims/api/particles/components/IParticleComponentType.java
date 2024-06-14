@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
+import org.zeith.hammerlib.util.mcf.Resources;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ public interface IParticleComponentType
 			"particle_lifetime_expression", "particle_expire_if_in_blocks", "particle_expire_if_not_in_blocks", "particle_kill_plane",
 			"particle_appearance_billboard", "particle_appearance_lighting", "particle_appearance_tinting",
 			"particle_initial_speed", "particle_initial_spin", "particle_motion_collision", "particle_motion_dynamic", "particle_motion_parametric"
-	).collect(Collectors.toMap(ResourceLocation::new, HammerAnimations::id));
+	).collect(Collectors.toMap(Resources::location, HammerAnimations::id));
 	
 	IParticleComponent fromJson(JsonElement element);
 	
@@ -38,7 +39,7 @@ public interface IParticleComponentType
 	
 	static IParticleComponentType byId(ResourceLocation id)
 	{
-		return HammerAnimationsApi.particleComponentTypes().getValue(VANILLA_COMPONENTS.getOrDefault(id, id));
+		return HammerAnimationsApi.particleComponentTypes().get(VANILLA_COMPONENTS.getOrDefault(id, id));
 	}
 	
 	static SimpleBuilder builder()

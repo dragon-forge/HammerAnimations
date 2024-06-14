@@ -1,10 +1,11 @@
 package org.zeith.hammeranims.net;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
-import org.zeith.hammeranims.api.animsys.*;
+import org.zeith.hammeranims.api.animsys.AnimationSystem;
+import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
-import org.zeith.hammerlib.net.*;
+import org.zeith.hammerlib.net.INBTPacket;
+import org.zeith.hammerlib.net.PacketContext;
 
 public class PacketRequestAnimationSystemSync
 		implements INBTPacket
@@ -38,6 +39,6 @@ public class PacketRequestAnimationSystemSync
 		var world = ctx.getSender().level();
 		var object = source != null ? source.get(IAnimatedObject.class, world).orElse(null) : null;
 		if(object != null)
-			ctx.withReply(new PacketSyncAnimationSystem(object.getAnimationSystem()));
+			ctx.withReply(new PacketSyncAnimationSystem(world.registryAccess(), object.getAnimationSystem()));
 	}
 }

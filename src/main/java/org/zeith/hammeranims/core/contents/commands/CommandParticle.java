@@ -44,7 +44,7 @@ public class CommandParticle
 	{
 		return (cs, b) ->
 		{
-			HammerAnimationsApi.particleContainers().getKeys().stream().map(Objects::toString).forEach(b::suggest);
+			HammerAnimationsApi.particleContainers().keySet().stream().map(Objects::toString).forEach(b::suggest);
 			return getOrRequest(cs.getSource().getPlayerOrException()).thenApply(custom ->
 			{
 				custom.stream().map(Objects::toString).forEach(b::suggest);

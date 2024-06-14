@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.contents.actions;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.animsys.actions.*;
@@ -10,7 +11,7 @@ public class EmptyAnimationAction
 {
 	@NotNull
 	@Override
-	public AnimationActionInstance deserializeInstance(CompoundTag tag)
+	public AnimationActionInstance deserializeInstance(HolderLookup.Provider lookup, CompoundTag tag)
 	{
 		return createInstance();
 	}

@@ -3,12 +3,9 @@ package org.zeith.hammeranims.core.proxy;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.common.NeoForge;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
@@ -16,7 +13,7 @@ import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
 import org.zeith.hammeranims.net.PacketProvideCustomParticleEffectList;
-import org.zeith.hammerlib.net.Network;
+import org.zeith.hammerlib.api.proxy.IClientProxy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ClientProxy
 		extends CommonProxy
+		implements IClientProxy
 {
 	protected static final List<IGeometricModel> createdModels = new ArrayList<>();
 	protected static final List<IGeometricModel> disposeModels = new ArrayList<>();
@@ -37,12 +35,11 @@ public class ClientProxy
 	}
 	
 	@Override
-	public void construct()
+	public void construct(IEventBus modBus)
 	{
-		super.construct();
+		super.construct(modBus);
 		
-		var modBus = FMLJavaModLoadingContext.get().getModEventBus();
-		var forgeBus = MinecraftForge.EVENT_BUS;
+		var forgeBus = NeoForge.EVENT_BUS;
 		
 		modBus.addListener(this::registerReloaders);
 		forgeBus.addListener(this::clientTick);
@@ -51,10 +48,8 @@ public class ClientProxy
 	
 	private boolean inWorld;
 	
-	private void clientTick(TickEvent.ClientTickEvent e)
+	private void clientTick(ClientTickEvent.Post e)
 	{
-		if(e.phase != TickEvent.Phase.END) return;
-		
 		if(!disposeModels.isEmpty())
 		{
 			HammerAnimations.LOG.info("Disposing {} OpenGL models.", disposeModels.size());
@@ -90,12 +85,6 @@ public class ClientProxy
 		GeometricModelImpl model = new GeometricModelImpl(def);
 		createdModels.add(model);
 		return model;
-	}
-	
-	@Override
-	public Level getClientWorld()
-	{
-		return Minecraft.getInstance().level;
 	}
 	
 	public static CompletableFuture<Void> performReload()

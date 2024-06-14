@@ -1,7 +1,8 @@
 package org.zeith.hammeranims.api.geometry.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraftforge.api.distmarker.*;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 
 import javax.annotation.Nullable;

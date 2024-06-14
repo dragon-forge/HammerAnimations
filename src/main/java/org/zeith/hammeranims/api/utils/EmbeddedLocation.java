@@ -2,6 +2,7 @@ package org.zeith.hammeranims.api.utils;
 
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
+import org.zeith.hammerlib.util.mcf.Resources;
 
 import java.util.Objects;
 
@@ -13,7 +14,7 @@ public class EmbeddedLocation
 	public EmbeddedLocation(String path)
 	{
 		String[] split = path.split("!", 2);
-		this.container = new ResourceLocation(split[0]);
+		this.container = Resources.location(split[0]);
 		this.key = split[1];
 	}
 	

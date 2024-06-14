@@ -1,10 +1,12 @@
 package org.zeith.hammeranims.core.contents.time;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
-import org.zeith.hammeranims.api.time.*;
+import org.zeith.hammeranims.api.time.TimeFunction;
+import org.zeith.hammeranims.api.time.TimeFunctionInstance;
 
 import java.time.Duration;
 
@@ -55,17 +57,17 @@ public class NormalizedTimeFunction
 		}
 		
 		@Override
-		public CompoundTag serializeNBT()
+		public CompoundTag serializeNBT(HolderLookup.Provider provider)
 		{
-			var tag = super.serializeNBT();
+			var tag = super.serializeNBT(provider);
 			tag.putDouble("NDuration", duration);
 			return tag;
 		}
 		
 		@Override
-		public void deserializeNBT(CompoundTag nbt)
+		public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt)
 		{
-			super.deserializeNBT(nbt);
+			super.deserializeNBT(provider, nbt);
 			duration = nbt.getDouble("NDuration");
 		}
 	}

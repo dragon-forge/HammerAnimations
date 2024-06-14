@@ -10,12 +10,16 @@ import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
 import org.zeith.hammeranims.api.geometry.event.DecodeGeometryEvent;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
-import org.zeith.hammeranims.core.impl.api.geometry.constrains.*;
+import org.zeith.hammeranims.core.impl.api.geometry.constrains.BoneConstraintsImpl;
+import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.GsonGeometryDecoder;
-import org.zeith.hammerlib.util.shaded.json.*;
+import org.zeith.hammerlib.util.mcf.Resources;
+import org.zeith.hammerlib.util.shaded.json.JSONObject;
+import org.zeith.hammerlib.util.shaded.json.JSONTokener;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class GeometryContainerImpl
@@ -67,11 +71,11 @@ public class GeometryContainerImpl
 	{
 		ResourceLocation key = getRegistryKey();
 		
-		ResourceLocation path = new ResourceLocation(key.getNamespace(),
+		ResourceLocation path = Resources.location(key.getNamespace(),
 				"bedrock/geometry/" + key.getPath() + suffix
 		);
 		
-		ResourceLocation constraintsPath = new ResourceLocation(key.getNamespace(),
+		ResourceLocation constraintsPath = Resources.location(key.getNamespace(),
 				"bedrock/geometry/" + key.getPath() + constraintsSuffix
 		);
 		

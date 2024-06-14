@@ -2,9 +2,10 @@ package org.zeith.hammeranims.core.proxy;
 
 import com.google.common.base.Stopwatch;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.level.Level;
+import net.neoforged.bus.api.IEventBus;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
@@ -17,6 +18,7 @@ import org.zeith.hammeranims.api.utils.IExtendedResourceProvider;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
+import org.zeith.hammerlib.api.proxy.IProxy;
 import org.zeith.hammerlib.util.java.IOUtils;
 
 import java.io.FileNotFoundException;
@@ -26,19 +28,15 @@ import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 public class CommonProxy
+		implements IProxy
 {
-	public void construct()
+	public void construct(IEventBus modBus)
 	{
 	}
 	
 	public IGeometricModel createGeometryData(GeometryDataImpl def)
 	{
 		return IGeometricModel.EMPTY;
-	}
-	
-	public Level getClientWorld()
-	{
-		return null;
 	}
 	
 	protected CompletableFuture<Void> reloadRegistries(PreparableReloadListener.PreparationBarrier pStage, IResourceProvider provider, boolean clientSide, Executor gameExecutor, Executor backgroundExecutor)
@@ -53,17 +51,17 @@ public class CommonProxy
 				gameExecutor, backgroundExecutor
 		);
 		
-		Collection<IAnimationContainer> animations = HammerAnimationsApi.animations().getValues();
+		var animations = HammerAnimationsApi.animations().entrySet();
 		HammerAnimations.LOG.info("Reloading {} animations.", animations.size());
-		queues.enqueue(animations.stream().map((ctr) -> (Runnable) () -> ctr.reload(provider)), CompletableFuture::runAsync);
+		queues.enqueue(animations.stream().map((ctr) -> (Runnable) () -> ctr.getValue().reload(provider)), CompletableFuture::runAsync);
 		
-		Collection<IGeometryContainer> geometries = HammerAnimationsApi.geometries().getValues();
+		var geometries = HammerAnimationsApi.geometries().entrySet();
 		HammerAnimations.LOG.info("Reloading {} models.", geometries.size());
-		queues.enqueue(geometries.stream().map((ctr) -> (Runnable) () -> ctr.reload(provider)), CompletableFuture::runAsync);
+		queues.enqueue(geometries.stream().map((ctr) -> (Runnable) () -> ctr.getValue().reload(provider)), CompletableFuture::runAsync);
 		
-		Collection<IParticleContainer> particles = HammerAnimationsApi.particleContainers().getValues();
+		var particles = HammerAnimationsApi.particleContainers().entrySet();
 		HammerAnimations.LOG.info("Reloading {} particles.", particles.size());
-		queues.enqueue(particles.stream().map((ctr) -> (Runnable) () -> ctr.reload(provider)), CompletableFuture::runAsync);
+		queues.enqueue(particles.stream().map((ctr) -> (Runnable) () -> ctr.getValue().reload(provider)), CompletableFuture::runAsync);
 		
 		HammerAnimationsApi.EVENT_BUS.post(queues);
 		
@@ -102,9 +100,9 @@ public class CommonProxy
 			@Override
 			public List<byte[]> readAll(ResourceLocation path)
 			{
-				List<byte[]> all = new ArrayList<>(manager.getResourceStack(path).stream().map(r ->
+				List<byte[]> all = new ArrayList<>(manager.listPacks().map(pr -> pr.getResource(PackType.CLIENT_RESOURCES, path)).filter(Objects::nonNull).map(r ->
 				{
-					try(var in = r.open())
+					try(var in = r.get())
 					{
 						return IOUtils.pipeOut(in);
 					} catch(IOException ignored)

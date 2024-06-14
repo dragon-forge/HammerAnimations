@@ -49,9 +49,9 @@ public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEn
 	}
 	
 	@Override
-	protected void setupRotations(@NotNull T pEntityLiving, @NotNull PoseStack pMatrixStack, float pAgeInTicks, float pRotationYaw, float pPartialTicks)
+	protected void setupRotations(@NotNull T pEntityLiving, @NotNull PoseStack pMatrixStack, float pAgeInTicks, float pRotationYaw, float pPartialTicks, float scale)
 	{
-		super.setupRotations(pEntityLiving, pMatrixStack, pAgeInTicks, pRotationYaw, pPartialTicks);
+		super.setupRotations(pEntityLiving, pMatrixStack, pAgeInTicks, pRotationYaw, pPartialTicks, scale);
 		pMatrixStack.translate(0, 1.5F, 0);
 		pMatrixStack.mulPose(Axis.XP.rotationDegrees(180f));
 		pMatrixStack.mulPose(Axis.YP.rotationDegrees(180f));

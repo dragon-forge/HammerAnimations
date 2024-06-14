@@ -1,16 +1,20 @@
 package org.zeith.hammeranims.api.animation.event;
 
-import net.minecraftforge.eventbus.api.*;
-import org.zeith.hammeranims.api.animation.*;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
+import org.zeith.hammeranims.api.animation.Animation;
+import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammerlib.util.java.Cast;
-import org.zeith.hammerlib.util.shaded.json.*;
+import org.zeith.hammerlib.util.shaded.json.JSONArray;
+import org.zeith.hammerlib.util.shaded.json.JSONObject;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
 
-@Cancelable
 public class DecodeAnimationEvent
 		extends Event
+		implements ICancellableEvent
 {
 	public final IResourceProvider resources;
 	public final IAnimationContainer container;
@@ -37,7 +41,7 @@ public class DecodeAnimationEvent
 		this.decoded = decoded;
 		try
 		{
-			super.setCanceled(true);
+			ICancellableEvent.super.setCanceled(true);
 		} catch(UnsupportedOperationException e)
 		{
 		}

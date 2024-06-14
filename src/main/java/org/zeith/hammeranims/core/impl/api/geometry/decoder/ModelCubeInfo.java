@@ -1,8 +1,9 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
-import net.minecraftforge.api.distmarker.*;
-import org.zeith.hammeranims.core.client.model.ModelCubeF;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
+import org.zeith.hammeranims.core.client.model.ModelCubeF;
 
 public class ModelCubeInfo
 {

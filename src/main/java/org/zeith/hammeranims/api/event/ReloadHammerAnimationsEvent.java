@@ -1,10 +1,12 @@
 package org.zeith.hammeranims.api.event;
 
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 
-import java.util.concurrent.*;
-import java.util.function.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public abstract class ReloadHammerAnimationsEvent

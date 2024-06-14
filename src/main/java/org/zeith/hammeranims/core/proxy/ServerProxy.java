@@ -1,27 +1,30 @@
 package org.zeith.hammeranims.core.proxy;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.forgespi.language.IModInfo;
-import net.minecraftforge.forgespi.locating.IModFile;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforgespi.language.IModInfo;
+import net.neoforged.neoforgespi.locating.IModFile;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
-import org.zeith.hammerlib.util.java.tuples.*;
+import org.zeith.hammerlib.util.java.tuples.Tuple2;
+import org.zeith.hammerlib.util.java.tuples.Tuples;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ServerProxy
 		extends CommonProxy
 {
 	@Override
-	public void construct()
+	public void construct(IEventBus modBus)
 	{
-		super.construct();
-		MinecraftForge.EVENT_BUS.addListener(this::reloadResources);
+		super.construct(modBus);
+		NeoForge.EVENT_BUS.addListener(this::reloadResources);
 	}
 	
 	public void reloadResources(AddReloadListenerEvent e)

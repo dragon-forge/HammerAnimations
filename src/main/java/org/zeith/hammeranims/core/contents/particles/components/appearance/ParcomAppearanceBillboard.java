@@ -226,29 +226,25 @@ public class ParcomAppearanceBillboard
 		
 		var lp = pose.last().pose();
 		
-		builder.vertex(lp, this.vertices[0].x, this.vertices[0].y, this.vertices[0].z)
-				.uv(u1, v1)
-				.color(particle.r, particle.g, particle.b, particle.a)
-				.uv2(light)
-				.endVertex();
+		builder.addVertex(lp, this.vertices[0].x, this.vertices[0].y, this.vertices[0].z)
+				.setUv(u1, v1)
+				.setColor(particle.r, particle.g, particle.b, particle.a)
+				.setLight(light);
 		
-		builder.vertex(lp, this.vertices[1].x, this.vertices[1].y, this.vertices[1].z)
-				.uv(u2, v1)
-				.color(particle.r, particle.g, particle.b, particle.a)
-				.uv2(light)
-				.endVertex();
+		builder.addVertex(lp, this.vertices[1].x, this.vertices[1].y, this.vertices[1].z)
+				.setUv(u2, v1)
+				.setColor(particle.r, particle.g, particle.b, particle.a)
+				.setLight(light);
 		
-		builder.vertex(lp, this.vertices[2].x, this.vertices[2].y, this.vertices[2].z)
-				.uv(u2, v2)
-				.color(particle.r, particle.g, particle.b, particle.a)
-				.uv2(light)
-				.endVertex();
+		builder.addVertex(lp, this.vertices[2].x, this.vertices[2].y, this.vertices[2].z)
+				.setUv(u2, v2)
+				.setColor(particle.r, particle.g, particle.b, particle.a)
+				.setLight(light);
 		
-		builder.vertex(lp, this.vertices[3].x, this.vertices[3].y, this.vertices[3].z)
-				.uv(u1, v2)
-				.color(particle.r, particle.g, particle.b, particle.a)
-				.uv2(light)
-				.endVertex();
+		builder.addVertex(lp, this.vertices[3].x, this.vertices[3].y, this.vertices[3].z)
+				.setUv(u1, v2)
+				.setColor(particle.r, particle.g, particle.b, particle.a)
+				.setLight(light);
 	}
 	
 	protected void calculateFacing(ParticleVariables vars, ParticleEmitter emitter, BedrockParticle particle, double px, double py, double pz)
@@ -565,10 +561,10 @@ public class ParcomAppearanceBillboard
 		float v2 = this.v2 / (float) this.textureHeight;
 		
 		var lp = pose.last().pose();
-		builder.vertex(lp, this.vertices[0].x, this.vertices[0].y, this.vertices[0].z).uv(u1, v1).color(particle.r, particle.g, particle.b, particle.a).uv2(LightTexture.FULL_BRIGHT).endVertex();
-		builder.vertex(lp, this.vertices[1].x, this.vertices[1].y, this.vertices[1].z).uv(u2, v1).color(particle.r, particle.g, particle.b, particle.a).uv2(LightTexture.FULL_BRIGHT).endVertex();
-		builder.vertex(lp, this.vertices[2].x, this.vertices[2].y, this.vertices[2].z).uv(u2, v2).color(particle.r, particle.g, particle.b, particle.a).uv2(LightTexture.FULL_BRIGHT).endVertex();
-		builder.vertex(lp, this.vertices[3].x, this.vertices[3].y, this.vertices[3].z).uv(u1, v2).color(particle.r, particle.g, particle.b, particle.a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+		builder.addVertex(lp, this.vertices[0].x, this.vertices[0].y, this.vertices[0].z).setUv(u1, v1).setColor(particle.r, particle.g, particle.b, particle.a).setLight(LightTexture.FULL_BRIGHT);
+		builder.addVertex(lp, this.vertices[1].x, this.vertices[1].y, this.vertices[1].z).setUv(u2, v1).setColor(particle.r, particle.g, particle.b, particle.a).setLight(LightTexture.FULL_BRIGHT);
+		builder.addVertex(lp, this.vertices[2].x, this.vertices[2].y, this.vertices[2].z).setUv(u2, v2).setColor(particle.r, particle.g, particle.b, particle.a).setLight(LightTexture.FULL_BRIGHT);
+		builder.addVertex(lp, this.vertices[3].x, this.vertices[3].y, this.vertices[3].z).setUv(u1, v2).setColor(particle.r, particle.g, particle.b, particle.a).setLight(LightTexture.FULL_BRIGHT);
 	}
 	
 	public void calculateUVs(ParticleVariables vars, BedrockParticle particle, float partialTicks)

@@ -1,14 +1,4 @@
 buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url "https://plugins.gradle.org/m2/" }
-        jcenter()
-        mavenCentral()
-        maven {
-            name = 'sponge'
-            url = 'https://repo.spongepowered.org/maven'
-        }
-    }
     dependencies {
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.+"
     }
@@ -16,15 +6,12 @@ buildscript {
 
 plugins {
     id "com.modrinth.minotaur" version "2.+"
-    id 'net.neoforged.gradle' version '[6.0.13, 6.2)'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'net.neoforged.gradle.userdev' version '7.0.142'
 }
 
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
-apply plugin: "com.matthewprenger.cursegradle"
-apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'com.matthewprenger.cursegradle'
 
 ext.configFile = file("build.txt")
 configFile.withReader {
@@ -42,94 +29,45 @@ base {
     archivesName = "${config.archive_name}-${config.mc_version}"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
-mixin {
-    add sourceSets.main, "mixins.${config.mod_id}.refmap.json"
-    config "mixins.${config.mod_id}.json"
+minecraft {
+    accessTransformers {
+        file('src/main/resources/META-INF/accesstransformer.cfg')
+    }
 }
 
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
-minecraft {
-    mappings channel: config.mappings_channel, version: config.mappings_version
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    copyIdeResources = true
-    runs {
-        client {
-            workingDirectory project.file('run/client')
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', config.mod_id
-            property "mixin.env.disableRefMap", "true"
-            def args = new ArrayList()
+runs {
+    configureEach {
+        systemProperty 'forge.logging.console.level', 'debug'
+        systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
 
-            args.add "--mixin"
-            args.add "mixins.${config.mod_id}.json"
+        modSource project.sourceSets.main
+    }
 
-            if (hasConfig("mc_user") && !config.mc_user.isEmpty()) {
-                def userId = config.mc_user.split(',', 2)
-                args.add "--username"
-                args.add userId[0]
+    client {
+        workingDirectory project.file('run/client')
+        systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
+		def args = new ArrayList()
+		
+		if (hasConfig("mc_user") && !config.mc_user.isEmpty()) {
+			def userId = config.mc_user.split(',', 2)
+			args.add "--username"
+			args.add userId[0]
 
-                args.add "--uuid"
-                if (userId.length > 1) args.add userId[1]
-                else args.add "00000000000000000000000000000001" // this is a default
-            }
+			args.add "--uuid"
+			if (userId.length > 1) args.add userId[1]
+			else args.add "00000000000000000000000000000001" // this is a default
+		}
+		
+		programArguments(args)
+    }
 
-            setArgs(args)
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run/server')
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', config.mod_id
-            property "mixin.env.disableRefMap", "true"
-            def args = new ArrayList()
-            args.add "--mixin"
-            args.add "mixins.${config.mod_id}.json"
-            setArgs(args)
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        gameTestServer {
-            workingDirectory project.file('run/server')
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', config.mod_id
-            def args = new ArrayList()
-            args.add "--mixin"
-            args.add "mixins.${config.mod_id}.json"
-            args.add "-Dmixin.env.disableRefMap=true"
-            setArgs(args)
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run/client')
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', config.mod_id
-            def args = new ArrayList()
-            args.add "--mixin"
-            args.add "mixins.${config.mod_id}.json"
-            args.add "-Dmixin.env.disableRefMap=true"
-            setArgs(args)
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
+    server {
+        workingDirectory project.file('run/server')
+        systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
+        programArgument '--nogui'
     }
 }
 
@@ -139,13 +77,16 @@ repositories {
     maven {
         name = "Zeitheron Maven"
         url = "https://maven.zeith.org/"
+        content {
+            includeGroupByRegex "org\\.zeith.*"
+        }
     }
     maven {
         name = "Jared's maven"
         url = "https://maven.blamejared.com/" // location of the maven that hosts JEI files since January 2023
-    }
-    maven {
-        url = "https://jitpack.io"
+        content {
+            includeGroupByRegex "mezz\\.jei.*"
+        }
     }
     flatDir { dirs "libraries/${config.mc_version}/all" }
     flatDir { dirs "libraries/${config.mc_version}/classpathOnly" }
@@ -154,24 +95,26 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.neoforged:forge:${config.mc_version}-${config.forge_version}"
-
-    implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
+    implementation "net.neoforged:neoforge:${config.forge_version}"
 
     ////// UTILITY STUFF //////
-    // implementation 'java-oo:javac-oo-plugin:0.5'
-    compileOnly 'org.projectlombok:lombok:1.18.32'
-    annotationProcessor 'org.projectlombok:lombok:1.18.32'
-    compileOnly 'org.jetbrains:annotations:24.0.1'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
     ///////////////////////////
 
-    if (hasConfig("jei_version") && !config.jei_version.isEmpty()) {
-        compileOnly fg.deobf("mezz.jei:jei-${config.mc_version}-common-api:${config.jei_version}")
-        compileOnly fg.deobf("mezz.jei:jei-${config.mc_version}-forge-api:${config.jei_version}")
-        runtimeOnly fg.deobf("mezz.jei:jei-${config.mc_version}-forge:${config.jei_version}")
+    if (hasConfig("hl_version") && !config.hl_version.isEmpty()) {
+        implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}"
+    }
+	
+    if (hasConfig("hammeranims_version") && !config.hammeranims_version.isEmpty()) {
+        implementation "org.zeith.hammeranims:HammerAnimations-${config.mc_version}:${config.hammeranims_version}"
     }
 
-    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+    if (hasConfig("jei_version") && !config.jei_version.isEmpty()) {
+        compileOnly "mezz.jei:jei-${config.mc_version}-common-api:${config.jei_version}"
+        compileOnly "mezz.jei:jei-${config.mc_version}-neoforge-api:${config.jei_version}"
+        runtimeOnly "mezz.jei:jei-${config.mc_version}-neoforge:${config.jei_version}"
+    }
 
     def libraries = new File(file("libraries"), "${config.mc_version}")
     if (!libraries.isDirectory()) libraries.mkdirs()
@@ -183,7 +126,7 @@ dependencies {
             def modartifact = file.name.substring(0, splitPos)
             def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
             dependencies {
-                implementation fg.deobf(project.dependencies.create("_all:$modartifact:$modversion") {
+                implementation(project.dependencies.create("_all:$modartifact:$modversion") {
                     transitive = false
                 })
             }
@@ -197,7 +140,7 @@ dependencies {
             def modartifact = file.name.substring(0, splitPos)
             def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
             dependencies {
-                compileOnly fg.deobf(project.dependencies.create("_classpath:$modartifact:$modversion") {
+                compileOnly(project.dependencies.create("_classpath:$modartifact:$modversion") {
                     transitive = false
                 })
             }
@@ -211,7 +154,7 @@ dependencies {
             def modartifact = file.name.substring(0, splitPos)
             def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
             dependencies {
-                runtimeOnly fg.deobf(project.dependencies.create("_runtime:$modartifact:$modversion") {
+                runtimeOnly(project.dependencies.create("_runtime:$modartifact:$modversion") {
                     transitive = false
                 })
             }
@@ -235,10 +178,10 @@ dependencies {
     } else libDir.mkdir();
 }
 
-def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
+def resourceTargets = ['META-INF/neoforge.mods.toml', 'pack.mcmeta']
 def replaceProperties = [
         minecraft_version: config.mc_version, minecraft_version_range: config.mc_range,
-        forge_version    : "${config.mc_version}-${config.forge_version}", forge_version_range: config.forge_range,
+        forge_version    : "${config.mc_version}-${config.forge_version}", forge_version_range: config.forge_range, javafml_range: config.javafml_range,
         mod_id           : config.mod_id, mod_name: config.mod_name, mod_license: config.mod_license, mod_version: config.mod_version,
         mod_authors      : config.mod_authors, mod_description: config.mod_description,
         hl_version       : config.hl_version, modrinth_project: config.modrinth_project,
@@ -246,7 +189,6 @@ def replaceProperties = [
 ]
 processResources {
     inputs.properties replaceProperties
-    replaceProperties.put 'project', project
 
     filesMatching(resourceTargets) {
         expand replaceProperties
@@ -364,7 +306,6 @@ curseforge {
         changelog = ""
         releaseType = config.release_type
         addGameVersion config.mc_version
-        addGameVersion "Forge"
         addGameVersion "NeoForge"
         mainArtifact(jar) {
             displayName = "[${config.mc_version}] ${config.mod_name} - ${config.mod_version}"
@@ -446,9 +387,9 @@ curseforge {
     }
 }
 
-import net.minecraftforge.gradle.common.tasks.SignJar
+import net.neoforged.gradle.common.tasks.PotentiallySignJar
 
-task signJar(type: SignJar, dependsOn: jar) {
+task signJar(type: PotentiallySignJar, dependsOn: jar) {
     onlyIf {
         System.env.MC_KS_PASS != null
     }
@@ -456,9 +397,19 @@ task signJar(type: SignJar, dependsOn: jar) {
     alias = System.env.MC_KS_ALIAS
     storePass = System.env.MC_KS_PASS
     keyPass = System.env.MC_KS_PASS
-    inputFile = jar.archiveFile
-    outputFile = jar.archiveFile
+    input = jar.archiveFile
 }
+
+task placeSignedJar {
+    doLast {
+        def resF = signJar.output.get().asFile
+        def af = jar.archiveFile.get().asFile
+        af.delete()
+        resF.renameTo(af)
+    }
+}
+
+signJar.finalizedBy('placeSignedJar')
 
 def reobfFile = jar.archiveFile.get().asFile
 def reobfArtifact = artifacts.add('default', reobfFile) {
@@ -466,8 +417,8 @@ def reobfArtifact = artifacts.add('default', reobfFile) {
     builtBy 'signJar'
 }
 
-jar.finalizedBy('reobfJar')
-publish.dependsOn('reobfJar')
+jar.finalizedBy('signJar')
+publish.dependsOn('signJar')
 
 build.dependsOn signJar
 
@@ -489,24 +440,10 @@ afterEvaluate {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            groupId = config.maven_group
-            artifactId = config.archive_name + "-" + config.mc_version
-
-            artifact reobfArtifact
-            artifact srcJar
-            artifact deobfJar
-
-            // pom.withXml {
-            //     def dependenciesNode = asNode().appendNode('dependencies')
-            //
-            //     if (!config.hl_version.isEmpty()) {
-            //         def dependencyNode = dependenciesNode.appendNode('dependency')
-            //         dependencyNode.appendNode('groupId', "org.zeith.hammerlib")
-            //         dependencyNode.appendNode('artifactId', "HammerLib-${config.mc_version}")
-            //         dependencyNode.appendNode('version', config.hl_version)
-            //     }
-            // }
+        register('mavenJava', MavenPublication) {
+            from components.java
+            it.artifactId = config.archive_name + "-" + config.mc_version
+            it.artifact srcJar
         }
     }
     repositories {
@@ -548,3 +485,10 @@ tasks.register("incrementBuildVersionProperty") {
 // This piece of garbage will ensure that the build number is updated after build is executed.
 tasks.build.doLast incrementBuild
 tasks.buildAndUploadMod.doLast incrementBuild
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}

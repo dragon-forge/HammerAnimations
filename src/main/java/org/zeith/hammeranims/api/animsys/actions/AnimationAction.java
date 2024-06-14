@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.animsys.actions;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -23,10 +24,10 @@ public abstract class AnimationAction
 	}
 	
 	@Nonnull
-	public AnimationActionInstance deserializeInstance(CompoundTag tag)
+	public AnimationActionInstance deserializeInstance(HolderLookup.Provider lookup, CompoundTag tag)
 	{
 		AnimationActionInstance inst = createInstance();
-		inst.deserializeNBT(tag);
+		inst.deserializeNBT(lookup, tag);
 		return inst;
 	}
 	

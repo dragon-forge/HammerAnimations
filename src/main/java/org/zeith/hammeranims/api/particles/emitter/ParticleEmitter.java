@@ -366,7 +366,7 @@ public class ParticleEmitter
 	{
 		if(this.effect == null) return;
 		
-		float partialTicks = Minecraft.getInstance().getDeltaFrameTime();
+		float partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
 		
 		List<IParticleRender> listParticle = this.effect.particleRender;
 		

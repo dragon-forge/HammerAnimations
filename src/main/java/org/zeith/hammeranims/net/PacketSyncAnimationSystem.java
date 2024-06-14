@@ -1,7 +1,9 @@
 package org.zeith.hammeranims.net;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.api.distmarker.*;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 import org.zeith.hammeranims.core.client.ClientHammerHooks;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
@@ -18,9 +20,9 @@ public class PacketSyncAnimationSystem
 	{
 	}
 	
-	public PacketSyncAnimationSystem(AnimationSystem system)
+	public PacketSyncAnimationSystem(HolderLookup.Provider provider, AnimationSystem system)
 	{
-		this.tag = system.serializeNBT();
+		this.tag = system.serializeNBT(provider);
 		this.source = system.owner.getAnimationSource();
 	}
 	

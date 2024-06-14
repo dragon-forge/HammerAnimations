@@ -1,10 +1,10 @@
 # Mod Info
-mod_version=20.1.34
+mod_version=21.0.33
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
-hl_version=20.1.29
-jei_version=15.2.0.22
+hl_version=21.0.1
+# jei_version=19.0.0.1
 
 # Persistent mod info
 mod_id=hammeranims
@@ -16,30 +16,27 @@ mod_license=All Rights Reserved
 mod_credits=Mojang (creation of model & animation standard)
 issue_tracker_url=https://github.com/dragon-forge/HammerAnimations/issues
 
-# Mappings
-mappings_channel=parchment
-mappings_version=2023.06.26-1.20.1
-
 # Maven Info
 maven_group=org.zeith.hammeranims
-maven_url=file:///SERVER//Maven
+maven_url=file:///R:/
 
 # MC Info
-mc_version=1.20.1
-mc_range=[1.20.1,1.21)
-forge_version=47.1.58
-forge_range=[47,)
+mc_version=1.21
+mc_range=[1.21,1.22)
+forge_version=21.0.0-beta
+forge_range=[21.0.0-beta,)
+javafml_range=[2.0,)
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
 
 # Misc Info
-java=17
+java=21
 
 # Project ID on CurseForge
 cf_project=899883
 modrinth_project=C7cTlgwS
 
 # alpha, beta, release
-release_type=release
+release_type=beta
 
 # List of mods separated by ;
 # If a specific mod for one platform is needed, @m: or @c: prefixes are used.

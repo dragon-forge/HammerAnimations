@@ -1,10 +1,12 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
-import net.minecraftforge.api.distmarker.*;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
-import org.zeith.hammeranims.api.geometry.model.*;
+import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.core.client.model.ModelBoneF;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.*;
 

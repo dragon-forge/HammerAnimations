@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.animsys.actions;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
@@ -7,6 +8,7 @@ import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
+import org.zeith.hammerlib.util.mcf.Resources;
 
 import javax.annotation.Nonnull;
 
@@ -35,13 +37,13 @@ public class AnimationActionInstance
 	}
 	
 	@Nonnull
-	public static AnimationActionInstance of(CompoundTag tag)
+	public static AnimationActionInstance of(HolderLookup.Provider provider, CompoundTag tag)
 	{
 		AnimationAction action = HammerAnimationsApi.animationActions()
-				.getValue(new ResourceLocation(tag.getString("Id")));
+				.get(Resources.location(tag.getString("Id")));
 		return action == null || action == DefaultsHA.EMPTY_ACTION
 			   ? EMPTY
-			   : action.deserializeInstance(tag);
+			   : action.deserializeInstance(provider, tag);
 	}
 	
 	public CompoundTag getExtra()
@@ -52,7 +54,7 @@ public class AnimationActionInstance
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundTag serializeNBT(HolderLookup.Provider lookup)
 	{
 		CompoundTag tag = InstanceHelpers.newNBTCompound();
 		if(extra != null) tag.put("Extra", extra);
@@ -61,7 +63,7 @@ public class AnimationActionInstance
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag nbt)
+	public void deserializeNBT(HolderLookup.Provider lookup, CompoundTag nbt)
 	{
 		if(nbt.contains("Extra", Tag.TAG_COMPOUND))
 			extra = nbt.getCompound("Extra");

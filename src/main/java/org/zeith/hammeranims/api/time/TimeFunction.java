@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.time;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
@@ -27,10 +28,10 @@ public abstract class TimeFunction
 	}
 	
 	@Nonnull
-	public TimeFunctionInstance deserializeInstance(CompoundTag tag)
+	public TimeFunctionInstance deserializeInstance(HolderLookup.Provider provider, CompoundTag tag)
 	{
 		TimeFunctionInstance inst = createInstance();
-		inst.deserializeNBT(tag);
+		inst.deserializeNBT(provider, tag);
 		return inst;
 	}
 	

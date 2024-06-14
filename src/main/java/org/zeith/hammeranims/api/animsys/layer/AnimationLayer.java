@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
 import lombok.Setter;
 import org.zeith.hammeranims.api.animation.*;
@@ -185,31 +186,31 @@ public class AnimationLayer
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundTag serializeNBT(HolderLookup.Provider provider)
 	{
 		var tag = InstanceHelpers.newNBTCompound();
 		tag.putFloat("Weight", weight);
 		tag.putString("Name", name);
 		tag.putDouble("StartTime", startTime);
 		tag.putBoolean("Frozen", frozen);
-		if(lastAnimation != null) tag.put("Last", lastAnimation.serializeNBT());
-		if(currentAnimation != null) tag.put("Current", currentAnimation.serializeNBT());
+		if(lastAnimation != null) tag.put("Last", lastAnimation.serializeNBT(provider));
+		if(currentAnimation != null) tag.put("Current", currentAnimation.serializeNBT(provider));
 		return tag;
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag tag)
+	public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag)
 	{
 		weight = tag.getFloat("Weight");
 		startTime = tag.getDouble("StartTime");
 		frozen = tag.getBoolean("Frozen");
 		
 		if(tag.contains("Last", Tag.TAG_COMPOUND))
-			lastAnimation = new ActiveAnimation(tag.getCompound("Last"));
+			lastAnimation = new ActiveAnimation(provider, tag.getCompound("Last"));
 		else lastAnimation = null;
 		
 		if(tag.contains("Current", Tag.TAG_COMPOUND))
-			currentAnimation = new ActiveAnimation(tag.getCompound("Current"));
+			currentAnimation = new ActiveAnimation(provider, tag.getCompound("Current"));
 		else currentAnimation = null;
 	}
 	

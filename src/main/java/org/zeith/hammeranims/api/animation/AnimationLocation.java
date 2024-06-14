@@ -21,7 +21,7 @@ public final class AnimationLocation
 	
 	public Optional<Animation> resolve()
 	{
-		return Optional.ofNullable(HammerAnimationsApi.animations().getValue(container))
+		return Optional.ofNullable(HammerAnimationsApi.animations().get(container))
 				.map(c -> c.getAnimations().get(key));
 	}
 }

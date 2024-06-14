@@ -1,7 +1,9 @@
 package org.zeith.hammeranims.core.init;
 
 import net.minecraft.world.entity.*;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
@@ -20,7 +22,7 @@ public interface ContainersHA
 	EntityType<EntityBilly> BILLY_ENTITY = EntityType.Builder.of(EntityBilly::new, MobCategory.MISC).sized(0.75F, 1F).build("billy");
 	
 	@RegistryName("billy")
-	BlockBilly BILLY_BLOCK = new BlockBilly();
+	BlockBilly BILLY_BLOCK = new BlockBilly(BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS));
 	
 	@RegistryName("billy")
 	@TileRenderer(RenderTileBilly.class)

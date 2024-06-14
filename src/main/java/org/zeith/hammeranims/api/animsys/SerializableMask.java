@@ -3,6 +3,7 @@ package org.zeith.hammeranims.api.animsys;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import lombok.*;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
@@ -25,13 +26,13 @@ public class SerializableMask
 	
 	protected Object2FloatMap<String> boneWeights = null;
 	
-	public SerializableMask(CompoundTag mask)
+	public SerializableMask(HolderLookup.Provider provider, CompoundTag mask)
 	{
-		deserializeNBT(mask);
+		deserializeNBT(provider, mask);
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundTag serializeNBT(HolderLookup.Provider provider)
 	{
 		var nbt = InstanceHelpers.newNBTCompound();
 		
@@ -51,7 +52,7 @@ public class SerializableMask
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag nbt)
+	public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt)
 	{
 		excludes.clear();
 		var excludeNBT = nbt.getList("Excludes", Tag.TAG_STRING);

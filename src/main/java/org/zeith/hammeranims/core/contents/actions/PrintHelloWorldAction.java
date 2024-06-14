@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.contents.actions;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -38,16 +39,16 @@ public class PrintHelloWorldAction
 		if(world instanceof ServerLevel sl)
 			sl.getServer().getPlayerList().broadcastSystemMessage(InstanceHelpers.componentText(
 					"Hello from server! Owner " + layer.system.owner + "@" + getAnimationPos(layer) +
-							" has finished animation " +
-							layer.getCurrentAnimation().getLocation() + " with message: " + msg), false);
+					" has finished animation " +
+					layer.getCurrentAnimation().getLocation() + " with message: " + msg), false);
 		else
 		{
 			for(Player player : world.players())
 			{
 				player.sendSystemMessage(InstanceHelpers.componentText(
 						"Hello from client! Owner " + layer.system.owner + "@" + getAnimationPos(layer) +
-								" has finished animation " +
-								layer.getCurrentAnimation().getLocation() + " with message: " + msg)
+						" has finished animation " +
+						layer.getCurrentAnimation().getLocation() + " with message: " + msg)
 				);
 			}
 		}
@@ -75,18 +76,18 @@ public class PrintHelloWorldAction
 		}
 		
 		@Override
-		public CompoundTag serializeNBT()
+		public CompoundTag serializeNBT(HolderLookup.Provider provider)
 		{
-			CompoundTag tag = super.serializeNBT();
+			CompoundTag tag = super.serializeNBT(provider);
 			tag.putString("Msg", message);
 			return tag;
 		}
 		
 		@Override
-		public void deserializeNBT(CompoundTag nbt)
+		public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt)
 		{
 			message = nbt.getString("Msg");
-			super.deserializeNBT(nbt);
+			super.deserializeNBT(provider, nbt);
 		}
 	}
 }

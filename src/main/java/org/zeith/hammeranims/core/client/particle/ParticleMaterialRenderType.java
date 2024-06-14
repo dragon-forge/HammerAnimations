@@ -1,8 +1,6 @@
 package org.zeith.hammeranims.core.client.particle;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.texture.TextureManager;
 import org.zeith.hammeranims.api.particles.ParticleMaterial;
@@ -25,13 +23,9 @@ public class ParticleMaterialRenderType
 	}
 	
 	@Override
-	public void begin(BufferBuilder pBuilder, TextureManager pTextureManager)
+	public BufferBuilder begin(Tesselator tess, TextureManager pTextureManager)
 	{
-	}
-	
-	@Override
-	public void end(Tesselator pTesselator)
-	{
+		return tess.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
 	}
 	
 	@Override

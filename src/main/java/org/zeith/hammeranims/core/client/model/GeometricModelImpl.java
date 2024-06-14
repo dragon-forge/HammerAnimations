@@ -2,8 +2,8 @@ package org.zeith.hammeranims.core.client.model;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
 import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;

@@ -1,7 +1,6 @@
 package org.zeith.hammeranims.core.contents.entity;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -9,15 +8,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import org.zeith.hammeranims.api.animsys.*;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import org.zeith.hammeranims.api.animsys.AnimationSystem;
+import org.zeith.hammeranims.api.animsys.CommonLayerNames;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.init.ContainersHA;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class EntityBilly
 		extends PathfinderMob
 		implements IAnimatedEntity
@@ -85,14 +85,14 @@ public class EntityBilly
 	@Override
 	public void addAdditionalSaveData(CompoundTag pCompound)
 	{
-		pCompound.put("Animations", animations.serializeNBT());
+		pCompound.put("Animations", animations.serializeNBT(registryAccess()));
 		super.addAdditionalSaveData(pCompound);
 	}
 	
 	@Override
 	public void readAdditionalSaveData(CompoundTag pCompound)
 	{
-		animations.deserializeNBT(pCompound.getCompound("Animations"));
+		animations.deserializeNBT(registryAccess(), pCompound.getCompound("Animations"));
 		super.readAdditionalSaveData(pCompound);
 	}
 	

@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.geometry.model;
 
-import net.minecraftforge.api.distmarker.*;
-import org.zeith.hammeranims.api.animsys.AnimationSystem;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.*;

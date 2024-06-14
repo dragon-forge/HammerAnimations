@@ -2,6 +2,7 @@ package org.zeith.hammeranims.api.animsys;
 
 import lombok.Setter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.zeith.hammeranims.api.animation.AnimationLocation;
@@ -50,7 +51,7 @@ public class AnimationSystem
 	
 	public IPacket createSyncPacket()
 	{
-		return new PacketSyncAnimationSystem(this);
+		return new PacketSyncAnimationSystem(owner.getAnimatedObjectWorld().registryAccess(), this);
 	}
 	
 	public void sync()
@@ -167,7 +168,7 @@ public class AnimationSystem
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundTag serializeNBT(HolderLookup.Provider provider)
 	{
 		var comp = newNBTCompound();
 		comp.putDouble("Time", time);
@@ -175,14 +176,14 @@ public class AnimationSystem
 		var layers = newNBTList();
 		for(AnimationLayer layer : this.layers)
 			if(layer.persistent) // save only persistent layers
-				layers.add(layer.serializeNBT());
+				layers.add(layer.serializeNBT(provider));
 		comp.put("Layers", layers);
 		
 		return comp;
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag nbt)
+	public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt)
 	{
 		time = nbt.getDouble("Time");
 		
@@ -191,7 +192,7 @@ public class AnimationSystem
 		{
 			var tag = layers.getCompound(i);
 			AnimationLayer l = layerMap.get(tag.getString("Name"));
-			if(l != null && l.persistent) l.deserializeNBT(tag);
+			if(l != null && l.persistent) l.deserializeNBT(provider, tag);
 		}
 	}
 	

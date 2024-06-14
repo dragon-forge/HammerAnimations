@@ -3,9 +3,11 @@ package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.util.Mth;
-import net.minecraftforge.api.distmarker.*;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
-import org.zeith.hammeranims.core.client.model.*;
+import org.zeith.hammeranims.core.client.model.ModelBoneF;
+import org.zeith.hammeranims.core.client.model.ModelCubeF;
 import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl.PositionalBone;
 
 import javax.annotation.Nullable;

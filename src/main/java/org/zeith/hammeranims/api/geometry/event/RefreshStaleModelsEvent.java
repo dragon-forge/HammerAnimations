@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.geometry.event;
 
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 /**
  * This event is fired on CLIENT side when the geometries become stale, and should be refreshed.

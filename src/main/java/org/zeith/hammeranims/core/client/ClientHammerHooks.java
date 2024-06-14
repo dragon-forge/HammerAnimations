@@ -3,28 +3,29 @@ package org.zeith.hammeranims.core.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.animsys.*;
+import org.zeith.hammeranims.api.animsys.AnimationSystem;
+import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 import org.zeith.hammerlib.util.java.Cast;
-import org.zeith.hammerlib.util.java.tuples.*;
+import org.zeith.hammerlib.util.java.tuples.Tuple3;
+import org.zeith.hammerlib.util.java.tuples.Tuples;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class ClientHammerHooks
 {
 	private static final List<Tuple3.Mutable3<IObjectSource<?>, CompoundTag, Integer>> QUEUED_SYSTEMS = new ArrayList<>();
 	
 	@SubscribeEvent
-	public static void clientTick(TickEvent.ClientTickEvent e)
+	public static void clientTick(ClientTickEvent.Pre e)
 	{
-		if(e.phase == TickEvent.Phase.END) return;
-		
 		var w = Minecraft.getInstance().level;
 		if(w == null)
 		{
@@ -67,7 +68,7 @@ public class ClientHammerHooks
 		if(obj == null) return false;
 		AnimationSystem sys = obj.getAnimationSystem();
 		if(sys == null) return true;
-		sys.deserializeNBT(tag);
+		sys.deserializeNBT(world.registryAccess(), tag);
 		return true;
 	}
 }

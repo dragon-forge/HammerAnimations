@@ -1,10 +1,15 @@
 package org.zeith.hammeranims.api.animsys;
 
-import net.minecraft.nbt.*;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import org.zeith.hammeranims.api.animation.*;
-import org.zeith.hammeranims.api.animsys.actions.*;
-import org.zeith.hammeranims.api.animsys.layer.*;
-import org.zeith.hammeranims.api.time.*;
+import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
+import org.zeith.hammeranims.api.animsys.actions.AnimationActionInstance;
+import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
+import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
+import org.zeith.hammeranims.api.time.TimeFunction;
+import org.zeith.hammeranims.api.time.TimeFunctionInstance;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
@@ -38,14 +43,14 @@ public class ConfiguredAnimation
 		return DefaultsHA.NULL_ANIMATION_SYNTETIC.configure();
 	}
 	
-	public ConfiguredAnimation(ConfiguredAnimation toCopy)
+	public ConfiguredAnimation(HolderLookup.Provider provider, ConfiguredAnimation toCopy)
 	{
-		this(toCopy.serializeNBT());
+		this(provider, toCopy.serializeNBT(provider));
 	}
 	
-	public ConfiguredAnimation(CompoundTag tag)
+	public ConfiguredAnimation(HolderLookup.Provider provider, CompoundTag tag)
 	{
-		deserializeNBT(tag);
+		deserializeNBT(provider, tag);
 	}
 	
 	public ConfiguredAnimation(Animation animation)
@@ -196,27 +201,27 @@ public class ConfiguredAnimation
 	}
 	
 	@Override
-	public CompoundTag serializeNBT()
+	public CompoundTag serializeNBT(HolderLookup.Provider provider)
 	{
 		var tag = InstanceHelpers.newNBTCompound();
 		
-		if(mask != null) tag.put("Mask", mask.serializeNBT());
+		if(mask != null) tag.put("Mask", mask.serializeNBT(provider));
 		
-		tag.put("Time", timeFunction.serializeNBT());
+		tag.put("Time", timeFunction.serializeNBT(provider));
 		tag.putString("Animation", animation.getLocation().toString());
 		tag.putFloat("Weight", weight);
 		tag.putBoolean("Reverse", reverse);
 		tag.putFloat("Speed", speed);
 		tag.putFloat("StartTime", startTime);
 		tag.putFloat("TransitionTime", transitionTime);
-		if(next != null) tag.put("Next", next.serializeNBT());
+		if(next != null) tag.put("Next", next.serializeNBT(provider));
 		tag.putByte("LoopMode", (byte) (loopMode != null ? loopMode.ordinal() : LoopMode.ONCE.ordinal()));
 		
 		if(!this.onFinish.isEmpty())
 		{
 			var onFinish = InstanceHelpers.newNBTList();
 			for(AnimationActionInstance finish : this.onFinish)
-				onFinish.add(finish.serializeNBT());
+				onFinish.add(finish.serializeNBT(provider));
 			tag.put("OnFinish", onFinish);
 		}
 		
@@ -224,11 +229,11 @@ public class ConfiguredAnimation
 	}
 	
 	@Override
-	public void deserializeNBT(CompoundTag tag)
+	public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag)
 	{
-		this.timeFunction = TimeFunctionInstance.of(tag.getCompound("Time"));
+		this.timeFunction = TimeFunctionInstance.of(provider, tag.getCompound("Time"));
 		
-		this.mask = tag.contains("Mask", Tag.TAG_COMPOUND) ? new SerializableMask(tag.getCompound("Mask")) : null;
+		this.mask = tag.contains("Mask", Tag.TAG_COMPOUND) ? new SerializableMask(provider, tag.getCompound("Mask")) : null;
 		
 		this.setAnimation(new AnimationLocation(tag.getString("Animation")).resolve().orElse(null));
 		this.weight = tag.getFloat("Weight");
@@ -237,7 +242,7 @@ public class ConfiguredAnimation
 		this.startTime = tag.getFloat("StartTime");
 		this.transitionTime = tag.getFloat("TransitionTime");
 		
-		if(tag.contains("Next", Tag.TAG_COMPOUND)) next = new ConfiguredAnimation(tag.getCompound("Next"));
+		if(tag.contains("Next", Tag.TAG_COMPOUND)) next = new ConfiguredAnimation(provider, tag.getCompound("Next"));
 		
 		loopMode = LoopMode.values()[tag.getByte("LoopMode") % LoopMode.VALUE_COUNT];
 		
@@ -245,7 +250,7 @@ public class ConfiguredAnimation
 		this.onFinish.clear();
 		for(int i = 0; i < onFinish.size(); i++)
 		{
-			AnimationActionInstance a = AnimationActionInstance.of(onFinish.getCompound(i));
+			AnimationActionInstance a = AnimationActionInstance.of(provider, onFinish.getCompound(i));
 			if(a != null && !a.isEmpty()) this.onFinish.add(a);
 		}
 	}

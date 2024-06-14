@@ -60,12 +60,9 @@ public class BedrockModelWrapper<T extends Entity & IAnimatedEntity>
 	}
 	
 	@Override
-	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
+	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, int colorIn)
 	{
-		renderData.apply(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn);
-		renderData.red = red;
-		renderData.green = green;
-		renderData.blue = blue;
+		renderData.apply(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn).applyColor(colorIn);
 		model.renderModel(renderData);
 	}
 }

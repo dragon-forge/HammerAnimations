@@ -61,6 +61,6 @@ public interface IParticleContainer
 			IParticleContainer c = ep.resolve(id);
 			if(c != null) return c;
 		}
-		return HammerAnimationsApi.particleContainers().getValue(id);
+		return HammerAnimationsApi.particleContainers().get(id);
 	}
 }

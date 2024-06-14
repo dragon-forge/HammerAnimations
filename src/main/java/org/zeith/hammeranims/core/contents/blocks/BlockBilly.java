@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.contents.blocks;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -12,9 +13,17 @@ import org.zeith.hammerlib.api.forge.BlockAPI;
 public class BlockBilly
 		extends BaseEntityBlock
 {
-	public BlockBilly()
+	public static final MapCodec<BlockBilly> CODEC = simpleCodec(BlockBilly::new);
+	
+	public BlockBilly(Properties props)
 	{
-		super(Properties.copy(Blocks.GLASS));
+		super(props);
+	}
+	
+	@Override
+	protected MapCodec<? extends BaseEntityBlock> codec()
+	{
+		return CODEC;
 	}
 	
 	@Nullable

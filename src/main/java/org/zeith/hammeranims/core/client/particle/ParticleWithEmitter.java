@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.world.phys.AABB;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
@@ -107,9 +108,9 @@ public class ParticleWithEmitter
 	}
 	
 	@Override
-	public boolean shouldCull()
+	public AABB getRenderBoundingBox(float partialTicks)
 	{
-		return false;
+		return AABB.INFINITE;
 	}
 	
 	public void spawn()

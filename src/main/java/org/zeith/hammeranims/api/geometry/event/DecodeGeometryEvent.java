@@ -1,19 +1,23 @@
 package org.zeith.hammeranims.api.geometry.event;
 
+import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.*;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammerlib.util.java.Cast;
-import org.zeith.hammerlib.util.shaded.json.*;
+import org.zeith.hammerlib.util.shaded.json.JSONArray;
+import org.zeith.hammerlib.util.shaded.json.JSONObject;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
-@Cancelable
 public class DecodeGeometryEvent
 		extends Event
+		implements ICancellableEvent
 {
 	public final ResourceLocation path;
 	public final IResourceProvider resources;
@@ -24,6 +28,7 @@ public class DecodeGeometryEvent
 	public final Supplier<Object> json;
 	public final String text;
 	
+	@Getter
 	protected IGeometryData decoded;
 	
 	public DecodeGeometryEvent(ResourceLocation path, IResourceProvider resources, IGeometryContainer container, Supplier<JSONObject> rootJson, Supplier<String> formatVersion, Supplier<Object> json, String text)
@@ -42,15 +47,10 @@ public class DecodeGeometryEvent
 		this.decoded = decoded;
 		try
 		{
-			super.setCanceled(true);
+			ICancellableEvent.super.setCanceled(true);
 		} catch(UnsupportedOperationException e)
 		{
 		}
-	}
-	
-	public IGeometryData getDecoded()
-	{
-		return decoded;
 	}
 	
 	@Override

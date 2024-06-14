@@ -7,6 +7,7 @@ import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.ParticleEffect;
 import org.zeith.hammeranims.api.particles.event.DecodeParticleEffectEvent;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
+import org.zeith.hammerlib.util.mcf.Resources;
 
 import java.util.Optional;
 
@@ -63,7 +64,7 @@ public class ParticleContainerImpl
 	{
 		ResourceLocation key = getRegistryKey();
 		
-		ResourceLocation path = new ResourceLocation(key.getNamespace(),
+		ResourceLocation path = Resources.location(key.getNamespace(),
 				"bedrock/particles/" + key.getPath() + suffix
 		);
 		

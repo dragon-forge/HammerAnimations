@@ -1,10 +1,9 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.geometry.event.DecodeGeometryEvent;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.GsonGeometryDecoder;
-import org.zeith.hammerlib.util.java.tuples.Tuple2;
 
 public class GeometryDecoder
 {

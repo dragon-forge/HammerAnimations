@@ -1,14 +1,17 @@
 package org.zeith.hammeranims.api.geometry.model;
 
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.client.render.vertex.IVertexOperator;
+import org.zeith.hammerlib.util.colors.ColorHelper;
+import org.zeith.hammerlib.util.mcf.Resources;
 
 public class RenderData
 {
 	public static final IVertexOperator[] NO_OP = new IVertexOperator[0];
-	public static final ResourceLocation MISSING_TEXTURE = new ResourceLocation("missing");
+	public static final ResourceLocation MISSING_TEXTURE = Resources.location("missing");
 	
 	@Deprecated(forRemoval = true)
 	public VertexConsumer buffer;
@@ -29,6 +32,15 @@ public class RenderData
 		this.output = IVertexRenderer.wrap(buffer = vertices).apply(operator);
 		this.lighting = light;
 		this.overlay = overlay;
+		return this;
+	}
+	
+	public RenderData applyColor(int rgba)
+	{
+		this.red = ColorHelper.getRed(rgba);
+		this.green = ColorHelper.getGreen(rgba);
+		this.blue = ColorHelper.getBlue(rgba);
+		this.alpha = ColorHelper.getAlpha(rgba);
 		return this;
 	}
 	

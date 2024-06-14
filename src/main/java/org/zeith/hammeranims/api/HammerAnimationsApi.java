@@ -3,9 +3,10 @@ package org.zeith.hammeranims.api;
 import com.google.common.collect.Lists;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.eventbus.api.*;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.*;
+import net.neoforged.bus.api.*;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.neoforged.neoforge.registries.RegistryBuilder;
 import org.zeith.api.registry.RegistryMapping;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
@@ -18,9 +19,8 @@ import org.zeith.hammeranims.api.utils.IResourceProvider;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class HammerAnimationsApi
 {
 	public static final float APPROX_ZERO = 1.0E-30F;
@@ -33,12 +33,12 @@ public class HammerAnimationsApi
 	
 	private static final List<IResourceProvider> AUXILIARY_RESOURCE_PROVIDERS = Lists.newArrayList();
 	
-	private static Supplier<IForgeRegistry<IAnimationContainer>> ANIMATION_CONTAINERS;
-	private static Supplier<IForgeRegistry<IGeometryContainer>> GEOMETRY_CONTAINERS;
-	private static Supplier<IForgeRegistry<TimeFunction>> TIME_FUNCTIONS;
-	private static Supplier<IForgeRegistry<AnimationAction>> ANIMATION_ACTIONS;
-	private static Supplier<IForgeRegistry<IParticleContainer>> PARTICLE_CONTAINERS;
-	private static Supplier<IForgeRegistry<IParticleComponentType>> PARTICLE_COMPONENT_TYPES;
+	private static Registry<IAnimationContainer> ANIMATION_CONTAINERS;
+	private static Registry<IGeometryContainer> GEOMETRY_CONTAINERS;
+	private static Registry<TimeFunction> TIME_FUNCTIONS;
+	private static Registry<AnimationAction> ANIMATION_ACTIONS;
+	private static Registry<IParticleContainer> PARTICLE_CONTAINERS;
+	private static Registry<IParticleComponentType> PARTICLE_COMPONENT_TYPES;
 	private static boolean hasInitialized = false;
 	
 	public static boolean LOG_RELOADS = !Boolean.parseBoolean(System.getProperty("hammeranims.silence"));
@@ -46,43 +46,12 @@ public class HammerAnimationsApi
 	@SubscribeEvent
 	public static void newRegistries(NewRegistryEvent e)
 	{
-		ANIMATION_CONTAINERS = e.create(new RegistryBuilder<IAnimationContainer>()
-						.setName(HammerAnimations.id("animations"))
-						.disableSaving(),
-				reg -> RegistryMapping.report(IAnimationContainer.class, reg, false)
-		);
-		
-		GEOMETRY_CONTAINERS = e.create(new RegistryBuilder<IGeometryContainer>()
-						.setName(HammerAnimations.id("geometry"))
-						.disableSaving(),
-				reg -> RegistryMapping.report(IGeometryContainer.class, reg, false)
-		);
-		
-		TIME_FUNCTIONS = e.create(new RegistryBuilder<TimeFunction>()
-						.setName(HammerAnimations.id("time_functions"))
-						.disableSaving()
-						.setDefaultKey(HammerAnimations.id("linear")),
-				reg -> RegistryMapping.report(TimeFunction.class, reg, false)
-		);
-		
-		ANIMATION_ACTIONS = e.create(new RegistryBuilder<AnimationAction>()
-						.setName(HammerAnimations.id("animation_actions"))
-						.disableSaving()
-						.setDefaultKey(HammerAnimations.id("empty")),
-				reg -> RegistryMapping.report(AnimationAction.class, reg, false)
-		);
-		
-		PARTICLE_CONTAINERS = e.create(new RegistryBuilder<IParticleContainer>()
-						.setName(HammerAnimations.id("particle_containers"))
-						.disableSaving(),
-				reg -> RegistryMapping.report(IParticleContainer.class, reg, false)
-		);
-		
-		PARTICLE_COMPONENT_TYPES = e.create(new RegistryBuilder<IParticleComponentType>()
-				.setName(HammerAnimations.id("particle_component_types"))
-				.disableSaving(),
-				reg -> RegistryMapping.report(IParticleComponentType.class, reg, false)
-		);
+		RegistryMapping.report(IAnimationContainer.class, ANIMATION_CONTAINERS = e.create(new RegistryBuilder<>(Keys.ANIMATION_CONTAINERS)), false);
+		RegistryMapping.report(IGeometryContainer.class, GEOMETRY_CONTAINERS = e.create(new RegistryBuilder<>(Keys.GEOMETRY_CONTAINERS)), false);
+		RegistryMapping.report(TimeFunction.class, TIME_FUNCTIONS = e.create(new RegistryBuilder<>(Keys.TIME_FUNCTIONS).defaultKey(HammerAnimations.id("linear"))), false);
+		RegistryMapping.report(AnimationAction.class, ANIMATION_ACTIONS = e.create(new RegistryBuilder<>(Keys.ANIMATION_ACTIONS).defaultKey(HammerAnimations.id("empty"))), false);
+		RegistryMapping.report(IParticleContainer.class, PARTICLE_CONTAINERS = e.create(new RegistryBuilder<>(Keys.PARTICLE_CONTAINERS)), false);
+		RegistryMapping.report(IParticleComponentType.class, PARTICLE_COMPONENT_TYPES = e.create(new RegistryBuilder<>(Keys.PARTICLE_COMPONENT_TYPES)), false);
 		
 		hasInitialized = true;
 	}
@@ -102,34 +71,34 @@ public class HammerAnimationsApi
 		return Collections.unmodifiableList(AUXILIARY_RESOURCE_PROVIDERS);
 	}
 	
-	public static IForgeRegistry<IAnimationContainer> animations()
+	public static Registry<IAnimationContainer> animations()
 	{
-		return ANIMATION_CONTAINERS.get();
+		return ANIMATION_CONTAINERS;
 	}
 	
-	public static IForgeRegistry<IGeometryContainer> geometries()
+	public static Registry<IGeometryContainer> geometries()
 	{
-		return GEOMETRY_CONTAINERS.get();
+		return GEOMETRY_CONTAINERS;
 	}
 	
-	public static IForgeRegistry<TimeFunction> timeFunctions()
+	public static Registry<TimeFunction> timeFunctions()
 	{
-		return TIME_FUNCTIONS.get();
+		return TIME_FUNCTIONS;
 	}
 	
-	public static IForgeRegistry<AnimationAction> animationActions()
+	public static Registry<AnimationAction> animationActions()
 	{
-		return ANIMATION_ACTIONS.get();
+		return ANIMATION_ACTIONS;
 	}
 	
-	public static IForgeRegistry<IParticleContainer> particleContainers()
+	public static Registry<IParticleContainer> particleContainers()
 	{
-		return PARTICLE_CONTAINERS.get();
+		return PARTICLE_CONTAINERS;
 	}
 	
-	public static IForgeRegistry<IParticleComponentType> particleComponentTypes()
+	public static Registry<IParticleComponentType> particleComponentTypes()
 	{
-		return PARTICLE_COMPONENT_TYPES.get();
+		return PARTICLE_COMPONENT_TYPES;
 	}
 	
 	public static class Keys

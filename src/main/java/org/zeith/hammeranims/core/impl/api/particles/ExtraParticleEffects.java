@@ -10,6 +10,7 @@ import org.zeith.hammeranims.api.utils.IExtendedResourceProvider;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
 import org.zeith.hammerlib.util.java.Cast;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.hammerlib.util.shaded.json.*;
 
 import java.util.*;
@@ -39,7 +40,7 @@ public class ExtraParticleEffects
 	public static CompletableFuture<ExtraParticleEffects> load(IExtendedResourceProvider resources, Executor exe)
 	{
 		Set<ResourceLocation> toLoad = new HashSet<>();
-		for(String extras : resources.readAllAsString(new ResourceLocation(HammerAnimations.MOD_ID, "bedrock/custom_particles.json")))
+		for(String extras : resources.readAllAsString(HammerAnimations.id("bedrock/custom_particles.json")))
 		{
 			JSONObject res = Cast.cast(new JSONTokener(extras).nextValue(), JSONObject.class);
 			if(res == null)
@@ -61,7 +62,7 @@ public class ExtraParticleEffects
 		{
 			UnregisteredParticleContainer ctr = new UnregisteredParticleContainer(id);
 			
-			ResourceLocation path = new ResourceLocation(id.getNamespace(),
+			ResourceLocation path = Resources.location(id.getNamespace(),
 					"bedrock/particles/" + id.getPath() + ".particle.json"
 			);
 			

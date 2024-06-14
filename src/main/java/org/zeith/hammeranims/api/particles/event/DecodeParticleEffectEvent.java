@@ -1,15 +1,16 @@
 package org.zeith.hammeranims.api.particles.event;
 
+import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.ParticleEffect;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 
-@Cancelable
 public class DecodeParticleEffectEvent
 		extends Event
+		implements ICancellableEvent
 {
 	public final ResourceLocation path;
 	public final IResourceProvider resources;
@@ -17,6 +18,7 @@ public class DecodeParticleEffectEvent
 	
 	public final String json;
 	
+	@Getter
 	protected ParticleEffect decoded;
 	
 	public DecodeParticleEffectEvent(ResourceLocation path, IResourceProvider resources, IParticleContainer container, String json)
@@ -32,15 +34,10 @@ public class DecodeParticleEffectEvent
 		this.decoded = decoded;
 		try
 		{
-			super.setCanceled(true);
+			ICancellableEvent.super.setCanceled(true);
 		} catch(UnsupportedOperationException e)
 		{
 		}
-	}
-	
-	public ParticleEffect getDecoded()
-	{
-		return decoded;
 	}
 	
 	@Override

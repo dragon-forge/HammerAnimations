@@ -8,6 +8,7 @@ import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.animation.event.*;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.init.DefaultsHA;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.hammerlib.util.shaded.json.JSONTokener;
 
 import javax.annotation.Nonnull;
@@ -86,7 +87,7 @@ public class AnimationContainerImpl
 	{
 		ResourceLocation key = getRegistryKey();
 		
-		ResourceLocation path = new ResourceLocation(key.getNamespace(),
+		ResourceLocation path = Resources.location(key.getNamespace(),
 				"bedrock/animations/" + key.getPath() + suffix
 		);
 		

@@ -1,13 +1,13 @@
 package org.zeith.hammeranims.core;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammerlib.net.Network;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class HammerHooks
 {
 	@SubscribeEvent

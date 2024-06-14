@@ -2,12 +2,12 @@ package org.zeith.hammeranims.core.contents.particles.components.expiration;
 
 import com.google.gson.JsonElement;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.zeith.hammeranims.api.particles.components.IParticleComponent;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
@@ -35,7 +35,7 @@ public class ParcomExpireBlocks
 				continue;
 			}
 			var location = InstanceHelpers.tryParseLocation(s);
-			Block block = ForgeRegistries.BLOCKS.getValue(location);
+			Block block = BuiltInRegistries.BLOCK.get(location);
 			if(block != null) this.blocks.add(block);
 		}
 	}
