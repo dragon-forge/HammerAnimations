@@ -6,8 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.*;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
-import net.neoforged.neoforge.registries.RegistryBuilder;
-import org.zeith.api.registry.RegistryMapping;
+import org.zeith.api.registry.MappedRegistryBuilder;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
@@ -33,32 +32,24 @@ public class HammerAnimationsApi
 	
 	private static final List<IResourceProvider> AUXILIARY_RESOURCE_PROVIDERS = Lists.newArrayList();
 	
-	private static Registry<IAnimationContainer> ANIMATION_CONTAINERS;
-	private static Registry<IGeometryContainer> GEOMETRY_CONTAINERS;
-	private static Registry<TimeFunction> TIME_FUNCTIONS;
-	private static Registry<AnimationAction> ANIMATION_ACTIONS;
-	private static Registry<IParticleContainer> PARTICLE_CONTAINERS;
-	private static Registry<IParticleComponentType> PARTICLE_COMPONENT_TYPES;
-	private static boolean hasInitialized = false;
+	public static final Registry<IAnimationContainer> ANIMATION_CONTAINER = new MappedRegistryBuilder<>(IAnimationContainer.class, Keys.ANIMATION_CONTAINERS).create();
+	public static final Registry<IGeometryContainer> GEOMETRY_CONTAINER = new MappedRegistryBuilder<>(IGeometryContainer.class, Keys.GEOMETRY_CONTAINERS).create();
+	public static final Registry<TimeFunction> TIME_FUNCTION = new MappedRegistryBuilder<>(TimeFunction.class, Keys.TIME_FUNCTIONS).defaultKey(HammerAnimations.id("linear")).create();
+	public static final Registry<AnimationAction> ANIMATION_ACTION = new MappedRegistryBuilder<>(AnimationAction.class, Keys.ANIMATION_ACTIONS).defaultKey(HammerAnimations.id("empty")).create();
+	public static final Registry<IParticleContainer> PARTICLE_CONTAINER = new MappedRegistryBuilder<>(IParticleContainer.class, Keys.PARTICLE_CONTAINERS).create();
+	public static final Registry<IParticleComponentType> PARTICLE_COMPONENT_TYPE = new MappedRegistryBuilder<>(IParticleComponentType.class, Keys.PARTICLE_COMPONENT_TYPES).create();
 	
 	public static boolean LOG_RELOADS = !Boolean.parseBoolean(System.getProperty("hammeranims.silence"));
 	
 	@SubscribeEvent
 	public static void newRegistries(NewRegistryEvent e)
 	{
-		RegistryMapping.report(IAnimationContainer.class, ANIMATION_CONTAINERS = e.create(new RegistryBuilder<>(Keys.ANIMATION_CONTAINERS)), false);
-		RegistryMapping.report(IGeometryContainer.class, GEOMETRY_CONTAINERS = e.create(new RegistryBuilder<>(Keys.GEOMETRY_CONTAINERS)), false);
-		RegistryMapping.report(TimeFunction.class, TIME_FUNCTIONS = e.create(new RegistryBuilder<>(Keys.TIME_FUNCTIONS).defaultKey(HammerAnimations.id("linear"))), false);
-		RegistryMapping.report(AnimationAction.class, ANIMATION_ACTIONS = e.create(new RegistryBuilder<>(Keys.ANIMATION_ACTIONS).defaultKey(HammerAnimations.id("empty"))), false);
-		RegistryMapping.report(IParticleContainer.class, PARTICLE_CONTAINERS = e.create(new RegistryBuilder<>(Keys.PARTICLE_CONTAINERS)), false);
-		RegistryMapping.report(IParticleComponentType.class, PARTICLE_COMPONENT_TYPES = e.create(new RegistryBuilder<>(Keys.PARTICLE_COMPONENT_TYPES)), false);
-		
-		hasInitialized = true;
-	}
-	
-	public static boolean hasInitialized()
-	{
-		return hasInitialized;
+		e.register(ANIMATION_CONTAINER);
+		e.register(GEOMETRY_CONTAINER);
+		e.register(TIME_FUNCTION);
+		e.register(ANIMATION_ACTION);
+		e.register(PARTICLE_CONTAINER);
+		e.register(PARTICLE_COMPONENT_TYPE);
 	}
 	
 	public static void addAuxiliaryResourceProvider(IResourceProvider provider)
@@ -73,32 +64,32 @@ public class HammerAnimationsApi
 	
 	public static Registry<IAnimationContainer> animations()
 	{
-		return ANIMATION_CONTAINERS;
+		return ANIMATION_CONTAINER;
 	}
 	
 	public static Registry<IGeometryContainer> geometries()
 	{
-		return GEOMETRY_CONTAINERS;
+		return GEOMETRY_CONTAINER;
 	}
 	
 	public static Registry<TimeFunction> timeFunctions()
 	{
-		return TIME_FUNCTIONS;
+		return TIME_FUNCTION;
 	}
 	
 	public static Registry<AnimationAction> animationActions()
 	{
-		return ANIMATION_ACTIONS;
+		return ANIMATION_ACTION;
 	}
 	
 	public static Registry<IParticleContainer> particleContainers()
 	{
-		return PARTICLE_CONTAINERS;
+		return PARTICLE_CONTAINER;
 	}
 	
 	public static Registry<IParticleComponentType> particleComponentTypes()
 	{
-		return PARTICLE_COMPONENT_TYPES;
+		return PARTICLE_COMPONENT_TYPE;
 	}
 	
 	public static class Keys
