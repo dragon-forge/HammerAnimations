@@ -1,10 +1,10 @@
 # Mod Info
-mod_version=21.0.33
+mod_version=21.0.34
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
-hl_version=21.0.1
-# jei_version=19.0.0.1
+hl_version=21.0.10
+jei_version=19.0.0.1
 
 # Persistent mod info
 mod_id=hammeranims
@@ -21,15 +21,7 @@ maven_group=org.zeith.hammeranims
 maven_url=file:///R:/
 
 # MC Info
-mc_version=1.21
-mc_range=[1.21,1.22)
-forge_version=21.0.0-beta
-forge_range=[21.0.0-beta,)
-javafml_range=[2.0,)
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
-
-# Misc Info
-java=21
 
 # Project ID on CurseForge
 cf_project=899883
