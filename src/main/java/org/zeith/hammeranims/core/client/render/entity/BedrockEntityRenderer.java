@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.client.render.entity;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -12,6 +12,10 @@ import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.client.render.entity.proc.HeadLookProcessor;
+import org.zeith.hammeranims.core.client.render.vertex.AccumulatingVertexConsumer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEntity>
 		extends LivingEntityRenderer<T, BedrockModelWrapper<T>>
@@ -33,6 +37,11 @@ public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEn
 		addProcessors(model);
 	}
 	
+	protected List<RenderType> getRenderPasses(T entity)
+	{
+		return null;
+	}
+	
 	protected RenderType getRenderType(ResourceLocation texture)
 	{
 		return RenderType.entitySolid(texture);
@@ -41,11 +50,34 @@ public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEn
 	@Override
 	public void render(@NotNull T pEntity, float pEntityYaw, float pPartialTicks, @NotNull PoseStack pMatrixStack, @NotNull MultiBufferSource pBuffer, int pPackedLight)
 	{
+		var rp = getRenderPasses(pEntity);
+		var entType = getRenderType(getTextureLocation(pEntity));
+		
+		List<AccumulatingVertexConsumer.IntoSource> accumulators = rp != null ? new ArrayList<>() : null;
+		MultiBufferSource multiBuffer = rp != null ? type ->
+		{
+			if(type == entType)
+			{
+				return switch(rp.size())
+				{
+					case 0 -> VertexMultiConsumer.create(new VertexConsumer[0]);
+					case 1 -> pBuffer.getBuffer(rp.get(0));
+					case 2 -> VertexMultiConsumer.create(AccumulatingVertexConsumer.register(accumulators, rp.get(0)), AccumulatingVertexConsumer.register(accumulators, rp.get(1)));
+					default -> VertexMultiConsumer.create(rp.stream().map(t2 -> AccumulatingVertexConsumer.register(accumulators, t2)).toArray(VertexConsumer[]::new));
+				};
+			}
+			return pBuffer.getBuffer(type);
+		} : pBuffer;
+		
 		model.entity = pEntity;
-		model.buffers = pBuffer;
-		super.render(pEntity, pEntityYaw, pPartialTicks, pMatrixStack, pBuffer, pPackedLight);
+		model.buffers = multiBuffer;
+		super.render(pEntity, pEntityYaw, pPartialTicks, pMatrixStack, multiBuffer, pPackedLight);
 		model.entity = null;
 		model.buffers = null;
+		
+		if(accumulators != null && !accumulators.isEmpty())
+			for(AccumulatingVertexConsumer.IntoSource src : accumulators)
+				src.applyAndReset(pBuffer);
 	}
 	
 	@Override
