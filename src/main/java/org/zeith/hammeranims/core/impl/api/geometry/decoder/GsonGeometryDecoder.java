@@ -2,6 +2,7 @@ package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
 import com.google.gson.*;
 import net.minecraft.resources.ResourceLocation;
+import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.utils.EmbeddedLocation;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
@@ -60,7 +61,7 @@ public class GsonGeometryDecoder
 			if(entry.getKey().equals("format_version"))
 			{
 				String formatVersion = GsonHelper.convertToString(entry.getValue(), entry.getKey());
-				checkFormatVersion(formatVersion);
+				checkFormatVersion(fileLocation, formatVersion);
 			} else if(entry.getKey().equals("minecraft:geometry"))
 			{
 				Tuple2<EmbeddedLocation, GeometryDataImpl> identifierAndModel = parseGeometry(container, fileLocation, GsonHelper.convertToJsonArray(entry.getValue(), entry.getKey()));
@@ -166,12 +167,12 @@ public class GsonGeometryDecoder
 		return part;
 	}
 	
-	private static void checkFormatVersion(String version)
+	private static void checkFormatVersion(ResourceLocation fileLocation, String version)
 	{
-		if(!contains(ACCEPTABLE_FORMAT_VERSIONS, version)) throw new JsonSyntaxException("The format version "
-				+ version + " is not supported. Supported versions: "
-				+ Arrays.toString(ACCEPTABLE_FORMAT_VERSIONS)
-		);
+		if(!contains(ACCEPTABLE_FORMAT_VERSIONS, version))
+			HammerAnimations.LOG.warn("[{}]: Potentially unsupported version of geometry {}. Supported versions: {}",
+					fileLocation, version, Arrays.toString(ACCEPTABLE_FORMAT_VERSIONS)
+			);
 	}
 	
 	public static <T> boolean contains(T[] array, T object)
