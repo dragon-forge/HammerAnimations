@@ -1,19 +1,24 @@
 package org.zeith.hammeranims.api.animsys;
 
-import com.zeitheron.hammercore.net.*;
-import lombok.Setter;
-import net.minecraft.nbt.*;
+import com.zeitheron.hammercore.net.HCNet;
+import com.zeitheron.hammercore.net.IPacket;
+import lombok.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.animation.AnimationLocation;
+import org.zeith.hammeranims.api.animation.IAnimationSource;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
-import org.zeith.hammeranims.net.*;
+import org.zeith.hammeranims.net.PacketRequestAnimationSystemSync;
+import org.zeith.hammeranims.net.PacketSyncAnimationSystem;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
@@ -29,12 +34,14 @@ public class AnimationSystem
 	public final IAnimatedObject owner;
 	
 	protected boolean hasTicked = false;
+	protected boolean hasReceivedTime = false;
 	
 	@Setter
 	protected double time;
 	
-	public boolean canSync = true, autoSync = false;
+	public boolean canSync = true, autoSync = false, syncTime = true;
 	
+	@Getter
 	protected final AnimationLayer[] layers;
 	protected final Map<String, AnimationLayer> layerMap;
 	
@@ -119,11 +126,6 @@ public class AnimationSystem
 		return layerMap.keySet();
 	}
 	
-	public AnimationLayer[] getLayers()
-	{
-		return layers;
-	}
-	
 	public Set<Map.Entry<String, AnimationLayer>> entrySet()
 	{
 		return layerMap.entrySet();
@@ -173,7 +175,8 @@ public class AnimationSystem
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		NBTTagCompound comp = newNBTCompound();
+		val comp = newNBTCompound();
+		
 		comp.setDouble("Time", time);
 		
 		NBTTagList layers = newNBTList();
@@ -188,12 +191,16 @@ public class AnimationSystem
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt)
 	{
-		time = nbt.getDouble("Time");
+		if(syncTime || !hasReceivedTime)
+		{
+			time = nbt.getDouble("Time");
+			hasReceivedTime = true;
+		}
 		
-		NBTTagList layers = nbt.getTagList("Layers", Constants.NBT.TAG_COMPOUND);
+		val layers = nbt.getTagList("Layers", Constants.NBT.TAG_COMPOUND);
 		for(int i = 0; i < layers.tagCount(); i++)
 		{
-			NBTTagCompound tag = layers.getCompoundTagAt(i);
+			val tag = layers.getCompoundTagAt(i);
 			AnimationLayer l = layerMap.get(tag.getString("Name"));
 			if(l != null && l.persistent) l.deserializeNBT(tag);
 		}
@@ -217,6 +224,7 @@ public class AnimationSystem
 		protected final IAnimatedObject owner;
 		protected boolean canSync = true;
 		protected boolean autoSync = false;
+		protected boolean syncTime = true;
 		protected final List<AnimationLayer.Builder> layers = new ArrayList<>();
 		
 		public Builder(@Nonnull IAnimatedObject owner)
@@ -248,6 +256,12 @@ public class AnimationSystem
 			return this;
 		}
 		
+		public Builder syncTime(boolean syncTime)
+		{
+			this.syncTime = syncTime;
+			return this;
+		}
+		
 		public Builder autoSync(boolean autoSync)
 		{
 			this.autoSync = autoSync;
@@ -266,6 +280,7 @@ public class AnimationSystem
 			}
 			sys.canSync = canSync;
 			sys.autoSync = autoSync;
+			sys.syncTime = syncTime;
 			return sys;
 		}
 	}
