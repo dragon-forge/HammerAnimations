@@ -61,7 +61,10 @@ public class ParticleWithEmitter
 		
 		emitter.update();
 		if(emitter.lifetime >= 0 && emitter.age >= emitter.lifetime)
+		{
 			emitter.running = false;
+			emitter.stop();
+		}
 		if(emitter.isFinished())
 			isExpired = true;
 		if(emitter.target != null)

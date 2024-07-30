@@ -79,7 +79,7 @@ public class ModelBoneF
 			matrixStackIn.scale(scale.x(), scale.y(), scale.z());
 	}
 	
-	private void renderCubes(PoseStack.Entry matrixEntryIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
+	public void renderCubes(PoseStack.Entry matrixEntryIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
 		for(ModelCubeF cube : cubes)
 			cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
