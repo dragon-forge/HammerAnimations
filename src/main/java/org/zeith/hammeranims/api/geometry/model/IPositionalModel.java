@@ -75,6 +75,18 @@ public interface IPositionalModel
 		}
 		
 		@Override
+		public boolean applyLocatorTransforms(@NotNull Matrix4f base, String locator)
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean applyLocatorTransforms(@NotNull Matrix4d base, String locator)
+		{
+			return false;
+		}
+		
+		@Override
 		public String toString()
 		{
 			return "IPositionalModel.EMPTY";
@@ -106,4 +118,30 @@ public interface IPositionalModel
 	 * @return true when the bone is found.
 	 */
 	boolean applyBoneTransforms(@Nonnull Matrix4d base, String bone);
+	
+	/**
+	 * Applies locator transforms to the given matrix.
+	 * If there is no locator, no transforms will happen.
+	 *
+	 * @param base
+	 * 		The matrix to be transformed.
+	 * @param locator
+	 * 		The locator to calculate transforms of.
+	 *
+	 * @return true when the locator is found.
+	 */
+	boolean applyLocatorTransforms(@Nonnull Matrix4f base, String locator);
+	
+	/**
+	 * Applies locator transforms to the given matrix.
+	 * If there is no locator, no transforms will happen.
+	 *
+	 * @param base
+	 * 		The matrix to be transformed.
+	 * @param locator
+	 * 		The locator to calculate transforms of.
+	 *
+	 * @return true when the locator is found.
+	 */
+	boolean applyLocatorTransforms(@Nonnull Matrix4d base, String locator);
 }

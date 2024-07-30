@@ -2,9 +2,12 @@ package org.zeith.hammeranims.core.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelPart;
-import org.zeith.hammeranims.api.geometry.model.*;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.zeith.hammeranims.api.geometry.model.IRenderableBone;
+import org.zeith.hammeranims.api.geometry.model.IRenderableHook;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
-import org.joml.*;
+import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;
 
 import java.util.*;
 
@@ -22,13 +25,14 @@ public class ModelBoneF
 	private final Vector3f rotation; // in radians
 	public Vector3f startRotationRadians;
 	private final Map<String, ModelBoneF> children;
+	private final Map<String, GeometryLocator> locators;
 	public List<ModelCubeF> cubes;
 	
 	public boolean renderCubes = true;
 	public boolean renderHookAfterCubes = true;
 	public boolean renderChildren = true;
 	
-	public ModelBoneF(String name, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, boolean neverRender)
+	public ModelBoneF(String name, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, Map<String, GeometryLocator> locators, boolean neverRender)
 	{
 		super(Collections.emptyList(), Collections.emptyMap());
 		this.boxName = name;
@@ -36,6 +40,7 @@ public class ModelBoneF
 		this.rotation = new Vector3f(startRotRadians);
 		this.visible = !neverRender;
 		this.children = Collections.unmodifiableMap(children);
+		this.locators = Collections.unmodifiableMap(locators);
 		this.cubes = cubes;
 		
 		for(ModelBoneF ch : children.values())
@@ -140,6 +145,12 @@ public class ModelBoneF
 	public Map<String, ModelBoneF> getChildren()
 	{
 		return children;
+	}
+	
+	@Override
+	public Map<String, GeometryLocator> getLocators()
+	{
+		return locators;
 	}
 	
 	@Override
