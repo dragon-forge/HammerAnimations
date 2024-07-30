@@ -1,15 +1,18 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
+import lombok.val;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
-import org.zeith.hammeranims.api.geometry.constrains.*;
+import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
+import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.ModelMeshInfo;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class PositionalModelImpl
@@ -21,6 +24,7 @@ public class PositionalModelImpl
 	protected final PositionalBone root;
 	protected final Map<String, PositionalBone> bones = new HashMap<>();
 	protected final Map<String, IBoneConstraints> boneConstraints = new HashMap<>();
+	protected final Map<String, PositionalBone> locatorSources = new HashMap<>();
 	
 	private PositionalModelImpl(IGeometryContainer container, ModelMeshInfo mesh)
 	{
@@ -38,6 +42,8 @@ public class PositionalModelImpl
 		parentTree.put(part.boxName, new ArrayList<>(boneStack)); // all parent bones will be a part of this
 		for(PositionalBone child : part.getChildren().values())
 			registerBone(boneStack, child);
+		for(val loc : part.getLocators().entrySet())
+			locatorSources.put(loc.getKey(), part);
 		boneStack.pop();
 	}
 	
@@ -160,6 +166,44 @@ public class PositionalModelImpl
 		return true;
 	}
 	
+	@Override
+	public boolean applyLocatorTransforms(@NotNull Matrix4f base, String locator)
+	{
+		val bone = locatorSources.get(locator);
+		if(bone == null) return false;
+		GeometryLocator loc = bone.getLocators().get(locator);
+		if(loc == null) return false;
+		if(applyBoneTransforms(base, bone.boxName))
+		{
+			val offset = loc.getOffset();
+			val rotation = loc.getRotation();
+			base.translate(offset.x() / 16F, offset.y() / 16F, offset.z() / 16F);
+			if(rotation.x() != 0.0F || rotation.y() != 0.0F || rotation.z() != 0.0F)
+				base.rotate(new Quaternionf().rotateZYX(rotation.z(), rotation.y(), rotation.x()));
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean applyLocatorTransforms(@NotNull Matrix4d base, String locator)
+	{
+		val bone = locatorSources.get(locator);
+		if(bone == null) return false;
+		GeometryLocator loc = bone.getLocators().get(locator);
+		if(loc == null) return false;
+		if(applyBoneTransforms(base, bone.boxName))
+		{
+			val offset = loc.getOffset();
+			val rotation = loc.getRotation();
+			base.translate(offset.x() / 16F, offset.y() / 16F, offset.z() / 16F);
+			if(rotation.x() != 0.0F || rotation.y() != 0.0F || rotation.z() != 0.0F)
+				base.rotate(new Quaterniond().rotateZYX(rotation.z(), rotation.y(), rotation.x()));
+			return true;
+		}
+		return false;
+	}
+	
 	public static class PositionalBone
 			implements IBone
 	{
@@ -172,17 +216,19 @@ public class PositionalModelImpl
 		private final Vector3f startRotationRadians;
 		private final Vector3f rotation;
 		private final Map<String, PositionalBone> children;
+		private final Map<String, GeometryLocator> locators;
 		
 		public float offsetX;
 		public float offsetY;
 		public float offsetZ;
 		
-		public PositionalBone(String name, Vector3f startRotRadians, Map<String, PositionalBone> children)
+		public PositionalBone(String name, Vector3f startRotRadians, Map<String, PositionalBone> children, Map<String, GeometryLocator> locators)
 		{
 			this.boxName = name;
 			this.startRotationRadians = startRotRadians;
 			this.rotation = new Vector3f(startRotRadians);
 			this.children = Collections.unmodifiableMap(children);
+			this.locators = Collections.unmodifiableMap(locators);
 			
 			for(PositionalBone p : children.values())
 				p.parent = this;
@@ -229,6 +275,12 @@ public class PositionalModelImpl
 		public Map<String, PositionalBone> getChildren()
 		{
 			return children;
+		}
+		
+		@Override
+		public Map<String, GeometryLocator> getLocators()
+		{
+			return locators;
 		}
 		
 		@Override

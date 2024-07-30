@@ -81,7 +81,7 @@ public class ExtraParticleEffects
 	{
 		UnregisteredParticleContainer ctr = new UnregisteredParticleContainer(id);
 		
-		ResourceLocation path = new ResourceLocation(id.getNamespace(),
+		ResourceLocation path = Resources.location(id.getNamespace(),
 				"bedrock/particles/" + id.getPath() + ".particle.json"
 		);
 		

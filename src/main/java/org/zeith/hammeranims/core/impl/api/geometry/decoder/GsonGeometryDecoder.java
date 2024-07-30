@@ -1,12 +1,15 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.*;
+import lombok.val;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.utils.EmbeddedLocation;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
-import org.zeith.hammeranims.core.impl.api.geometry.constrains.*;
+import org.zeith.hammeranims.core.impl.api.geometry.constrains.BoneConstraintsImpl;
+import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
 import org.zeith.hammeranims.core.jomljson.*;
 import org.zeith.hammeranims.core.utils.GsonHelper;
 import org.joml.*;
@@ -100,8 +103,8 @@ public class GsonGeometryDecoder
 				} else
 				{
 					throw new JsonSyntaxException("Can't find parent '"
-							+ value.getParentName() + "' for bone '"
-							+ value.getName() + "'"
+												  + value.getParentName() + "' for bone '"
+												  + value.getName() + "'"
 					);
 				}
 			} else
@@ -153,6 +156,7 @@ public class GsonGeometryDecoder
 					Vector3f innerPivot = GsonHelper.getAsVec3f(cubeObject, "pivot", new Vector3f(0, 0, 0));
 					
 					children.add(new ModelPartInfo(Collections.singletonList(cube),
+							ImmutableList.of(),
 							innerPivot, innerRotation,
 							false,
 							name + "_generated_" + (i++), name
@@ -162,7 +166,29 @@ public class GsonGeometryDecoder
 			}
 		}
 		
-		ModelPartInfo part = new ModelPartInfo(cubes, pivot, rotation, neverRender, name, parentName);
+		List<ModelLocatorInfo> locators = new ArrayList<>();
+		if(bone.has("locators"))
+		{
+			int i = 0;
+			val locs = GsonHelper.getAsJsonObject(bone, "locators");
+			for(val locEntry : locs.entrySet())
+			{
+				val theLoc = locEntry.getValue();
+				if(theLoc.isJsonObject())
+				{
+					val obj = theLoc.getAsJsonObject();
+					Vector3f offset = GsonHelper.getAsVec3f(obj, "offset");
+					Vector3f innerRotation = GsonHelper.getAsVec3f(obj, "rotation", new Vector3f(0, 0, 0));
+					locators.add(new ModelLocatorInfo(offset, innerRotation, locEntry.getKey()));
+				} else
+				{
+					Vector3f origin = GsonHelper.toVec3f(GsonHelper.convertToJsonArray(locEntry.getValue(), locEntry.getKey()), locEntry.getKey());
+					locators.add(new ModelLocatorInfo(origin, new Vector3f(), locEntry.getKey()));
+				}
+			}
+		}
+		
+		ModelPartInfo part = new ModelPartInfo(cubes, locators, pivot, rotation, neverRender, name, parentName);
 		part.addChildren(children);
 		return part;
 	}

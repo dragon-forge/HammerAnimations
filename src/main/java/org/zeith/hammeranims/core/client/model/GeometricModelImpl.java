@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.client.model;
 
+import lombok.val;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -19,6 +20,7 @@ public class GeometricModelImpl
 	protected final IGeometryConstraints constraints;
 	protected final Map<String, ModelBoneF> bones = new HashMap<>();
 	protected final Map<String, IBoneConstraints> boneConstraints = new HashMap<>();
+	protected final Map<String, ModelBoneF> locatorSources = new HashMap<>();
 	
 	public GeometricModelImpl(GeometryDataImpl root)
 	{
@@ -32,6 +34,8 @@ public class GeometricModelImpl
 		bones.put(part.boxName, part);
 		boneConstraints.put(part.boxName, constraints.getConstraints(part.boxName));
 		part.getChildren().values().forEach(this::registerBone);
+		for(val loc : part.getLocators().entrySet())
+			locatorSources.put(loc.getKey(), part);
 	}
 	
 	@Override
@@ -129,6 +133,5 @@ public class GeometricModelImpl
 	@Override
 	public void dispose()
 	{
-	
 	}
 }

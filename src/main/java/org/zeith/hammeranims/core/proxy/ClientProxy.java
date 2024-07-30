@@ -1,15 +1,22 @@
 package org.zeith.hammeranims.core.proxy;
 
+import lombok.val;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.NeoForge;
+import org.joml.Matrix3f;
 import org.zeith.hammeranims.HammerAnimations;
+import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
+import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
 import org.zeith.hammeranims.net.PacketProvideCustomParticleEffectList;
@@ -27,6 +34,26 @@ public class ClientProxy
 	protected static final List<IGeometricModel> disposeModels = new ArrayList<>();
 	
 	protected static ExtraParticleEffects extraEffects;
+	
+	@Override
+	public IParticleRotationUpdater createParticle(AnimatedParticleEffect effect, Matrix3f rotation, Vec3 pos)
+	{
+		val world = Minecraft.getInstance().level;
+		IParticleContainer container = effect.getParticle();
+		if(world == null || container == null) return null;
+		ParticleWithEmitter pwe = new ParticleWithEmitter(
+				world,
+				pos.x, pos.y, pos.z,
+				container
+		);
+		if(rotation != null)
+		{
+			pwe.getEmitter().rotation = rotation;
+			pwe.getEmitter().lastWorldTick = world.getGameTime();
+		}
+		pwe.spawn();
+		return pwe.getEmitter();
+	}
 	
 	@Override
 	public ExtraParticleEffects getExtraParticles()
