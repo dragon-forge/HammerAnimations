@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.animsys;
 
+import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -36,9 +37,11 @@ public class AnimationSystem
 	protected double time;
 	
 	protected boolean hasTicked = false;
+	protected boolean hasReceivedTime = false;
 	
-	public boolean canSync = true, autoSync = false;
+	public boolean canSync = true, autoSync = false, syncTime = true;
 	
+	@Getter
 	protected final AnimationLayer[] layers;
 	protected final Map<String, AnimationLayer> layerMap;
 	
@@ -116,11 +119,6 @@ public class AnimationSystem
 		return layerMap.keySet();
 	}
 	
-	public AnimationLayer[] getLayers()
-	{
-		return layers;
-	}
-	
 	public Set<Map.Entry<String, AnimationLayer>> entrySet()
 	{
 		return layerMap.entrySet();
@@ -185,7 +183,11 @@ public class AnimationSystem
 	@Override
 	public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt)
 	{
-		time = nbt.getDouble("Time");
+		if(syncTime || !hasReceivedTime)
+		{
+			time = nbt.getDouble("Time");
+			hasReceivedTime = true;
+		}
 		
 		var layers = nbt.getList("Layers", Tag.TAG_COMPOUND);
 		for(int i = 0; i < layers.size(); i++)
@@ -214,6 +216,7 @@ public class AnimationSystem
 		protected final IAnimatedObject owner;
 		protected boolean canSync = true;
 		protected boolean autoSync = false;
+		protected boolean syncTime = true;
 		protected final List<AnimationLayer.Builder> layers = new ArrayList<>();
 		
 		public Builder(@Nonnull IAnimatedObject owner)
@@ -245,6 +248,12 @@ public class AnimationSystem
 			return this;
 		}
 		
+		public Builder syncTime(boolean syncTime)
+		{
+			this.syncTime = syncTime;
+			return this;
+		}
+		
 		public Builder autoSync(boolean autoSync)
 		{
 			this.autoSync = autoSync;
@@ -263,6 +272,7 @@ public class AnimationSystem
 			}
 			sys.canSync = canSync;
 			sys.autoSync = autoSync;
+			sys.syncTime = syncTime;
 			return sys;
 		}
 	}
