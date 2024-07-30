@@ -3,6 +3,7 @@ package org.zeith.hammeranims.core.client.model;
 import net.minecraft.client.model.*;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;
 import org.zeith.hammeranims.core.utils.PoseStack;
 import org.zeith.hammeranims.joml.*;
 
@@ -21,12 +22,13 @@ public class ModelBoneF
 	private final Vector3f rotation; // in radians
 	public Vector3f startRotationRadians;
 	private final Map<String, ModelBoneF> children;
+	private final Map<String, GeometryLocator> locators;
 	public List<ModelCubeF> cubes;
 	
 	private PoseStack.Entry lastTransform = new PoseStack().last();
 	private boolean transformValid;
 	
-	public ModelBoneF(ModelBase model, String name, int textureWidth, int textureHeight, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, boolean neverRender)
+	public ModelBoneF(ModelBase model, String name, int textureWidth, int textureHeight, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, Map<String, GeometryLocator> locators, boolean neverRender)
 	{
 		super(model, name);
 		this.setTextureSize(textureWidth, textureHeight);
@@ -34,6 +36,7 @@ public class ModelBoneF
 		this.rotation = new Vector3f(startRotRadians);
 		this.isHidden = neverRender;
 		this.children = Collections.unmodifiableMap(children);
+		this.locators = Collections.unmodifiableMap(locators);
 		this.cubes = cubes;
 		
 		for(ModelBoneF ch : children.values())
@@ -124,6 +127,12 @@ public class ModelBoneF
 	public Map<String, ModelBoneF> getChildren()
 	{
 		return children;
+	}
+	
+	@Override
+	public Map<String, GeometryLocator> getLocators()
+	{
+		return locators;
 	}
 	
 	public void reset()

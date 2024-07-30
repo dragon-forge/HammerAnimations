@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.geometry.model;
 
+import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;
 import org.zeith.hammeranims.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -23,4 +24,6 @@ public interface IBone
 	}
 	
 	Map<String, ? extends IBone> getChildren();
+	
+	Map<String, GeometryLocator> getLocators();
 }

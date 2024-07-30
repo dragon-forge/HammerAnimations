@@ -66,13 +66,17 @@ public class TileBilly
 				.rotateY((float) (MathHelper.torad * 0));
 		IPositionalModel posMod = ContainersHA.BILLY_GEOM.getPositionalModel();
 		posMod.applySystem(1F, animations);
-		if(posMod.applyBoneTransforms(mat, "bob"))
+		if(posMod.applyLocatorTransforms(mat, "particle"))
 		{
-			Vector3f relativePos = new Vector3f(-2 / 16F, 1 / 16F, 1 / 16F);
-			mat.transformPosition(relativePos);
+			Vector3f pos = new Vector3f(0, 0, 0);
+			mat.transformPosition(pos);
+			
+			Vector3f move = new Vector3f(0, 1F / 16F, 0);
+			mat.transformPosition(move);
+			move.sub(pos);
 			
 			if(atTickRate(5))
-				world.spawnParticle(EnumParticleTypes.END_ROD, relativePos.x, relativePos.y, relativePos.z, 0, 0.1, 0);
+				world.spawnParticle(EnumParticleTypes.END_ROD, pos.x, pos.y, pos.z, move.x, move.y, move.z);
 		}
 		
 	}

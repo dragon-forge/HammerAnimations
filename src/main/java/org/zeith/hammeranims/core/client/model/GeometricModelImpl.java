@@ -2,15 +2,17 @@ package org.zeith.hammeranims.core.client.model;
 
 import com.zeitheron.hammercore.client.utils.UtilsFX;
 import com.zeitheron.hammercore.utils.math.MathHelper;
+import lombok.val;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.*;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
-import org.zeith.hammeranims.api.geometry.constrains.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
+import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
@@ -29,6 +31,7 @@ public class GeometricModelImpl
 	protected final IGeometryConstraints constraints;
 	protected final Map<String, ModelBoneF> bones = new HashMap<>();
 	protected final Map<String, IBoneConstraints> boneConstraints = new HashMap<>();
+	protected final Map<String, ModelBoneF> locatorSources = new HashMap<>();
 	
 	public GeometricModelImpl(GeometryDataImpl root)
 	{
@@ -49,6 +52,8 @@ public class GeometricModelImpl
 		bones.put(part.boxName, part);
 		boneConstraints.put(part.boxName, constraints.getConstraints(part.boxName));
 		part.getChildren().values().forEach(this::registerBone);
+		for(val loc : part.getLocators().entrySet())
+			locatorSources.put(loc.getKey(), part);
 	}
 	
 	@Override
@@ -148,7 +153,6 @@ public class GeometricModelImpl
 		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(NORMAL_3B);
 	}
 	
-	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void renderModel(RenderData data)
@@ -170,6 +174,5 @@ public class GeometricModelImpl
 	@Override
 	public void dispose()
 	{
-	
 	}
 }
