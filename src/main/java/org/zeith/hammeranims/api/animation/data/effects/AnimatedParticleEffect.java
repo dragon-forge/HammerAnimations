@@ -1,0 +1,49 @@
+package org.zeith.hammeranims.api.animation.data.effects;
+
+import lombok.Value;
+import lombok.val;
+import net.minecraft.resources.ResourceLocation;
+import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.core.utils.InstanceHelpers;
+import org.zeith.hammerlib.util.shaded.json.JSONArray;
+import org.zeith.hammerlib.util.shaded.json.JSONObject;
+
+import java.util.*;
+
+@Value
+public class AnimatedParticleEffect
+{
+	ResourceLocation effect;
+	String locator;
+	String pre_effect_script;
+	
+	public IParticleContainer getParticle()
+	{
+		return IParticleContainer.byRegistryKey(effect);
+	}
+	
+	public static List<AnimatedParticleEffect> decode(Object object)
+	{
+		if(object instanceof JSONArray)
+		{
+			List<AnimatedParticleEffect> lst = new ArrayList<>();
+			for(Object value : (JSONArray) object)
+			{
+				lst.addAll(decode(value));
+			}
+			return Collections.unmodifiableList(lst);
+		} else if(object instanceof JSONObject)
+		{
+			val ob = (JSONObject) object;
+			return Collections.singletonList(
+					new AnimatedParticleEffect(
+							InstanceHelpers.tryParseLocation(((JSONObject) object).getString("effect")),
+							ob.optString("locator"),
+							ob.optString("pre_effect_script")
+					)
+			);
+		}
+		
+		return Collections.emptyList();
+	}
+}

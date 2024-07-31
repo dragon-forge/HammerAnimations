@@ -131,6 +131,17 @@
 						"1.8": [0, 0, 0]
 					}
 				}
+			},
+			"sound_effects": {
+				"0.8": {
+					"effect": "entity.chicken.egg"
+				}
+			},
+			"particle_effects": {
+				"0.9": {
+					"effect": "hammeranims:smoke_line",
+					"locator": "particle"
+				}
 			}
 		},
 		"breathe": {

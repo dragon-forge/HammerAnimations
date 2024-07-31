@@ -6,6 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.joml.Matrix3f;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
@@ -19,6 +20,7 @@ public class PacketPlayParticleEffectAtObject
 {
 	IObjectSource<?> source;
 	ResourceLocation container;
+	Matrix3f rotation;
 	
 	public PacketPlayParticleEffectAtObject(IAnimatedObject object, IParticleContainer particle)
 	{
@@ -32,6 +34,18 @@ public class PacketPlayParticleEffectAtObject
 		this.container = particle;
 	}
 	
+	public PacketPlayParticleEffectAtObject(IAnimatedObject object, IParticleContainer particle, Matrix3f rotation)
+	{
+		this(object, particle);
+		this.rotation = new Matrix3f(rotation);
+	}
+	
+	public PacketPlayParticleEffectAtObject(IAnimatedObject object, ResourceLocation particle, Matrix3f rotation)
+	{
+		this(object, particle);
+		this.rotation = new Matrix3f(rotation);
+	}
+	
 	public PacketPlayParticleEffectAtObject()
 	{
 	}
@@ -41,6 +55,19 @@ public class PacketPlayParticleEffectAtObject
 	{
 		buf.writeNbt(IObjectSource.writeSource(source));
 		buf.writeResourceLocation(container);
+		buf.writeBoolean(rotation != null);
+		if(rotation != null)
+		{
+			buf.writeFloat(rotation.m00());
+			buf.writeFloat(rotation.m01());
+			buf.writeFloat(rotation.m02());
+			buf.writeFloat(rotation.m10());
+			buf.writeFloat(rotation.m11());
+			buf.writeFloat(rotation.m12());
+			buf.writeFloat(rotation.m20());
+			buf.writeFloat(rotation.m21());
+			buf.writeFloat(rotation.m22());
+		}
 	}
 	
 	@Override
@@ -48,6 +75,20 @@ public class PacketPlayParticleEffectAtObject
 	{
 		this.source = IObjectSource.readSource(buf.readNbt()).orElse(null);
 		this.container = buf.readResourceLocation();
+		if(buf.readBoolean())
+		{
+			this.rotation = new Matrix3f(
+					buf.readFloat(),
+					buf.readFloat(),
+					buf.readFloat(),
+					buf.readFloat(),
+					buf.readFloat(),
+					buf.readFloat(),
+					buf.readFloat(),
+					buf.readFloat(),
+					buf.readFloat()
+			);
+		}
 	}
 	
 	@Override
