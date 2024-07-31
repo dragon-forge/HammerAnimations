@@ -1,9 +1,12 @@
 package org.zeith.hammeranims.core.impl.api.animation;
 
-import org.zeith.hammeranims.HammerAnimations;
+import it.unimi.dsi.fastutil.ints.*;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
-import org.zeith.hammeranims.api.animation.data.*;
+import org.zeith.hammeranims.api.animation.data.BoneAnimation;
+import org.zeith.hammeranims.api.animation.data.IAnimationData;
+import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
+import org.zeith.hammeranims.api.animation.data.effects.AnimatedSoundEffect;
 import org.zeith.hammeranims.api.animation.event.DecodeAnimationEvent;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammerlib.util.shaded.json.JSONObject;
@@ -77,8 +80,53 @@ public class AnimationDecoder
 			bones.put(boneKey, parse);
 		}
 		
+		JSONObject soundEffectsObj = obj.optJSONObject("sound_effects");
+		Int2ObjectMap<List<AnimatedSoundEffect>> soundEffects = new Int2ObjectOpenHashMap<>(soundEffectsObj != null ? soundEffectsObj.length() : 0);
+		if(soundEffectsObj != null)
+		{
+			for(String key : soundEffectsObj.keySet())
+			{
+				Duration timestamp;
+				try
+				{
+					double seconds = Double.parseDouble(key);
+					seconds *= 1000; // ms
+					timestamp = Duration.ofMillis((long) seconds);
+				} catch(NumberFormatException err)
+				{
+					loc.warn("Unable to decode sound_effects keyframe '{}' (must be a double)", key);
+					continue;
+				}
+				soundEffects.put((int) (timestamp.toMillis() / 50L), AnimatedSoundEffect.decode(soundEffectsObj.opt(key)));
+			}
+		}
+		
+		JSONObject particleEffectsObj = obj.optJSONObject("particle_effects");
+		Int2ObjectMap<List<AnimatedParticleEffect>> particleEffects = new Int2ObjectOpenHashMap<>(particleEffectsObj != null ? particleEffectsObj.length() : 0);
+		if(particleEffectsObj != null)
+		{
+			for(String key : particleEffectsObj.keySet())
+			{
+				Duration timestamp;
+				try
+				{
+					double seconds = Double.parseDouble(key);
+					seconds *= 1000; // ms
+					timestamp = Duration.ofMillis((long) seconds);
+				} catch(NumberFormatException err)
+				{
+					loc.warn("Unable to decode sound_effects keyframe '{}' (must be a double)", key);
+					continue;
+				}
+				particleEffects.put((int) (timestamp.toMillis() / 50L), AnimatedParticleEffect.decode(particleEffectsObj.opt(key)));
+			}
+		}
+		
 		final LoopMode mode = modeRaw;
 		final Map<String, BoneAnimation> bonesView = Collections.unmodifiableMap(bones);
+		Int2ObjectMap<List<AnimatedSoundEffect>> soundEffectsView = Int2ObjectMaps.unmodifiable(soundEffects);
+		Int2ObjectMap<List<AnimatedParticleEffect>> particleEffectsView = Int2ObjectMaps.unmodifiable(particleEffects);
+		
 		e.setDecoded(new Animation(e.container, e.key, new IAnimationData()
 		{
 			@Override
@@ -100,6 +148,18 @@ public class AnimationDecoder
 			}
 			
 			@Override
+			public Int2ObjectMap<List<AnimatedSoundEffect>> getSoundEffects()
+			{
+				return soundEffectsView;
+			}
+			
+			@Override
+			public Int2ObjectMap<List<AnimatedParticleEffect>> getParticleEffects()
+			{
+				return particleEffectsView;
+			}
+			
+			@Override
 			public float getWeight()
 			{
 				return fweight;
@@ -109,7 +169,7 @@ public class AnimationDecoder
 			public String toString()
 			{
 				return "IAnimationData{loop_mode=" + mode + ",duration=" + time.toMillis() / 1000F + ",bones=" +
-						bonesView + "}";
+					   bonesView + ",weight=" + fweight + "}";
 			}
 		}));
 	}

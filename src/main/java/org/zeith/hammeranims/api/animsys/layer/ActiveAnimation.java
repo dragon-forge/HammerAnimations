@@ -1,7 +1,9 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
-import net.minecraft.nbt.*;
-import org.zeith.hammeranims.api.animation.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import org.zeith.hammeranims.api.animation.AnimationLocation;
+import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
@@ -19,6 +21,8 @@ public class ActiveAnimation
 	
 	// May be used to tweak animation's weight while it's active!
 	public float realTimeWeight = 1F;
+	
+	public int lastTick;
 	
 	public ActiveAnimation(CompoundTag tag)
 	{

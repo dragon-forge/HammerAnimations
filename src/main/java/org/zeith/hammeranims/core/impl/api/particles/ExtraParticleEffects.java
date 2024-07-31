@@ -15,15 +15,18 @@ import org.zeith.hammerlib.util.shaded.json.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ExtraParticleEffects
 {
+	private final Function<ResourceLocation, IParticleContainer> loader;
 	private final Map<ResourceLocation, IParticleContainer> extraEffects;
 	
-	public ExtraParticleEffects(Map<ResourceLocation, IParticleContainer> extraEffects)
+	public ExtraParticleEffects(Function<ResourceLocation, IParticleContainer> loader, Map<ResourceLocation, IParticleContainer> extraEffects)
 	{
-		this.extraEffects = extraEffects;
+		this.loader = loader;
+		this.extraEffects = Collections.synchronizedMap(new HashMap<>(extraEffects));
 	}
 	
 	public Set<ResourceLocation> getKeys()
@@ -33,7 +36,7 @@ public class ExtraParticleEffects
 	
 	public IParticleContainer resolve(ResourceLocation id)
 	{
-		return extraEffects.get(id);
+		return extraEffects.computeIfAbsent(id, loader);
 	}
 	
 	public static CompletableFuture<ExtraParticleEffects> load(IExtendedResourceProvider resources, Executor exe)
@@ -57,25 +60,9 @@ public class ExtraParticleEffects
 		
 		HammerAnimations.LOG.info("Loading {} custom particle effects.", toLoad.size());
 		
-		List<CompletableFuture<UnregisteredParticleContainer>> containers = toLoad.stream().map(id -> CompletableFuture.supplyAsync(() ->
-		{
-			UnregisteredParticleContainer ctr = new UnregisteredParticleContainer(id);
-			
-			ResourceLocation path = new ResourceLocation(id.getNamespace(),
-					"bedrock/particles/" + id.getPath() + ".particle.json"
-			);
-			
-			ctr.effect = Optional.ofNullable(ParticleContainerImpl.defaultReadParticle(path, resources, ctr, resources.readAsString(path)).orElseGet(() ->
-			{
-				HammerAnimations.LOG.warn("Unable to load custom particle effect {} from file {}", id, path);
-				return null;
-			})).orElseGet(() -> ParticleEffect.empty(ctr));
-			
-			if(HammerAnimationsApi.LOG_RELOADS)
-				HammerAnimations.LOG.debug("Loaded custom particle effect {}", id);
-			
-			return ctr;
-		}, exe)).collect(Collectors.toList());
+		List<CompletableFuture<UnregisteredParticleContainer>> containers = toLoad.stream()
+				.map(id -> CompletableFuture.supplyAsync(() -> createUnregistered(resources, id), exe))
+				.collect(Collectors.toList());
 		
 		return CompletableFuture.allOf(containers.toArray(new CompletableFuture[0])).thenApply(__ ->
 		{
@@ -85,8 +72,28 @@ public class ExtraParticleEffects
 				UnregisteredParticleContainer upc = c.join();
 				extras.put(upc.getRegistryKey(), upc);
 			}
-			return new ExtraParticleEffects(extras.build());
+			return new ExtraParticleEffects(id -> createUnregistered(resources, id), extras.build());
 		});
+	}
+	
+	public static UnregisteredParticleContainer createUnregistered(IExtendedResourceProvider resources, ResourceLocation id)
+	{
+		UnregisteredParticleContainer ctr = new UnregisteredParticleContainer(id);
+		
+		ResourceLocation path = new ResourceLocation(id.getNamespace(),
+				"bedrock/particles/" + id.getPath() + ".particle.json"
+		);
+		
+		ctr.effect = Optional.ofNullable(ParticleContainerImpl.defaultReadParticle(path, resources, ctr, resources.readAsString(path)).orElseGet(() ->
+		{
+			HammerAnimations.LOG.warn("Unable to load custom particle effect {} from file {}", id, path);
+			return null;
+		})).orElseGet(() -> ParticleEffect.empty(ctr));
+		
+		if(HammerAnimationsApi.LOG_RELOADS)
+			HammerAnimations.LOG.debug("Loaded custom particle effect {}", id);
+		
+		return ctr;
 	}
 	
 	public static class UnregisteredParticleContainer

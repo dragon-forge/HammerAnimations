@@ -1,19 +1,25 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
+import lombok.val;
 import net.minecraft.nbt.*;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
+import org.zeith.hammeranims.api.animation.data.effects.AnimatedSoundEffect;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.actions.AnimationActionInstance;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
+import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
+import org.zeith.hammeranims.core.init.ContainersHA;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
 
 import javax.annotation.*;
 import java.time.Duration;
-import java.util.Objects;
+import java.util.*;
 
 public class AnimationLayer
 		implements ICompoundSerializable
@@ -30,6 +36,8 @@ public class AnimationLayer
 	
 	public double startTime;
 	public ActiveAnimation currentAnimation;
+	
+	private final Map<IParticleRotationUpdater, AnimatedParticleEffect> particles = new HashMap<>();
 	
 	@Setter
 	public float weight = 1F;
@@ -133,8 +141,49 @@ public class AnimationLayer
 		}
 	}
 	
+	public void processEffects(double sysTime, @NotNull ActiveAnimation a)
+	{
+		int ticks = (int) Math.round(a.config.timeFunction.getTime(system, sysTime, 0F, a) * 20);
+		
+		if(a.lastTick != ticks)
+		{
+			val prev = a.lastTick;
+			a.lastTick = ticks;
+			val anim = a.config.getAnimation();
+			if(anim == null) return;
+			
+			val data = anim.getData();
+			val particles = data.getParticleEffects();
+			val sounds = data.getSoundEffects();
+			
+			val owner = system.owner;
+			
+			for(int i = prev; i < ticks; i++)
+			{
+				val snds = sounds.get(i);
+				if(snds != null)
+					snds.forEach(owner::playSound);
+				
+				val fx = particles.get(i);
+				if(fx != null) for(AnimatedParticleEffect effect : fx)
+				{
+					val pp = owner.playParticle(effect);
+					if(pp != null) this.particles.put(pp, effect);
+				}
+			}
+		}
+	}
+	
 	public void tick(double sysTime)
 	{
+		particles.entrySet().removeIf(upd ->
+		{
+			IParticleRotationUpdater u = upd.getKey();
+			val mat = system.owner.getParticleEffectRotation(upd.getValue());
+			if(mat != null) u.setMatrix(mat);
+			return !u.emittingParticles();
+		});
+		
 		if(frozen)
 		{
 			startTime += 0.05;
@@ -142,6 +191,10 @@ public class AnimationLayer
 				currentAnimation.activationTime += 0.05;
 			if(lastAnimation != null)
 				lastAnimation.activationTime += 0.05;
+		} else
+		{
+			if(currentAnimation != null) processEffects(sysTime, currentAnimation);
+			if(lastAnimation != null) processEffects(sysTime, lastAnimation);
 		}
 		
 		if(lastAnimation != null)

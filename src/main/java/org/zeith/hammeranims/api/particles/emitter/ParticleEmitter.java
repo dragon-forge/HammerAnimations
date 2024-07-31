@@ -28,6 +28,7 @@ import java.lang.Math;
 import java.util.*;
 
 public class ParticleEmitter
+		implements IParticleRotationUpdater
 {
 	public ParticleEffect effect;
 	public List<BedrockParticle> particles = new ArrayList<>();
@@ -42,6 +43,8 @@ public class ParticleEmitter
 	@Setter
 	public Level world;
 	public boolean lit;
+	
+	public long lastWorldTick;
 	
 	public boolean added;
 	public int sanityTicks;
@@ -256,6 +259,8 @@ public class ParticleEmitter
 			return;
 		}
 		
+		lastWorldTick = world.getGameTime();
+		
 		this.setEmitterVariables(0);
 		
 		for(IEmitterUpdate component : this.effect.emitterUpdates)
@@ -334,6 +339,14 @@ public class ParticleEmitter
 		
 		for(IParticleInitialize component : this.effect.particleInitializes)
 			component.apply(this, particle);
+		
+		{
+			Vector3f vec = new Vector3f((float) particle.position.x, (float) particle.position.y, (float) particle.position.z);
+			rotation.transform(vec);
+			particle.position.x = vec.x;
+			particle.position.y = vec.y;
+			particle.position.z = vec.z;
+		}
 		
 		if(particle.relativePosition && !particle.relativeRotation)
 		{
@@ -569,5 +582,17 @@ public class ParticleEmitter
 			}
 			return max;
 		});
+	}
+	
+	@Override
+	public void setMatrix(Matrix3f rotation)
+	{
+		this.rotation = rotation;
+	}
+	
+	@Override
+	public boolean emittingParticles()
+	{
+		return running && world.getGameTime() - lastWorldTick < 5L;
 	}
 }

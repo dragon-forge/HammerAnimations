@@ -10,6 +10,7 @@ import org.joml.*;
 import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.tile.IAnimatedTile;
 import org.zeith.hammeranims.core.init.*;
@@ -54,7 +55,6 @@ public class TileBilly
 			animations.startAnimationAt(CommonLayerNames.LEGS, ContainersHA.BILLY_WALK.configure()
 					.speed(power / 15F)
 					.loopMode(LoopMode.ONCE)
-					.timeFunction(DefaultsHA.NORMALIZED_TIME.of(10))
 					.next(ContainersHA.BILLY_WALK.configure()
 							.speed(2F)
 							.loopMode(LoopMode.ONCE)
@@ -89,6 +89,12 @@ public class TileBilly
 			if(atTickRate(5))
 				level.addParticle(ParticleTypes.END_ROD, relativePos.x, relativePos.y, relativePos.z, relativePosUp.x, relativePosUp.y, relativePosUp.z);
 		}
+	}
+	
+	@Override
+	public IGeometryContainer getObjectModel()
+	{
+		return ContainersHA.BILLY_GEOM;
 	}
 	
 	@Override

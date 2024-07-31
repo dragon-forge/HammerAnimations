@@ -3,11 +3,11 @@ package org.zeith.hammeranims.core.contents.particles.components.appearance;
 import com.google.gson.*;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import lombok.val;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import org.joml.*;
 import org.joml.Math;
+import org.joml.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleRender;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
@@ -218,6 +218,8 @@ public class ParcomAppearanceBillboard
 		
 		for(Vector4f vt : this.vertices)
 			this.transform.transform(vt);
+		
+		val norm = transform.transformPosition(new Vector3f(0, 1, 0)).normalize();
 		
 		float u1 = this.u1 / (float) this.textureWidth;
 		float u2 = this.u2 / (float) this.textureWidth;
