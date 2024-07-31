@@ -1,8 +1,11 @@
 package org.zeith.hammeranims.core.client.particle;
 
-import com.zeitheron.hammercore.client.particle.api.SimpleParticle;
+import com.zeitheron.hammercore.proxy.ParticleProxy_Client;
 import lombok.Getter;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
@@ -10,7 +13,7 @@ import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 
 @Getter
 public class ParticleWithEmitter
-		extends SimpleParticle
+		extends Particle
 {
 	public static int MAX_EMITTER_GENERATIONS = 6;
 	
@@ -37,6 +40,12 @@ public class ParticleWithEmitter
 		
 		emitter.lastGlobal.set(posX, posY, posZ);
 		emitter.prevGlobal.set(emitter.lastGlobal);
+	}
+	
+	public void spawn()
+	{
+		if(emitter.generation >= MAX_EMITTER_GENERATIONS) return;
+		ParticleProxy_Client.queueParticleSpawn(this);
 	}
 	
 	public ParticleEmitter createEmitter(IParticleContainer container)
@@ -79,19 +88,19 @@ public class ParticleWithEmitter
 	}
 	
 	@Override
-	public void spawn()
-	{
-		if(emitter.generation >= MAX_EMITTER_GENERATIONS) return;
-		super.spawn();
-	}
-	
-	@Override
-	public void doRenderParticle(double x, double y, double z, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ)
+	public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ)
 	{
 		if(emitter.isFinished()) return;
+		Tessellator tessellator = Tessellator.getInstance();
+		
+		tessellator.draw();
+		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x - posX, y - posY, z - posZ);
+		GlStateManager.translate(-interpPosX, -interpPosY, -interpPosZ);
 		emitter.render(partialTicks);
 		GlStateManager.popMatrix();
+		
+		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		bufferbuilder.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 	}
 }

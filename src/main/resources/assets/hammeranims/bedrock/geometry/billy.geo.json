@@ -46,7 +46,7 @@
 					"locators": {
 						"particle": {
 							"offset": [2, 15.5, 2],
-							"rotation": [-45, 0, 0]
+							"rotation": [-40, 0, 0]
 						},
 						"simple": [2, 16, 2]
 					}

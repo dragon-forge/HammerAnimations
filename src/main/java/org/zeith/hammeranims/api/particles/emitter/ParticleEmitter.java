@@ -3,6 +3,7 @@ package org.zeith.hammeranims.api.particles.emitter;
 import com.zeitheron.hammercore.client.utils.UtilsFX;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -29,6 +30,7 @@ import java.lang.Math;
 import java.util.*;
 
 public class ParticleEmitter
+		implements IParticleRotationUpdater
 {
 	public ParticleEffect effect;
 	public List<BedrockParticle> particles = new ArrayList<>();
@@ -40,8 +42,10 @@ public class ParticleEmitter
 	public boolean isRenderingGUI = false;
 	
 	public IAnimatedObject target;
-	public World world;
+	public @Setter World world;
 	public boolean lit;
+	
+	public long lastWorldTick;
 	
 	public boolean added;
 	public int sanityTicks;
@@ -134,11 +138,6 @@ public class ParticleEmitter
 	{
 		this.target = target;
 		this.world = target == null ? null : target.getAnimatedObjectWorld();
-	}
-	
-	public void setWorld(World world)
-	{
-		this.world = world;
 	}
 	
 	public void setEffect(ParticleEffect scheme)
@@ -272,6 +271,8 @@ public class ParticleEmitter
 			return;
 		}
 		
+		lastWorldTick = world.getTotalWorldTime();
+		
 		this.setEmitterVariables(0);
 		
 		for(IEmitterUpdate component : this.effect.emitterUpdates)
@@ -349,6 +350,14 @@ public class ParticleEmitter
 		
 		for(IParticleInitialize component : this.effect.particleInitializes)
 			component.apply(this, particle);
+		
+		{
+			Vector3f vec = new Vector3f((float) particle.position.x, (float) particle.position.y, (float) particle.position.z);
+			rotation.transform(vec);
+			particle.position.x = vec.x;
+			particle.position.y = vec.y;
+			particle.position.z = vec.z;
+		}
 		
 		if(particle.relativePosition && !particle.relativeRotation)
 		{
@@ -577,5 +586,17 @@ public class ParticleEmitter
 		this.blockPos.setPos(x, y, z);
 		
 		return this.world.isBlockLoaded(this.blockPos) ? this.world.getCombinedLight(this.blockPos, 0) : 0;
+	}
+	
+	@Override
+	public void setMatrix(Matrix3f rotation)
+	{
+		this.rotation = rotation;
+	}
+	
+	@Override
+	public boolean emittingParticles()
+	{
+		return running && world.getTotalWorldTime() - lastWorldTick < 5L;
 	}
 }

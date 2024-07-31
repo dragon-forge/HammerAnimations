@@ -20,6 +20,8 @@ public class ActiveAnimation
 	// May be used to tweak animation's weight while it's active!
 	public float realTimeWeight = 1F;
 	
+	public int lastTick;
+	
 	public ActiveAnimation(NBTTagCompound tag)
 	{
 		deserializeNBT(tag);

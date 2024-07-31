@@ -4,11 +4,13 @@ import com.google.common.base.Suppliers;
 import com.zeitheron.hammercore.client.HammerCoreClient;
 import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
 import com.zeitheron.hammercore.net.HCNet;
+import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.*;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.resource.*;
@@ -18,13 +20,17 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.McUtil;
+import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
 import org.zeith.hammeranims.api.geometry.model.RenderData;
+import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
 import org.zeith.hammeranims.api.utils.IExtendedResourceProvider;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.client.BuiltInResourcePack;
 import org.zeith.hammeranims.core.client.CommandReloadHA;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
+import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.client.render.TessellatorVertexRenderer;
 import org.zeith.hammeranims.core.client.render.entity.RenderEntityBilly;
@@ -33,6 +39,7 @@ import org.zeith.hammeranims.core.contents.blocks.TileBilly;
 import org.zeith.hammeranims.core.contents.entity.EntityBilly;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
+import org.zeith.hammeranims.joml.Matrix3f;
 import org.zeith.hammeranims.net.PacketProvideCustomParticleEffectList;
 
 import java.io.IOException;
@@ -136,6 +143,26 @@ public class ClientProxy
 				return HammerAnimations.MOD_NAME;
 			}
 		});
+	}
+	
+	@Override
+	public IParticleRotationUpdater createParticle(AnimatedParticleEffect effect, Matrix3f rotation, Vec3d pos)
+	{
+		val world = Minecraft.getMinecraft().world;
+		IParticleContainer container = effect.getParticle();
+		if(world == null || container == null) return null;
+		ParticleWithEmitter pwe = new ParticleWithEmitter(
+				world,
+				pos.x, pos.y, pos.z,
+				container
+		);
+		if(rotation != null)
+		{
+			pwe.getEmitter().rotation = rotation;
+			pwe.getEmitter().lastWorldTick = world.getTotalWorldTime();
+		}
+		pwe.spawn();
+		return pwe.getEmitter();
 	}
 	
 	/**

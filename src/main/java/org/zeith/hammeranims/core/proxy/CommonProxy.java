@@ -2,18 +2,23 @@ package org.zeith.hammeranims.core.proxy;
 
 import com.google.common.base.Stopwatch;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
+import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
 import org.zeith.hammeranims.api.event.ReloadHammerAnimationsEvent;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
+import org.zeith.hammeranims.joml.Matrix3f;
 
 import java.util.Collection;
 import java.util.concurrent.*;
@@ -31,6 +36,11 @@ public class CommonProxy
 	
 	public void init()
 	{
+	}
+	
+	public IParticleRotationUpdater createParticle(AnimatedParticleEffect effect, Matrix3f rotation, Vec3d pos)
+	{
+		return null;
 	}
 	
 	public ExtraParticleEffects getExtraParticles()

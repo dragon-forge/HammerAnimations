@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.contents.particles.components.appearance;
 
 import com.google.gson.*;
+import lombok.val;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -223,6 +224,8 @@ public class ParcomAppearanceBillboard
 		for(Vector4f vt : this.vertices)
 			this.transform.transform(vt);
 		
+		val norm = transform.transformPosition(new Vector3f(0, 1, 0)).normalize();
+		
 		float u1 = this.u1 / (float) this.textureWidth;
 		float u2 = this.u2 / (float) this.textureWidth;
 		float v1 = this.v1 / (float) this.textureHeight;
@@ -237,7 +240,7 @@ public class ParcomAppearanceBillboard
 				particle.r, particle.g, particle.b, particle.a,
 				u1, v1,
 				lightX, lightY,
-				0, 1, 0,
+				norm.x, norm.y, norm.z,
 				vt
 		);
 		
@@ -246,7 +249,7 @@ public class ParcomAppearanceBillboard
 				particle.r, particle.g, particle.b, particle.a,
 				u2, v1,
 				lightX, lightY,
-				0, 1, 0,
+				norm.x, norm.y, norm.z,
 				vt
 		);
 		
@@ -255,7 +258,7 @@ public class ParcomAppearanceBillboard
 				particle.r, particle.g, particle.b, particle.a,
 				u2, v2,
 				lightX, lightY,
-				0, 1, 0,
+				norm.x, norm.y, norm.z,
 				vt
 		);
 		
@@ -264,7 +267,7 @@ public class ParcomAppearanceBillboard
 				particle.r, particle.g, particle.b, particle.a,
 				u1, v2,
 				lightX, lightY,
-				0, 1, 0,
+				norm.x, norm.y, norm.z,
 				vt
 		);
 	}

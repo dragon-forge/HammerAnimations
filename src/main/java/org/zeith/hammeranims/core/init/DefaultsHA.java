@@ -4,6 +4,7 @@ import com.zeitheron.hammercore.annotations.*;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.time.TimeFunction;
 import org.zeith.hammeranims.core.contents.actions.EmptyAnimationAction;
 import org.zeith.hammeranims.core.contents.time.*;
@@ -13,6 +14,9 @@ public interface DefaultsHA
 {
 	@RegistryName("null")
 	IAnimationContainer NULL_ANIMATION = IAnimationContainer.create();
+	
+	@RegistryName("null")
+	IGeometryContainer NULL_GEOMETRY = IGeometryContainer.create();
 	
 	@RegistryName("linear")
 	TimeFunction LINEAR_TIME = new LinearTimeFunction();
