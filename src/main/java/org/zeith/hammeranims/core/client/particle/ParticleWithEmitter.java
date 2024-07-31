@@ -2,10 +2,12 @@ package org.zeith.hammeranims.core.client.particle;
 
 import com.zeitheron.hammercore.proxy.ParticleProxy_Client;
 import lombok.Getter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
@@ -15,6 +17,7 @@ import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 public class ParticleWithEmitter
 		extends Particle
 {
+	private static final ResourceLocation PARTICLE_TEXTURES = new ResourceLocation("textures/particle/particles.png");
 	public static int MAX_EMITTER_GENERATIONS = 6;
 	
 	protected final ParticleEmitter emitter;
@@ -100,6 +103,7 @@ public class ParticleWithEmitter
 		emitter.render(partialTicks);
 		GlStateManager.popMatrix();
 		
+		Minecraft.getMinecraft().getTextureManager().bindTexture(PARTICLE_TEXTURES);
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		bufferbuilder.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 	}
