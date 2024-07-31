@@ -6,8 +6,7 @@ import jdk.nashorn.api.scripting.ClassFilter;
 import org.zeith.hammeranims.HammerAnimations;
 
 import javax.script.ScriptEngine;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.util.function.Supplier;
 
 public class NashornRelay
@@ -24,12 +23,14 @@ public class NashornRelay
 		{
 			Class<?> ClassFilter = ReflectionUtil.fetchClass("jdk.nashorn.api.scripting.ClassFilter");
 			Class<?> NashornScriptEngineFactory = ReflectionUtil.fetchClass("jdk.nashorn.api.scripting.NashornScriptEngineFactory");
-			Class<?> NoJSClasses = ReflectionUtil.fetchClass(NashornRelay.class.getName() + "$NoJSClasses");
+			Class<?> NoJSClasses = ReflectionUtil.fetchClass("org.zeith.hammeranims.core.js.NoJSClasses");
 			
 			Constructor<?> c = NoJSClasses.getDeclaredConstructor();
 			c.setAccessible(true);
 			
 			Constructor<?> sefCt = NashornScriptEngineFactory.getDeclaredConstructor();
+			
+			Method getScriptEngine = NashornScriptEngineFactory.getMethod("getScriptEngine", ClassFilter);
 			
 			Object sef = sefCt.newInstance();
 			Object filter = c.newInstance();
@@ -38,8 +39,8 @@ public class NashornRelay
 			{
 				try
 				{
-					return (ScriptEngine) NashornScriptEngineFactory.getMethod("getScriptEngine", ClassFilter).invoke(sef, filter);
-				} catch(IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
+					return (ScriptEngine) getScriptEngine.invoke(sef, filter);
+				} catch(IllegalAccessException | InvocationTargetException e)
 				{
 					throw new RuntimeException(e);
 				}
