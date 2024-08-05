@@ -30,4 +30,10 @@ public interface IRenderableBone
 		// Then apply current bone transforms
 		applyBoneTransforms(pose);
 	}
+	
+	void renderCubes(boolean b);
+	
+	void renderHookAfterCubes(boolean b);
+	
+	void renderChildren(boolean b);
 }
