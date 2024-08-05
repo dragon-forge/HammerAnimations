@@ -160,8 +160,12 @@ public class ModelBoneF
 		return locators;
 	}
 	
+	@Override
 	public void reset()
 	{
+		renderCubes = true;
+		renderHookAfterCubes = true;
+		renderChildren = true;
 		transformValid = false;
 		rotation.set(startRotationRadians.x, startRotationRadians.y, startRotationRadians.z);
 		offset.set(0, 0, 0);
