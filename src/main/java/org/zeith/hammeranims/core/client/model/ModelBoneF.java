@@ -28,6 +28,10 @@ public class ModelBoneF
 	private PoseStack.Entry lastTransform = new PoseStack().last();
 	private boolean transformValid;
 	
+	public boolean renderCubes = true;
+	public boolean renderHookAfterCubes = true;
+	public boolean renderChildren = true;
+	
 	public ModelBoneF(ModelBase model, String name, int textureWidth, int textureHeight, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, Map<String, GeometryLocator> locators, boolean neverRender)
 	{
 		super(model, name);
@@ -63,8 +67,9 @@ public class ModelBoneF
 		
 		this.renderCubes(poseStackIn.last(), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
-		for(ModelBoneF part : this.children.values())
-			part.render(poseStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		if(renderChildren)
+			for(ModelBoneF part : this.children.values())
+				part.render(poseStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
 		poseStackIn.popPose();
 	}
@@ -82,11 +87,31 @@ public class ModelBoneF
 			matrixStackIn.scale(scale.x(), scale.y(), scale.z());
 	}
 	
+	@Override
+	public void renderCubes(boolean b)
+	{
+		this.renderCubes = b;
+	}
+	
+	@Override
+	public void renderHookAfterCubes(boolean b)
+	{
+		this.renderHookAfterCubes = b;
+	}
+	
+	@Override
+	public void renderChildren(boolean b)
+	{
+		this.renderChildren = b;
+	}
+	
 	public void renderCubes(PoseStack.Entry matrixEntryIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
-		for(ModelCubeF cube : cubes)
-			cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		renderHook.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		if(renderCubes)
+			for(ModelCubeF cube : cubes)
+				cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		if(renderHookAfterCubes)
+			renderHook.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
 	public void applyTransform(PoseStack stack)
