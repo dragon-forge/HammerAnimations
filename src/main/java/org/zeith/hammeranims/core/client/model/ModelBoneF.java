@@ -25,6 +25,10 @@ public class ModelBoneF
 	private final Map<String, ModelBoneF> children;
 	public List<ModelCubeF> cubes;
 	
+	public boolean renderCubes = true;
+	public boolean renderHookAfterCubes = true;
+	public boolean renderChildren = true;
+	
 	public ModelBoneF(String name, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, boolean neverRender)
 	{
 		super(Collections.emptyList(), Collections.emptyMap());
@@ -88,11 +92,31 @@ public class ModelBoneF
 			matrixStackIn.scale(scale.x(), scale.y(), scale.z());
 	}
 	
+	@Override
+	public void renderCubes(boolean b)
+	{
+		this.renderCubes = b;
+	}
+	
+	@Override
+	public void renderHookAfterCubes(boolean b)
+	{
+		this.renderHookAfterCubes = b;
+	}
+	
+	@Override
+	public void renderChildren(boolean b)
+	{
+		this.renderChildren = b;
+	}
+	
 	private void renderCubes(IPoseEntry matrixEntryIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
-		for(ModelCubeF cube : cubes)
-			cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		renderHook.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		if(renderCubes)
+			for(ModelCubeF cube : cubes)
+				cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		if(renderHookAfterCubes)
+			renderHook.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
 	@Override
@@ -128,6 +152,9 @@ public class ModelBoneF
 	@Override
 	public void reset()
 	{
+		renderCubes = true;
+		renderHookAfterCubes = true;
+		renderChildren = true;
 		rotation.set(startRotationRadians.x, startRotationRadians.y, startRotationRadians.z);
 		offset.set(0, 0, 0);
 		scale.set(1, 1, 1);
