@@ -42,7 +42,7 @@ public class Jdk8JsFactory
 		{
 			Class<?> ClassFilter = ReflectionUtil.fetchClass("jdk.nashorn.api.scripting.ClassFilter");
 			Class<?> NashornScriptEngineFactory = ReflectionUtil.fetchClass("jdk.nashorn.api.scripting.NashornScriptEngineFactory");
-			Class<?> NoJSClasses = ReflectionUtil.fetchClass("org.zeith.terraria.asm.js.parsers.NoJSClassesJ8");
+			Class<?> NoJSClasses = ReflectionUtil.fetchClass("org.zeith.hammeranims.core.js.parsers.NoJSClassesJ8");
 			
 			Constructor<?> c = NoJSClasses.getDeclaredConstructor();
 			c.setAccessible(true);
@@ -68,7 +68,7 @@ public class Jdk8JsFactory
 			return theFactory.get(); // verify we can create it at least once without crashing the game down the line!
 		} catch(Throwable e)
 		{
-			HammerAnimations.LOG.warn("Failed to use \"jdk.nashorn.api.scripting.NashornScriptEngineFactory\". Passing off to other built-in factory;", e);
+			HammerAnimations.LOG.warn("Failed to use \"jdk.nashorn.api.scripting.NashornScriptEngineFactory\".", e);
 			theFactory = Cast.constant(null);
 		}
 		
