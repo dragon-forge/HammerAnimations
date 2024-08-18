@@ -3,6 +3,7 @@ package org.zeith.hammeranims.api.animation.interp;
 import com.google.gson.JsonElement;
 import org.zeith.hammeranims.core.js.ExpressionParser;
 
+@FunctionalInterface
 public interface InterpolatedDouble<T extends IVariableAccess>
 {
 	double get(T query);
