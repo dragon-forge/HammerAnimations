@@ -1,16 +1,15 @@
 package org.zeith.hammeranims.core.js;
 
+import lombok.val;
 import net.minecraft.util.Mth;
-import org.openjdk.nashorn.api.scripting.*;
 import org.zeith.hammeranims.api.animation.interp.IVariableAccess;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 
 import javax.script.ScriptException;
-import java.util.Random;
+import java.util.*;
 
 public class ExpressionParser
 {
-	public static final ClassFilter NO_JS_CLASSES = className -> false;
 	public static final MathJS MATH = new MathJS();
 	
 	public static <T extends IVariableAccess> InterpolatedDouble<T> parse(String expression)
@@ -25,27 +24,25 @@ public class ExpressionParser
 		{
 		}
 		
-		NashornScriptEngine js = (NashornScriptEngine) new NashornScriptEngineFactory().getScriptEngine(NO_JS_CLASSES);
+		Map<String, Object> js = new HashMap<>();
 		try
 		{
 			js.put("Java", null); // Prevent exploiting Java types.
 			js.put("Math", MATH);
 			js.put("math", MATH);
 			
-			String fun = "function get() {return " + expression + ";\n}";
+			String fun = "function get() {\n\treturn " + expression + ";\n}";
 			
-			var bindings = (ScriptObjectMirror) js.createBindings();
-			js.eval(fun, bindings);
-			var get = (ScriptObjectMirror) bindings.getMember("get");
+			val res = JsFactory.parse(IDoubleTest.class, js, fun);
+			if(res == null) return query -> 0;
 			
-			InterpolatedDouble id0 = get.to(InterpolatedDouble.class);
-			
+			val t = res.b();
 			return query ->
 			{
 				try
 				{
-					query.putObjects(js::put);
-					return id0.get(query);
+					query.putObjects(res.a()::put);
+					return t.get();
 				} catch(RuntimeException e)
 				{
 					e.printStackTrace();

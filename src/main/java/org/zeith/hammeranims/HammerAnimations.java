@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
 import org.zeith.hammeranims.core.impl.api.particles.ParticleDecoder;
+import org.zeith.hammeranims.core.js.JsFactory;
 import org.zeith.hammeranims.core.proxy.*;
 import org.zeith.hammerlib.api.proxy.IProxy;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;
@@ -41,6 +42,7 @@ public class HammerAnimations
 		
 		LOG.info("{} is constructing.", MOD_NAME);
 		PROXY.construct(modBus);
+		JsFactory.init(true);
 		
 		LanguageAdapter.registerMod(MOD_ID);
 	}
