@@ -4,7 +4,7 @@ import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.core.js.converters.IJsConverter;
 import org.zeith.hammeranims.core.js.converters.fb.BindingsFallbackJsConverter;
 import org.zeith.hammeranims.core.js.converters.fb.CastingFallbackJsConverter;
-import org.zeith.hammerlib.util.java.ReflectionUtil;
+import org.zeith.hammeranims.core.utils.MinecraftHelper;
 
 import javax.script.ScriptEngine;
 import java.lang.reflect.Method;
@@ -25,8 +25,8 @@ public class OpenJDKParser
 	
 	public OpenJDKParser()
 	{
-		Class<?> engineFactoryType = ReflectionUtil.fetchClass("org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory");
-		Class<?> classFilterType = ReflectionUtil.fetchClass("org.openjdk.nashorn.api.scripting.ClassFilter");
+		Class<?> engineFactoryType = MinecraftHelper.fetchClass("org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory");
+		Class<?> classFilterType = MinecraftHelper.fetchClass("org.openjdk.nashorn.api.scripting.ClassFilter");
 		if(engineFactoryType == null)
 		{
 			found = false;

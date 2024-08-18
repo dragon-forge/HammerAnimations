@@ -5,8 +5,8 @@ import org.zeith.hammeranims.core.js.converters.IJsConverter;
 import org.zeith.hammeranims.core.js.converters.fb.BindingsFallbackJsConverter;
 import org.zeith.hammeranims.core.js.converters.fb.CastingFallbackJsConverter;
 import org.zeith.hammeranims.core.js.converters.j8.*;
+import org.zeith.hammeranims.core.utils.MinecraftHelper;
 import org.zeith.hammerlib.util.java.Cast;
-import org.zeith.hammerlib.util.java.ReflectionUtil;
 
 import javax.script.ScriptEngine;
 import java.lang.reflect.*;
@@ -40,9 +40,9 @@ public class Jdk8JsFactory
 		
 		try
 		{
-			Class<?> ClassFilter = ReflectionUtil.fetchClass("jdk.nashorn.api.scripting.ClassFilter");
-			Class<?> NashornScriptEngineFactory = ReflectionUtil.fetchClass("jdk.nashorn.api.scripting.NashornScriptEngineFactory");
-			Class<?> NoJSClasses = ReflectionUtil.fetchClass("org.zeith.hammeranims.core.js.parsers.NoJSClassesJ8");
+			Class<?> ClassFilter = MinecraftHelper.fetchClass("jdk.nashorn.api.scripting.ClassFilter");
+			Class<?> NashornScriptEngineFactory = MinecraftHelper.fetchClass("jdk.nashorn.api.scripting.NashornScriptEngineFactory");
+			Class<?> NoJSClasses = MinecraftHelper.fetchClass("org.zeith.hammeranims.core.js.parsers.NoJSClassesJ8");
 			
 			Constructor<?> c = NoJSClasses.getDeclaredConstructor();
 			c.setAccessible(true);
