@@ -24,7 +24,7 @@ public interface IRenderableBone
 	default void applyTransformTree(PoseStack pose)
 	{
 		// Firstly, apply parent's transforms recursively
-		var par = getParent();
+		IRenderableBone par = getParent();
 		if(par != null) par.applyTransformTree(pose);
 		
 		// Then apply current bone transforms
