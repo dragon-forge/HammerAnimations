@@ -17,7 +17,7 @@ public interface IRenderableBone
 	void render(MatrixStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha);
 	
 	@OnlyIn(Dist.CLIENT)
-	void transform(MatrixStack matrixStackIn);
+	void applyBoneTransforms(PoseStack matrixStackIn);
 	
 	@OnlyIn(Dist.CLIENT)
 	default void applyTransformTree(MatrixStack pose)
@@ -27,7 +27,7 @@ public interface IRenderableBone
 		if(par != null) par.applyTransformTree(pose);
 		
 		// Then apply current bone transforms
-		transform(pose);
+		applyBoneTransforms(pose);
 	}
 	
 	void renderCubes(boolean b);

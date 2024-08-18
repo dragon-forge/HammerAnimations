@@ -56,7 +56,7 @@ public class ModelBoneF
 		{
 			poseStackIn.pushPose();
 			
-			this.transform(poseStackIn);
+			this.applyBoneTransforms(poseStackIn);
 			
 			this.renderCubes(IPoseEntry.read(poseStackIn.last()), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			
@@ -74,7 +74,7 @@ public class ModelBoneF
 	}
 	
 	@Override
-	public void transform(MatrixStack matrixStackIn)
+	public void applyBoneTransforms(MatrixStack matrixStackIn)
 	{
 		matrixStackIn.translate(-offset.x() / 16F, -offset.y() / 16F, offset.z() / 16F);
 		matrixStackIn.translate(this.x / 16.0F, this.y / 16.0F, this.z / 16.0F);
