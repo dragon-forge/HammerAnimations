@@ -61,7 +61,7 @@ public class ModelBoneF
 		
 		poseStackIn.pushPose();
 		
-		this.translateAndRotate(poseStackIn);
+		this.applyBoneTransforms(poseStackIn);
 		
 		lastTransform = poseStackIn.last();
 		
@@ -75,7 +75,7 @@ public class ModelBoneF
 	}
 	
 	@Override
-	public void translateAndRotate(PoseStack matrixStackIn)
+	public void applyBoneTransforms(PoseStack matrixStackIn)
 	{
 		matrixStackIn.translate(-offset.x() / 16F, -offset.y() / 16F, offset.z() / 16F);
 		matrixStackIn.translate(this.offsetX / 16.0F, this.offsetY / 16.0F, this.offsetZ / 16.0F);
