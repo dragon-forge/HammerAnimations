@@ -70,7 +70,7 @@ public class ModelBoneF
 	@Override
 	public void translateAndRotate(MatrixStack pPoseStack)
 	{
-		transform(pPoseStack);
+		applyBoneTransforms(pPoseStack);
 	}
 	
 	@Override

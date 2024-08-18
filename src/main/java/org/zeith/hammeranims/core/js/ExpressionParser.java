@@ -1,14 +1,12 @@
 package org.zeith.hammeranims.core.js;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
-import net.minecraft.util.math.MathHelper;
+import com.zeitheron.hammercore.utils.math.MathHelper;
+import lombok.val;
 import org.zeith.hammeranims.api.animation.interp.IVariableAccess;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
-import org.zeith.hammeranims.core.utils.MinecraftHelper;
 
-import javax.script.*;
-import java.util.Random;
-import java.util.function.Function;
+import javax.script.ScriptException;
+import java.util.*;
 
 public class ExpressionParser
 {
@@ -16,7 +14,9 @@ public class ExpressionParser
 	
 	public static <T extends IVariableAccess> InterpolatedDouble<T> parse(String expression)
 	{
-		// Try parsing expression as contstant first.
+		expression = ExpressionFixer.fixExpression(expression);
+		
+		// Try parsing expression as constant first.
 		try
 		{
 			return InterpolatedDouble.constant(Double.parseDouble(expression));
@@ -24,7 +24,7 @@ public class ExpressionParser
 		{
 		}
 		
-		ScriptEngine js = NashornFactory.createEngine();
+		Map<String, Object> js = new HashMap<>();
 		try
 		{
 			js.put("Java", null); // Prevent exploiting Java types.
@@ -33,18 +33,16 @@ public class ExpressionParser
 			
 			String fun = "function get() {\n\treturn " + expression + ";\n}";
 			
-			ScriptObjectMirror bindings = (ScriptObjectMirror) js.createBindings();
-			js.eval(fun, bindings);
-			ScriptObjectMirror get = (ScriptObjectMirror) bindings.getMember("get");
+			val res = JsFactory.parse(IDoubleTest.class, js, fun);
+			if(res == null) return query -> 0;
 			
-			InterpolatedDouble id0 = get.to(InterpolatedDouble.class);
-			
+			val t = res.b();
 			return query ->
 			{
 				try
 				{
-					query.putObjects(js::put);
-					return id0.get(query);
+					query.putObjects(res.a()::put);
+					return t.get();
 				} catch(RuntimeException e)
 				{
 					e.printStackTrace();
@@ -65,12 +63,12 @@ public class ExpressionParser
 		
 		public double cos(double x)
 		{
-			return MathHelper.cos((float) (x * MinecraftHelper.DEG_TO_RAD));
+			return MathHelper.cos(x * MathHelper.torad);
 		}
 		
 		public double sin(double x)
 		{
-			return MathHelper.sin((float) (x * MinecraftHelper.DEG_TO_RAD));
+			return MathHelper.sin(x * MathHelper.torad);
 		}
 		
 		public double abs(double x)
@@ -213,25 +211,6 @@ public class ExpressionParser
 			interpolatedAngle = (interpolatedAngle % 360 + 360) % 360;
 			
 			return interpolatedAngle;
-		}
-	}
-	
-	static class NashornFactory
-	{
-		NashornFactory()
-		{
-		}
-		
-		static ScriptEngine createEngine()
-		{
-			return (new jdk.nashorn.api.scripting.NashornScriptEngineFactory())
-					.getScriptEngine(s -> false);
-		}
-		
-		@SuppressWarnings("unchecked")
-		static <A, R> Function<A, R> getFunction(Bindings obj)
-		{
-			return a -> (R) ((ScriptObjectMirror) obj).call(obj, a);
 		}
 	}
 }

@@ -17,7 +17,7 @@ public interface IRenderableBone
 	void render(MatrixStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha);
 	
 	@OnlyIn(Dist.CLIENT)
-	void applyBoneTransforms(PoseStack matrixStackIn);
+	void applyBoneTransforms(MatrixStack matrixStackIn);
 	
 	@OnlyIn(Dist.CLIENT)
 	default void applyTransformTree(MatrixStack pose)
