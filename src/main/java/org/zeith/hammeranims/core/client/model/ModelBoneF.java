@@ -103,7 +103,7 @@ public class ModelBoneF
 		this.renderChildren = b;
 	}
 	
-	private void renderCubes(PoseStack.Pose matrixEntryIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
+	public void renderCubes(PoseStack.Pose matrixEntryIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
 		if(renderCubes)
 			for(ModelCubeF cube : cubes)
