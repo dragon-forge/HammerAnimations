@@ -1,9 +1,10 @@
 package org.zeith.hammeranims.core.js;
 
-import com.zeitheron.hammercore.utils.math.MathHelper;
+import net.minecraft.util.math.MathHelper;
 import lombok.val;
 import org.zeith.hammeranims.api.animation.interp.IVariableAccess;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
+import org.zeith.hammeranims.core.utils.MinecraftHelper;
 
 import javax.script.ScriptException;
 import java.util.*;
@@ -63,12 +64,12 @@ public class ExpressionParser
 		
 		public double cos(double x)
 		{
-			return MathHelper.cos(x * MathHelper.torad);
+			return MathHelper.cos((float) (x * MinecraftHelper.DEG_TO_RAD));
 		}
 		
 		public double sin(double x)
 		{
-			return MathHelper.sin(x * MathHelper.torad);
+			return MathHelper.sin((float) (x * MinecraftHelper.DEG_TO_RAD));
 		}
 		
 		public double abs(double x)

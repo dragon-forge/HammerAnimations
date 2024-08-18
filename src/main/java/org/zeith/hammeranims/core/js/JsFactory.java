@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.core.js;
 
-import com.zeitheron.hammercore.utils.java.tuples.Tuple2;
-import com.zeitheron.hammercore.utils.java.tuples.Tuples;
 import lombok.val;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.core.js.converters.IJsConverter;
 import org.zeith.hammeranims.core.js.parsers.*;
+import org.zeith.hammerlib.util.java.tuples.Tuple2;
+import org.zeith.hammerlib.util.java.tuples.Tuples;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;

@@ -1,12 +1,12 @@
 package org.zeith.hammeranims.core.js.parsers;
 
-import com.zeitheron.hammercore.utils.ReflectionUtil;
-import com.zeitheron.hammercore.utils.base.Cast;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.core.js.converters.IJsConverter;
 import org.zeith.hammeranims.core.js.converters.fb.BindingsFallbackJsConverter;
 import org.zeith.hammeranims.core.js.converters.fb.CastingFallbackJsConverter;
 import org.zeith.hammeranims.core.js.converters.j8.*;
+import org.zeith.hammerlib.util.java.Cast;
+import org.zeith.hammerlib.util.java.ReflectionUtil;
 
 import javax.script.ScriptEngine;
 import java.lang.reflect.*;

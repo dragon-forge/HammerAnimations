@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.core.js.converters.j8;
 
-import com.zeitheron.hammercore.utils.base.Cast;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import lombok.val;
 import org.zeith.hammeranims.core.js.converters.IJsConverter;
+import org.zeith.hammerlib.util.java.Cast;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
