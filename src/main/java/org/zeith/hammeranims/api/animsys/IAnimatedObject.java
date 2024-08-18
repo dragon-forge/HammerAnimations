@@ -102,7 +102,7 @@ public interface IAnimatedObject
 		if(world == null || pos == null || !world.isClientSide()) return;
 		val vol = getAnimationObjectVolume();
 		if(vol <= 0F) return;
-		world.playSound(null, pos.x, pos.y, pos.z, BuiltInRegistries.SOUND_EVENT.get(effect.getEffect()), getAnimationObjectSoundCategory(), 1F, 1F);
+		world.playLocalSound(pos.x, pos.y, pos.z, BuiltInRegistries.SOUND_EVENT.get(effect.getEffect()), getAnimationObjectSoundCategory(), 1F, 1F, false);
 	}
 	
 	default Matrix3f getParticleEffectRotation(AnimatedParticleEffect effect)

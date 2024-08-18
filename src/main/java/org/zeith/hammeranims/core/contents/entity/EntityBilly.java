@@ -14,6 +14,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.init.ContainersHA;
 
@@ -74,6 +75,12 @@ public class EntityBilly
 				new AnimationLayer.Builder(CommonLayerNames.AMBIENT),
 				new AnimationLayer.Builder(CommonLayerNames.LEGS)
 		);
+	}
+	
+	@Override
+	public IGeometryContainer getObjectModel()
+	{
+		return ContainersHA.BILLY_GEOM;
 	}
 	
 	@Override
