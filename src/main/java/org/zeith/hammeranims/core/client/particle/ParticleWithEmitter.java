@@ -64,9 +64,11 @@ public class ParticleWithEmitter
 		emitter.lastGlobal.set(x, y, z);
 		
 		emitter.update();
-		
 		if(emitter.lifetime >= 0 && emitter.age >= emitter.lifetime)
+		{
 			emitter.running = false;
+			emitter.stop();
+		}
 		if(emitter.isFinished())
 			removed = true;
 		if(emitter.target != null)
