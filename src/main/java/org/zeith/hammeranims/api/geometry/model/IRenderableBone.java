@@ -18,7 +18,7 @@ public interface IRenderableBone
 	void render(PoseStack poseStackIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha);
 	
 	@OnlyIn(Dist.CLIENT)
-	void translateAndRotate(PoseStack matrixStackIn);
+	void applyBoneTransforms(PoseStack matrixStackIn);
 	
 	@OnlyIn(Dist.CLIENT)
 	default void applyTransformTree(PoseStack pose)
@@ -28,6 +28,6 @@ public interface IRenderableBone
 		if(par != null) par.applyTransformTree(pose);
 		
 		// Then apply current bone transforms
-		translateAndRotate(pose);
+		applyBoneTransforms(pose);
 	}
 }
