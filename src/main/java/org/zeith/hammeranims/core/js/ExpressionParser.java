@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.core.js;
 
-import com.zeitheron.hammercore.utils.math.*;
-import jdk.nashorn.api.scripting.*;
+import com.zeitheron.hammercore.utils.math.MathHelper;
+import lombok.val;
 import org.zeith.hammeranims.api.animation.interp.IVariableAccess;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 
-import javax.script.*;
+import javax.script.ScriptException;
 import java.util.*;
 
 public class ExpressionParser
@@ -24,10 +24,8 @@ public class ExpressionParser
 		{
 		}
 		
-		ScriptEngine js = NashornRelay.tryCreateNashorn();
-		if(js == null) js = new ScriptEngineManager().getEngineByName("Nashorn");
-		
-		if(js != null) try
+		Map<String, Object> js = new HashMap<>();
+		try
 		{
 			js.put("Java", null); // Prevent exploiting Java types.
 			js.put("Math", MATH);
@@ -35,16 +33,16 @@ public class ExpressionParser
 			
 			String fun = "function get() {\n\treturn " + expression + ";\n}";
 			
-			ScriptObjectMirror eval = (ScriptObjectMirror) js.eval(fun);
-			InterpolatedDouble id0 = eval.to(InterpolatedDouble.class);
+			val res = JsFactory.parse(IDoubleTest.class, js, fun);
+			if(res == null) return query -> 0;
 			
-			ScriptEngine jsf = js;
+			val t = res.b();
 			return query ->
 			{
 				try
 				{
-					query.putObjects(jsf::put);
-					return id0.get(query);
+					query.putObjects(res.a()::put);
+					return t.get();
 				} catch(RuntimeException e)
 				{
 					e.printStackTrace();
@@ -55,8 +53,6 @@ public class ExpressionParser
 		{
 			throw new RuntimeException(e);
 		}
-		
-		return query -> 0;
 	}
 	
 	private static final Random rng = new Random();
