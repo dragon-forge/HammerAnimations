@@ -34,6 +34,13 @@ public class JsFactory
 		if(loadedConverter) return converter;
 		val parser = getParser();
 		
+		if(parser == null)
+		{
+			converter = null;
+			loadedConverter = true;
+			return null;
+		}
+		
 		String expression = "a+b";
 		String fun = "function get() {\n\treturn " + expression + ";\n}";
 		
@@ -107,7 +114,8 @@ public class JsFactory
 	{
 		IJsParser p = getParser();
 		IJsConverter c = getConverter();
-		if((p == null || c == null) && require) throw new IllegalStateException("Nashorn JS environment was not found.");
+		if((p == null || c == null) && require)
+			throw new IllegalStateException("Nashorn JS environment was not found.\n\n------------------------------------------------------------\nPLEASE DO NOT REPORT THIS ISSUE! IT IS AN INTENTIONAL CRASH.\nYOUR JAVA RUNTIME IS MISSING A CRITICAL COMPONENT FOR HammerAnimations: Nashorn.\nCONSIDER INSTALLING NASHORN INTO YOUR MODS FOLDER, OR USING JDK INSTEAD OF JRE.\n------------------------------------------------------------\n");
 		HammerAnimations.LOG.info("Using {} JS parser with {} converter.", p, c);
 	}
 }

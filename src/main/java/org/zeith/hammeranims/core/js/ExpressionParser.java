@@ -190,6 +190,30 @@ public class ExpressionParser
 			return Math.min(a, b);
 		}
 		
+		public double max(double a, double b, double... extraValues)
+		{
+			double max = Math.max(a, b);
+			for(double value : extraValues) max = Math.max(value, max);
+			return max;
+		}
+		
+		public double min(double a, double b, double... extraValues)
+		{
+			double max = Math.min(a, b);
+			for(double value : extraValues) max = Math.min(value, max);
+			return max;
+		}
+		
+		public double max(double b)
+		{
+			return b;
+		}
+		
+		public double min(double b)
+		{
+			return b;
+		}
+		
 		public double min_angle(double value)
 		{
 			return ((value + 180.0) % 360.0 + 360.0) % 360.0 - 180.0;

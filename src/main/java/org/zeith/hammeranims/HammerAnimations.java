@@ -36,7 +36,6 @@ public class HammerAnimations
 	
 	public HammerAnimations()
 	{
-		JsFactory.init(true);
 		AnimationDecoder.init();
 		GeometryDecoder.init();
 		ParticleDecoder.init();
@@ -56,6 +55,7 @@ public class HammerAnimations
 	public void construct(FMLConstructionEvent e)
 	{
 		LOG.info("{} is constructing.", MOD_NAME);
+		JsFactory.init(true);
 		MinecraftForge.EVENT_BUS.register(PROXY);
 		PROXY.construct();
 	}
