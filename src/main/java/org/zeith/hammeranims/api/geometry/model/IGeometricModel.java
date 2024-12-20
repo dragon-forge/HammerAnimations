@@ -1,0 +1,105 @@
+package org.zeith.hammeranims.api.geometry.model;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+
+/**
+ * Interface for defining a geometric model with pose manipulation and rendering capabilities.
+ */
+public interface IGeometricModel
+		extends IGenericModel
+{
+	IGeometricModel EMPTY = new IGeometricModel()
+	{
+		private final GeometryPose pose = new GeometryPose(s -> false);
+		
+		@Override
+		public IRenderableBone getRoot()
+		{
+			return null;
+		}
+		
+		@Override
+		public Set<String> getBoneNames()
+		{
+			return Collections.emptySet();
+		}
+		
+		@Override
+		public Collection<IRenderableBone> getBones()
+		{
+			return Collections.emptySet();
+		}
+		
+		@Nullable
+		@Override
+		public IRenderableBone getBone(String bone)
+		{
+			return null;
+		}
+		
+		@Override
+		public boolean hasBone(String bone)
+		{
+			return false;
+		}
+		
+		@Override
+		public void resetPose()
+		{
+		}
+		
+		@Override
+		public GeometryPose emptyPose()
+		{
+			pose.reset();
+			return pose;
+		}
+		
+		@Override
+		public void applyPose(GeometryPose pose)
+		{
+		}
+		
+		@Override
+		public void renderModel(RenderData data)
+		{
+		}
+		
+		@Override
+		public void dispose()
+		{
+		}
+		
+		@Override
+		public String toString()
+		{
+			return "IGeometricModel.EMPTY";
+		}
+	};
+	
+	@Override
+	IRenderableBone getRoot();
+	
+	@Override
+	Collection<? extends IRenderableBone> getBones();
+	
+	@Nullable
+	@Override
+	IRenderableBone getBone(String bone);
+	
+	/**
+	 * Renders the model using the provided render data.
+	 *
+	 * @param data
+	 * 		The render data to be passed along.
+	 */
+	void renderModel(RenderData data);
+	
+	/**
+	 * Disposes this model and it's used GPU/memory resources.
+	 * This will be only called on render thread.
+	 */
+	void dispose();
+}
