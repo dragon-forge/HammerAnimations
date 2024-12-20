@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.standalone.contexts;
 
-import org.zeith.hammeranims.standalone.utils.base.Cast;
+import org.zeith.hammeranims.standalone.utils.Cast;
 
 import java.util.HashMap;
 import java.util.Map;

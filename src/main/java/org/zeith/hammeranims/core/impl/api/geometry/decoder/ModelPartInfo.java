@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
-import org.zeith.hammeranims.standalone.utils.math.MathHelper;
+import org.zeith.hammeranims.standalone.utils.MathHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.Getter;
 import lombok.val;

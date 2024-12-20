@@ -1,24 +1,29 @@
 package org.zeith.hammeranims.core.client.model;
 
-import shaded.client.model.Bone;
-import shaded.joml.Quaternionf;
-import shaded.joml.Vector3f;
 import org.zeith.hammeranims.api.geometry.model.IRenderableBone;
 import org.zeith.hammeranims.api.geometry.model.IRenderableHook;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;
 import org.zeith.hammeranims.core.utils.PoseStack;
+import shaded.joml.Quaternionf;
+import shaded.joml.Vector3f;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class ModelBoneF
-		extends Bone
 		implements IRenderableBone
 {
 	protected ModelBoneF parent;
 	
 	public IRenderableHook renderHook = IRenderableHook.NOTHING;
 	
+	public float textureWidth;
+	public float textureHeight;
+	public boolean isHidden;
+	public final String name;
+	
+	private final Vector3f mcOffset = new Vector3f();
 	private final Vector3f scale = new Vector3f(1, 1, 1);
 	public Vector3f offset = new Vector3f();
 	private final Vector3f rotation; // in radians
@@ -36,13 +41,14 @@ public class ModelBoneF
 	
 	public ModelBoneF(String name, int textureWidth, int textureHeight, Vector3f startRotRadians, List<ModelCubeF> cubes, Map<String, ModelBoneF> children, Map<String, GeometryLocator> locators, boolean neverRender)
 	{
-		super( name);
-		this.size(textureWidth, textureHeight);
+		this.name = name;
+		this.textureWidth = textureWidth;
+		this.textureHeight = textureHeight;
 		this.startRotationRadians = startRotRadians;
 		this.rotation = new Vector3f(startRotRadians);
 		this.isHidden = neverRender;
-		this.children = Collections.unmodifiableMap(children);
-		this.locators = Collections.unmodifiableMap(locators);
+		this.children = children;
+		this.locators = locators;
 		this.cubes = cubes;
 		
 		for(ModelBoneF ch : children.values())
@@ -68,7 +74,7 @@ public class ModelBoneF
 		lastTransform = poseStackIn.last();
 		
 		this.renderCubes(poseStackIn.last(), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		
+
 		if(renderChildren)
 			for(ModelBoneF part : this.children.values())
 				part.render(poseStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
@@ -77,16 +83,18 @@ public class ModelBoneF
 	}
 	
 	@Override
-	public void applyBoneTransforms(PoseStack matrixStackIn)
+	public void applyBoneTransforms(PoseStack pose)
 	{
-		matrixStackIn.translate(-offset.x() / 16F, -offset.y() / 16F, offset.z() / 16F);
-		matrixStackIn.translate(this.offsetX / 16.0F, this.offsetY / 16.0F, this.offsetZ / 16.0F);
+		var combined = new Vector3f(mcOffset)
+				.add(-offset.x, -offset.y, offset.z)
+				.mul(1 / 16F);
+		pose.last().getPose().translate(combined);
 		
 		if(this.rotation.x() != 0.0F || this.rotation.y() != 0.0F || this.rotation.z() != 0.0F)
-			matrixStackIn.mulPose(new Quaternionf().rotateZYX(rotation.z(), rotation.y(), rotation.x()));
+			pose.mulPose(new Quaternionf().rotateZYX(rotation.z(), rotation.y(), rotation.x()));
 		
 		if(this.scale.x() != 1.0F || this.scale.y() != 1.0F || this.scale.z() != 1.0F)
-			matrixStackIn.scale(scale.x(), scale.y(), scale.z());
+			pose.scale(scale.x(), scale.y(), scale.z());
 	}
 	
 	@Override
@@ -176,8 +184,6 @@ public class ModelBoneF
 	
 	public void setPos(float x, float y, float z)
 	{
-		offsetX = x;
-		offsetY = y;
-		offsetZ = z;
+		mcOffset.set(x, y, z);
 	}
 }

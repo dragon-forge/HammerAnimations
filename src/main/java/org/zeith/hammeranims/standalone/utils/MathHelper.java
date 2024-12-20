@@ -1,4 +1,4 @@
-package org.zeith.hammeranims.standalone.utils.math;
+package org.zeith.hammeranims.standalone.utils;
 
 public class MathHelper
 {

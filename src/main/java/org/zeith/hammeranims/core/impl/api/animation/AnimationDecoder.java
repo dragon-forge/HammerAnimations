@@ -4,7 +4,6 @@ import shaded.json.JSONObject;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.BoneAnimation;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
-import org.zeith.hammeranims.api.animation.event.DecodeAnimationEvent;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 
 import java.time.Duration;
@@ -12,23 +11,21 @@ import java.util.*;
 
 public class AnimationDecoder
 {
-	public static void decodeAnimation(DecodeAnimationEvent e)
+	public static Animation decodeAnimation(JSONObject obj, IAnimationContainer container, String key, String formatVersion)
 	{
-		if(e.container == DefaultsHA.NULL_ANIMATION)
+		if(container == DefaultsHA.NULL_ANIMATION)
 		{
-			e.setDecoded(DefaultsHA.NULL_ANIMATION_SYNTETIC);
-			return;
+			return DefaultsHA.NULL_ANIMATION_SYNTETIC;
 		}
 		
-		JSONObject obj = e.asObject().orElse(null);
-		if(obj == null) return;
+		if(obj == null) return null;
 		if(!obj.has("bones"))
-			return;
+			return null;
 		
-		AnimationLocation loc = new AnimationLocation(e.container.getRegistryKey(), e.key);
+		AnimationLocation loc = new AnimationLocation(container.getRegistryKey(), key);
 		
-		if(!"1.8.0".equals(e.formatVersion))
-			loc.warn("Potentially unsupported version of animation: {}; We support 1.8.0. Potential incompatibility may arise!", e.formatVersion);
+		if(!"1.8.0".equals(formatVersion))
+			loc.warn("Potentially unsupported version of animation: {}; We support 1.8.0. Potential incompatibility may arise!", formatVersion);
 		
 		Object o = obj.opt("loop");
 		
@@ -70,7 +67,7 @@ public class AnimationDecoder
 		final LoopMode mode = modeRaw;
 		final Map<String, BoneAnimation> bonesView = Collections.unmodifiableMap(bones);
 		
-		e.setDecoded(new Animation(e.container, e.key, new IAnimationData()
+		return new Animation(container, key, new IAnimationData()
 		{
 			@Override
 			public LoopMode getLoopMode()
@@ -102,6 +99,7 @@ public class AnimationDecoder
 				return "IAnimationData{loop_mode=" + mode + ",duration=" + time.toMillis() / 1000F + ",bones=" +
 					   bonesView + ",weight=" + fweight + "}";
 			}
-		}));
+		}
+		);
 	}
 }

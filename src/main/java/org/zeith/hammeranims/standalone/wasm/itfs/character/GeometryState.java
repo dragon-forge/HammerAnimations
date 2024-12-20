@@ -18,12 +18,12 @@ public class GeometryState
 	private RenderData state = new RenderData();
 	private IGeometricModel model;
 	
-	private final int vertexCount;
+	private int vertexCount;
 	
 	private final int vertexSize = 3, uvSize = 2, normalSize = 3;
 	private Float32Array vertices, uvs, normals;
 	
-	private final Vector3f min, max;
+	private Vector3f min, max;
 	
 	public GeometryState(IGeometryContainer geo)
 	{
@@ -37,7 +37,7 @@ public class GeometryState
 		this.vertexCount = out.getVertexCount();
 		this.min = out.getMin();
 		this.max = out.getMax();
-		
+
 		this.vertices = new Float32Array(vertexCount * vertexSize);
 		this.uvs = new Float32Array(vertexCount * uvSize);
 		this.normals = new Float32Array(vertexCount * normalSize);

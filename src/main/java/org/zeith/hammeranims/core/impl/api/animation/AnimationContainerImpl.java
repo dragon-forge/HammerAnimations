@@ -5,7 +5,6 @@ import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
-import org.zeith.hammeranims.api.animation.event.DecodeAnimationEvent;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import shaded.json.JSONObject;
@@ -51,7 +50,7 @@ public class AnimationContainerImpl
 		}
 	};
 	
-	public static Optional<IReadAnimationHolder> defaultReadAnimation(IResourceProvider resources, IAnimationContainer container, Optional<String> text)
+	public static Optional<IReadAnimationHolder> defaultReadAnimation(IAnimationContainer container, Optional<String> text)
 	{
 		return text.map(JSONTokener::new)
 				.map(v -> (JSONObject) v.nextValue())
@@ -67,11 +66,7 @@ public class AnimationContainerImpl
 						String fmt = json.getString("format_version");
 						
 						for(String animKey : animations.keySet())
-						{
-							DecodeAnimationEvent evt = new DecodeAnimationEvent(resources, container, json, fmt, animKey, animations.get(animKey));
-							AnimationDecoder.decodeAnimation(evt);
-							holder.put(animKey, evt.getDecoded());
-						}
+							holder.put(animKey, AnimationDecoder.decodeAnimation(animations.getJSONObject(animKey), container, animKey, fmt));
 						
 						return holder;
 					} catch(Exception e)
@@ -91,7 +86,7 @@ public class AnimationContainerImpl
 				"bedrock/animations/" + key.getPath() + suffix
 		);
 		
-		animations = Optional.ofNullable(defaultReadAnimation(resources, this, resources.readAsString(path)).orElseGet(() ->
+		animations = Optional.ofNullable(defaultReadAnimation(this, resources.readAsString(path)).orElseGet(() ->
 		{
 			HammerAnimations.LOG.warn("Unable to load animation {} from file {}", key, path);
 			return null;

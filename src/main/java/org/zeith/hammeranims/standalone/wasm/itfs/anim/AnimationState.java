@@ -1,13 +1,15 @@
-package org.zeith.hammeranims.standalone.utils;
+package org.zeith.hammeranims.standalone.wasm.itfs.anim;
 
+import org.teavm.jso.JSObject;
+import org.teavm.jso.impl.JS;
 import org.zeith.hammeranims.api.animsys.*;
-import shaded.util.math.Vec3d;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
-import org.zeith.hammeranims.standalone.IProcedure;
-import org.zeith.hammeranims.standalone.wasm.itfs.anim.HAAnimation;
+import org.zeith.hammeranims.standalone.ConfigureException;
+import org.zeith.hammeranims.standalone.utils.Cast;
+import shaded.util.math.Vec3d;
 
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AnimationState
@@ -16,7 +18,6 @@ public class AnimationState
 	protected final AnimationSystem system;
 	
 	public final double expectedDuration;
-	public final boolean loop;
 	
 	public AnimationState(List<ConfiguredAnimation> animations)
 	{
@@ -24,18 +25,14 @@ public class AnimationState
 		for(int layerId = 0; layerId < animations.size(); layerId++)
 			sys.addLayers(new AnimationLayer.Builder(Integer.toString(layerId)));
 		this.system = sys.build();
-
-//		this.loop = animations.getFirst().configure().getAnimation().getData().getLoopMode() == LoopMode.LOOP;
-		this.loop = true;
 		
 		double duration = 0;
 		int lId = 0;
 		for(ConfiguredAnimation a : animations)
 		{
 			int layerId = lId++;
-			a = a.transitionTime(Duration.ZERO);
 			if(!system.startAnimationAt(Integer.toString(layerId), a))
-				throw new IProcedure.ConfigureException("Unable to start animation " + a.getLocation());
+				throw new ConfigureException("Unable to start animation " + a.getLocation());
 			duration = Math.max(duration, a.getAnimation().getData().getLengthSeconds());
 		}
 		
@@ -51,6 +48,17 @@ public class AnimationState
 		GeometryPose pose = new GeometryPose();
 		system.applyAnimation(0, pose);
 		return pose;
+	}
+	
+	@Override
+	public JSObject mix(JSObject other)
+	{
+		List<ConfiguredAnimation> animations = new ArrayList<>();
+		for(AnimationLayer l : system.getLayers())
+			animations.add(l.currentAnimation.config.copy());
+		for(AnimationLayer l : Cast.<AnimationState>cast(other).system.getLayers())
+			animations.add(l.currentAnimation.config.copy());
+		return new AnimationState(animations);
 	}
 	
 	@Override

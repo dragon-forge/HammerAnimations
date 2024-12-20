@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import org.zeith.hammeranims.standalone.utils.math.MathHelper;
+import org.zeith.hammeranims.standalone.utils.MathHelper;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.jetbrains.annotations.Nullable;

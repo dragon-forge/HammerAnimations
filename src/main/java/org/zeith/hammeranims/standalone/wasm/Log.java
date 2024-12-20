@@ -7,6 +7,7 @@ import org.zeith.hammeranims.standalone.utils.Log4jStyle;
 
 public class Log
 {
+	public static boolean disable;
 	public static final Log inst = new Log();
 	
 	public static Object makeError()
@@ -16,26 +17,31 @@ public class Log
 	
 	public void trace(String msg, Object... e)
 	{
+		if(disable) return;
 		Log4jStyle.print(ln -> ctrace(toJS(ln)), "TRACE", msg, e);
 	}
 	
 	public void debug(String msg, Object... e)
 	{
+		if(disable) return;
 		Log4jStyle.print(ln -> cdebug(toJS(ln)), "DEBUG", msg, e);
 	}
 	
 	public void info(String msg, Object... e)
 	{
+		if(disable) return;
 		Log4jStyle.print(ln -> cinf(toJS(ln)), "INFO", msg, e);
 	}
 	
 	public void warn(String msg, Object... e)
 	{
+		if(disable) return;
 		Log4jStyle.print(ln -> cwarn(toJS(ln)), "WARN", msg, e);
 	}
 	
 	public void error(String msg, Object... e)
 	{
+		if(disable) return;
 		Log4jStyle.print(ln -> cerr(toJS(ln)), "ERROR", msg, e);
 	}
 	

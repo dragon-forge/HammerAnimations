@@ -9,6 +9,9 @@ public interface HAAnimation
 	@JSExport
 	HAAnimationPose poseAt(double seconds);
 	
+	@JSExport
+	JSObject mix(JSObject other);
+	
 	@JSProperty
 	@JSExport
 	double getExpectedDuration();

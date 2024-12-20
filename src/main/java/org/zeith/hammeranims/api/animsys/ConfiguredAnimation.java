@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.animsys;
 
-import org.zeith.hammeranims.standalone.utils.base.Cast;
+import org.zeith.hammeranims.standalone.utils.Cast;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
@@ -37,6 +37,22 @@ public class ConfiguredAnimation
 	public ConfiguredAnimation(Animation animation)
 	{
 		setAnimation(animation);
+	}
+	
+	public ConfiguredAnimation copy()
+	{
+		ConfiguredAnimation copy = new ConfiguredAnimation(animation);
+		copy.weight = weight;
+		copy.speed = speed;
+		copy.startTime = startTime;
+		copy.reverse = reverse;
+		copy.transitionTime = transitionTime;
+		copy.timeFunction = timeFunction;
+		copy.important = important;
+		copy.loopMode = loopMode;
+		copy.mask = mask;
+		copy.next = next != null ? next.copy() : null;
+		return copy;
 	}
 	
 	public Animation getAnimation()

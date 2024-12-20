@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.impl.api.geometry.constrains;
 
-import org.zeith.hammeranims.standalone.utils.base.Cast;
+import org.zeith.hammeranims.standalone.utils.Cast;
 import org.zeith.hammeranims.api.geometry.constrains.*;
 
 import java.util.Map;

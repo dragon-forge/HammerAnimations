@@ -38,7 +38,7 @@ teavm {
         mainClass = "org.zeith.hammeranims.standalone.wasm.Main"
     }
     wasmGC {
-        addedToWebApp = true
         targetFileName = "hammeranims.wasm"
+        outputDir = file("binaries")
     }
 }

@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.js;
 
-import org.zeith.hammeranims.standalone.utils.math.MathHelper;
+import org.zeith.hammeranims.standalone.utils.MathHelper;
 import lombok.val;
 import org.zeith.hammeranims.api.animation.interp.IVariableAccess;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;

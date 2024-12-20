@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.client.model;
 
-import org.zeith.hammeranims.standalone.utils.math.MathHelper;
+import org.zeith.hammeranims.standalone.utils.MathHelper;
 import lombok.val;
 import shaded.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;

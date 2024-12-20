@@ -1,4 +1,4 @@
-package org.zeith.hammeranims.standalone.utils.base;
+package org.zeith.hammeranims.standalone.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,19 +1,16 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
 import lombok.val;
-import shaded.json.*;
-import shaded.util.ResourceLocation;
-import shaded.joml.Vector3f;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
-import org.zeith.hammeranims.api.utils.EmbeddedLocation;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
 import org.zeith.hammeranims.core.jomljson.GeometryConstrainsImplAdapter;
 import org.zeith.hammeranims.core.utils.GsonHelper;
-import shaded.tuples.Tuple2;
-import shaded.tuples.Tuples;
+import shaded.joml.Vector3f;
+import shaded.json.*;
+import shaded.util.ResourceLocation;
 
 import java.util.*;
 
@@ -29,7 +26,7 @@ public class GsonGeometryDecoder
 		return GeometryConstrainsImplAdapter.parse(json);
 	}
 	
-	public static List<Tuple2<EmbeddedLocation, GeometryDataImpl>> readGeometryFile(IGeometryContainer container, ResourceLocation location, String text)
+	public static GeometryDataImpl readGeometryFile(IGeometryContainer container, ResourceLocation location, String text)
 	{
 		if(text != null && !text.isEmpty())
 		{
@@ -43,13 +40,12 @@ public class GsonGeometryDecoder
 			}
 		} else
 		{
-			throw new RuntimeException("Geometry file not found: " + location);
+			throw new RuntimeException("Geometry file not found: " + location + " got " + (text == null ? "null" : "empty") + " string...");
 		}
 	}
 	
-	private static List<Tuple2<EmbeddedLocation, GeometryDataImpl>> readGeometryFile(IGeometryContainer container, ResourceLocation fileLocation, JSONObject object)
+	private static GeometryDataImpl readGeometryFile(IGeometryContainer container, ResourceLocation fileLocation, JSONObject object)
 	{
-		List<Tuple2<EmbeddedLocation, GeometryDataImpl>> definitions = new ArrayList<>();
 		for(var entry : object.entrySet())
 			if(entry.getKey().equals("format_version"))
 			{
@@ -57,20 +53,18 @@ public class GsonGeometryDecoder
 				checkFormatVersion(fileLocation, formatVersion);
 			} else if(entry.getKey().equals("minecraft:geometry"))
 			{
-				Tuple2<EmbeddedLocation, GeometryDataImpl> identifierAndModel = parseGeometry(container, fileLocation, GsonHelper.convertToJsonArray(entry.getValue(), entry.getKey()));
-				definitions.add(identifierAndModel);
+				return parseGeometry(container, fileLocation, GsonHelper.convertToJsonArray(entry.getValue(), entry.getKey()));
 			}
 		
-		return definitions;
+		return null;
 	}
 	
-	private static Tuple2<EmbeddedLocation, GeometryDataImpl> parseGeometry(IGeometryContainer container, ResourceLocation fileLocation, JSONArray subModelArr)
+	private static GeometryDataImpl parseGeometry(IGeometryContainer container, ResourceLocation fileLocation, JSONArray subModelArr)
 	{
 		JSONObject subModel = GsonHelper.convertToJsonObject(subModelArr.get(0), "member of 'minecraft:geometry'");
 		JSONArray bones = GsonHelper.getAsJsonArray(subModel, "bones");
 		
 		JSONObject description = GsonHelper.getAsJsonObject(subModel, "description");
-		String identifier = GsonHelper.getAsString(description, "identifier");
 		
 		ModelMaterialInfo material = new ModelMaterialInfo(description);
 		
@@ -103,7 +97,7 @@ public class GsonGeometryDecoder
 			}
 		}
 		
-		return Tuples.immutable(new EmbeddedLocation(fileLocation, identifier), makeDefinition(container, material, rootChildren));
+		return makeDefinition(container, material, rootChildren);
 	}
 	
 	private static GeometryDataImpl makeDefinition(IGeometryContainer container, ModelMaterialInfo material, List<ModelPartInfo> roots)
