@@ -1,7 +1,8 @@
 package org.zeith.hammeranims.standalone.wasm.itfs.anim;
 
 import org.teavm.jso.JSObject;
-import org.teavm.jso.impl.JS;
+import org.teavm.jso.core.JSString;
+import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
@@ -17,6 +18,7 @@ public class AnimationState
 {
 	protected final AnimationSystem system;
 	
+	private final JSString loopMode;
 	public final double expectedDuration;
 	
 	public AnimationState(List<ConfiguredAnimation> animations)
@@ -25,6 +27,10 @@ public class AnimationState
 		for(int layerId = 0; layerId < animations.size(); layerId++)
 			sys.addLayers(new AnimationLayer.Builder(Integer.toString(layerId)));
 		this.system = sys.build();
+		
+		LoopMode lm = LoopMode.ONCE;
+		if(!animations.isEmpty()) lm = animations.getFirst().loopMode;
+		loopMode = JSString.valueOf(lm.name());
 		
 		double duration = 0;
 		int lId = 0;
@@ -65,6 +71,12 @@ public class AnimationState
 	public double getExpectedDuration()
 	{
 		return expectedDuration;
+	}
+	
+	@Override
+	public JSString getLoopMode()
+	{
+		return loopMode;
 	}
 	
 	@Override
