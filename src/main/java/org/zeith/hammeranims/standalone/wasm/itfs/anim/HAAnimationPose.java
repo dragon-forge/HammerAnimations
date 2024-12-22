@@ -2,7 +2,7 @@ package org.zeith.hammeranims.standalone.wasm.itfs.anim;
 
 import org.teavm.jso.*;
 
-@JSClass(name = "HammerAnimsPose")
+@JSClass(name = "GeometryPose")
 public interface HAAnimationPose
 		extends JSObject
 {

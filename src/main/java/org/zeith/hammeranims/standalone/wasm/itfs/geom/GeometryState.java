@@ -1,4 +1,4 @@
-package org.zeith.hammeranims.standalone.wasm.itfs.character;
+package org.zeith.hammeranims.standalone.wasm.itfs.geom;
 
 import shaded.joml.Vector3f;
 import org.teavm.jso.core.JSArray;
@@ -13,7 +13,7 @@ import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.standalone.hammeranims.CountingVertexOutput;
 
 public class GeometryState
-		implements HAGeoBuffers, IVertexOutput
+		implements HAGeoState, IVertexOutput
 {
 	private RenderData state = new RenderData();
 	private IGeometricModel model;

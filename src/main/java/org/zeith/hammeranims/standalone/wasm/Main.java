@@ -11,10 +11,9 @@ import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.standalone.wasm.itfs.anim.AnimationState;
 import org.zeith.hammeranims.standalone.wasm.itfs.anim.HAAnimation;
-import org.zeith.hammeranims.standalone.wasm.itfs.character.GeometryState;
-import org.zeith.hammeranims.standalone.wasm.itfs.character.HAGeoBuffers;
+import org.zeith.hammeranims.standalone.wasm.itfs.geom.GeometryState;
+import org.zeith.hammeranims.standalone.wasm.itfs.geom.HAGeoState;
 
-import java.time.Duration;
 import java.util.*;
 
 public class Main
@@ -38,7 +37,7 @@ public class Main
 	}
 	
 	@JSExport
-	public static HAGeoBuffers anim_parseGeometry(String id, String src)
+	public static HAGeoState anim_parseGeometry(String id, String src)
 	{
 		return new GeometryState(HammerAnimations.loadGeo(id, src));
 	}
@@ -62,25 +61,7 @@ public class Main
 				continue;
 			}
 			
-			JSObject w = JS.get(entry, JS.wrap("weight"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.weight(JS.unwrapFloat(w));
-			
-			w = JS.get(entry, JS.wrap("speed"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.speed(JS.unwrapFloat(w));
-			
-			w = JS.get(entry, JS.wrap("startTime"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.speed(JS.unwrapFloat(w));
-			
-			w = JS.get(entry, JS.wrap("freezeAt"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.freezeAt(JS.unwrapFloat(w));
-			
-			w = JS.get(entry, JS.wrap("reversed"));
-			if(!JS.isNull(w) && w instanceof JSBoolean) ca.reversed(JS.unwrapBoolean(w));
-			
-			w = JS.get(entry, JS.wrap("transitionTime"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.transitionTime(JS.unwrapFloat(w));
-			else ca = ca.transitionTime(Duration.ZERO);
-			
+			HaJsHelper.configure(ca, entry);
 			JS.set(map, n, new AnimationState(List.of(ca)));
 		}
 		return map;
@@ -100,25 +81,7 @@ public class Main
 			IAnimationContainer ctr = HammerAnimations.loadAnim(id, src);
 			
 			var ca = ctr.configure();
-			
-			JSObject w = JS.get(entry, JS.wrap("weight"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.weight(JS.unwrapFloat(w));
-			
-			w = JS.get(entry, JS.wrap("speed"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.speed(JS.unwrapFloat(w));
-			
-			w = JS.get(entry, JS.wrap("startTime"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.speed(JS.unwrapFloat(w));
-			
-			w = JS.get(entry, JS.wrap("freezeAt"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.freezeAt(JS.unwrapFloat(w));
-			
-			w = JS.get(entry, JS.wrap("reversed"));
-			if(!JS.isNull(w) && w instanceof JSBoolean) ca.reversed(JS.unwrapBoolean(w));
-			
-			w = JS.get(entry, JS.wrap("transitionTime"));
-			if(!JS.isNull(w) && w instanceof JSNumber) ca.transitionTime(JS.unwrapFloat(w));
-			else ca = ca.transitionTime(Duration.ZERO);
+			HaJsHelper.configure(ca, entry);
 			
 			anims.add(ca);
 		}

@@ -1,12 +1,12 @@
-package org.zeith.hammeranims.standalone.wasm.itfs.character;
+package org.zeith.hammeranims.standalone.wasm.itfs.geom;
 
 import org.teavm.jso.*;
 import org.teavm.jso.core.JSArray;
 import org.teavm.jso.core.JSNumber;
 import org.teavm.jso.typedarrays.Float32Array;
 
-@JSClass
-public interface HAGeoBuffers
+@JSClass(name = "GeometryState")
+public interface HAGeoState
 {
 	@JSProperty
 	@JSExport

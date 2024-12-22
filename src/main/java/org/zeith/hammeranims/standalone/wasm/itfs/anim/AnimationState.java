@@ -8,6 +8,7 @@ import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.standalone.ConfigureException;
 import org.zeith.hammeranims.standalone.utils.Cast;
+import org.zeith.hammeranims.standalone.wasm.HaJsHelper;
 import shaded.util.math.Vec3d;
 
 import java.util.ArrayList;
@@ -64,6 +65,19 @@ public class AnimationState
 			animations.add(l.currentAnimation.config.copy());
 		for(AnimationLayer l : Cast.<AnimationState>cast(other).system.getLayers())
 			animations.add(l.currentAnimation.config.copy());
+		return new AnimationState(animations);
+	}
+	
+	@Override
+	public HAAnimation reconfigure(JSObject options)
+	{
+		List<ConfiguredAnimation> animations = new ArrayList<>();
+		for(AnimationLayer l : system.getLayers())
+		{
+			var copy = l.currentAnimation.config.copy();
+			HaJsHelper.configure(copy, options);
+			animations.add(copy);
+		}
 		return new AnimationState(animations);
 	}
 	

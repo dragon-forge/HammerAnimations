@@ -3,7 +3,7 @@ package org.zeith.hammeranims.standalone.wasm.itfs.anim;
 import org.teavm.jso.*;
 import org.teavm.jso.core.JSString;
 
-@JSClass(name = "HammerAnimsAnimation")
+@JSClass(name = "AnimationState")
 public interface HAAnimation
 		extends JSObject
 {
@@ -12,6 +12,9 @@ public interface HAAnimation
 	
 	@JSExport
 	JSObject mix(JSObject other);
+	
+	@JSExport
+	HAAnimation reconfigure(JSObject options);
 	
 	@JSProperty
 	@JSExport
