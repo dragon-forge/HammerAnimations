@@ -29,19 +29,6 @@ public class TessellatorVertexRenderer
 		hasTranslucency = false;
 	}
 	
-	public void drawVertex(BufferBuilder bb, RenderVertex rv)
-	{
-		int packedLight = rv.packedLight;
-		int k3 = packedLight >> 16 & 65535;
-		int l3 = packedLight & 65535;
-		bb.pos(rv.x, rv.y, rv.z)
-//				.normal(rv.nx, rv.ny, rv.nz)
-				.tex(rv.u, rv.v)
-				.lightmap(k3, l3)
-				.color(rv.red, rv.green, rv.blue, rv.alpha)
-				.endVertex();
-	}
-	
 	@Override
 	public void vertex(VertexType type, RenderVertex... vertex)
 	{
@@ -82,5 +69,18 @@ public class TessellatorVertexRenderer
 		buffer.begin(glMode, translucencyState.getVertexFormat());
 		buffer.setVertexState(translucencyState);
 		tess.draw();
+	}
+	
+	public static void drawVertex(BufferBuilder bb, RenderVertex rv)
+	{
+		int packedLight = rv.packedLight;
+		int k3 = packedLight >> 16 & 65535;
+		int l3 = packedLight & 65535;
+		bb.pos(rv.x, rv.y, rv.z)
+//				.normal(rv.nx, rv.ny, rv.nz)
+		  .tex(rv.u, rv.v)
+		  .lightmap(k3, l3)
+		  .color(rv.red, rv.green, rv.blue, rv.alpha)
+		  .endVertex();
 	}
 }

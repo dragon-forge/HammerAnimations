@@ -13,6 +13,11 @@ public interface IVertexRenderer
 	IVertexRenderer DUMMY = new IVertexRenderer()
 	{
 		@Override
+		public void bind(RenderData data)
+		{
+		}
+		
+		@Override
 		public void begin(int glMode, VertexFormat format)
 		{
 		}
@@ -49,6 +54,12 @@ public interface IVertexRenderer
 		
 		return new IVertexRenderer()
 		{
+			@Override
+			public void bind(RenderData data)
+			{
+				deez.bind(data);
+			}
+			
 			@Override
 			public void begin(int glMode, VertexFormat format)
 			{
