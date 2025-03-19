@@ -1,6 +1,8 @@
 package org.zeith.hammeranims.core.client.render;
 
+import com.zeitheron.hammercore.client.utils.UtilsFX;
 import net.minecraft.client.renderer.vertex.VertexFormat;
+import org.zeith.hammeranims.api.geometry.model.RenderData;
 import org.zeith.hammeranims.core.client.render.vertex.*;
 
 import java.util.function.UnaryOperator;
@@ -33,6 +35,11 @@ public interface IVertexRenderer
 	};
 	
 	void begin(int glMode, VertexFormat format);
+	
+	default void bind(RenderData data)
+	{
+		UtilsFX.bindTexture(data.texture);
+	}
 	
 	void upload();
 	

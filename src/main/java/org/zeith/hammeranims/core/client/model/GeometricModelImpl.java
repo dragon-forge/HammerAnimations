@@ -1,6 +1,5 @@
 package org.zeith.hammeranims.core.client.model;
 
-import com.zeitheron.hammercore.client.utils.UtilsFX;
 import com.zeitheron.hammercore.utils.math.MathHelper;
 import lombok.val;
 import net.minecraft.client.model.ModelBase;
@@ -158,9 +157,9 @@ public class GeometricModelImpl
 	public void renderModel(RenderData data)
 	{
 		PoseStack pose = data.pose;
-		UtilsFX.bindTexture(data.texture);
 		
 		IVertexRenderer renderer = data.renderer;
+		renderer.bind(data);
 		renderer.begin(GL11.GL_QUADS, POSITION_TEX_LMAP_COLOR);
 		root.render(pose,
 				renderer,
