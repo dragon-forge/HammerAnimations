@@ -167,7 +167,8 @@ public class GeometricModelImpl
 				data.red, data.green, data.blue, data.alpha
 		);
 		renderer.upload();
-		pose.reset();
+		
+		if(data.resetPoseAfterDraw) pose.reset();
 	}
 	
 	@Override

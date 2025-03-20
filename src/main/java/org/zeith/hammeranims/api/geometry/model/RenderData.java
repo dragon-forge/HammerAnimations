@@ -15,6 +15,7 @@ public class RenderData
 	public ResourceLocation texture;
 	public IVertexRenderer renderer = IVertexRenderer.DUMMY;
 	public PoseStack pose = new PoseStack();
+	public boolean resetPoseAfterDraw = true;
 	
 	public RenderData(ResourceLocation texture)
 	{
