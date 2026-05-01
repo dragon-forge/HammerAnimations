@@ -20,7 +20,7 @@ import java.util.*;
 import static org.zeith.hammeranims.core.contents.time.LinearTimeFunction.FREEZE_SPEED;
 
 public class ConfiguredAnimation
-		implements ICompoundSerializable
+		implements ICompoundSerializable, IAnimationSource
 {
 	public Animation animation;
 	public float weight = 1F; // [0; 1]
@@ -191,6 +191,12 @@ public class ConfiguredAnimation
 	public AnimationLocation getLocation()
 	{
 		return animation != null ? animation.getLocation() : null;
+	}
+	
+	@Override
+	public ConfiguredAnimation configure()
+	{
+		return new ConfiguredAnimation(this);
 	}
 	
 	public ActiveAnimation activate(AnimationLayer layer)
