@@ -1,17 +1,13 @@
 package org.zeith.hammeranims.api.particles.emitter;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import it.unimi.dsi.fastutil.longs.Long2IntMap;
-import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import com.mojang.blaze3d.vertex.*;
+import it.unimi.dsi.fastutil.longs.*;
+import it.unimi.dsi.fastutil.objects.*;
 import lombok.Setter;
 import net.minecraft.client.*;
 import net.minecraft.client.renderer.*;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.*;
 import net.minecraft.world.level.Level;
 import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
@@ -23,6 +19,7 @@ import org.zeith.hammeranims.api.particles.curve.ParticleCurve;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionAppearance;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
+import org.zeith.hammeranims.molang.*;
 
 import java.lang.Math;
 import java.util.*;
@@ -34,7 +31,8 @@ public class ParticleEmitter
 	public List<BedrockParticle> particles = new ArrayList<>();
 	public List<BedrockParticle> splitParticles = new ArrayList<>();
 	
-	public final Map<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> variables = new HashMap<>();
+	public final Map<String, List<Expression>> variables = new HashMap<>();
+	public final Map<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> curves = new HashMap<>();
 	public final Object2DoubleMap<String> initialValues = new Object2DoubleOpenHashMap<>();
 	
 	public boolean isRenderingGUI = false;
@@ -94,7 +92,7 @@ public class ParticleEmitter
 	
 	private BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 	
-	public double[] scale = { 1, 1, 1 };
+	public double[] scale = {1, 1, 1};
 	
 	/* Camera properties */
 	public CameraType perspective;
@@ -144,7 +142,7 @@ public class ParticleEmitter
 		
 		for(ParticleCurve curve : effect.curves)
 		{
-			registerVariable(curve.variable, curve);
+			registerCurve(curve.variable, curve);
 		}
 		
 		if(variables != null)
@@ -175,10 +173,10 @@ public class ParticleEmitter
 		vars.particle_speed.set(particle.speed);
 		vars.particle_bounces = particle.bounces;
 		
-		for(Map.Entry<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> e : variables.entrySet())
-		{
-			vars.putUpdate(e.getKey(), e.getValue());
-		}
+		vars.update(particle, this, partialTicks);
+		
+		for(Map.Entry<String, List<Expression>> e : variables.entrySet()) vars.putUpdate(e.getKey(), e.getValue());
+		for(Map.Entry<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> e : curves.entrySet()) vars.putUpdate(e.getKey(), e.getValue());
 	}
 	
 	public void setEmitterVariables(float partialTicks)
@@ -190,10 +188,8 @@ public class ParticleEmitter
 		vars.emitter_random_3 = this.random3;
 		vars.emitter_random_4 = this.random4;
 		
-		for(Map.Entry<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> e : variables.entrySet())
-		{
+		for(Map.Entry<String, List<Expression>> e : variables.entrySet())
 			vars.putUpdate(e.getKey(), e.getValue());
-		}
 	}
 	
 	public void parseVariables(Map<String, String> variables)
@@ -201,11 +197,11 @@ public class ParticleEmitter
 		for(Map.Entry<String, String> entry : variables.entrySet())
 		{
 			String name = entry.getKey(), expression = entry.getValue();
-			registerVariable(name, InterpolatedDouble.parse(expression));
+			registerVariable(name, MoLang.parse(expression));
 		}
 	}
 	
-	public void registerVariable(String name, InterpolatedDouble<ParticleVariables> expression)
+	public void registerVariable(String name, List<Expression> expression)
 	{
 		if(!name.startsWith("variable."))
 		{
@@ -213,7 +209,18 @@ public class ParticleEmitter
 			return;
 		}
 		
-		this.variables.put(name, new InterpolatedDouble.NumberWrapped<>(expression));
+		this.variables.put(name, expression);
+	}
+	
+	public void registerCurve(String name, InterpolatedDouble<ParticleVariables> expression)
+	{
+		if(!name.startsWith("variable."))
+		{
+			HammerAnimations.LOG.warn("Tried to registerVariable, the name '{}' does not start with 'variable.'", name);
+			return;
+		}
+		
+		this.curves.put(name, new InterpolatedDouble.NumberWrapped<>(expression));
 	}
 	
 	public void replaceVariables()
@@ -569,19 +576,20 @@ public class ParticleEmitter
 	private int getBrightnessCached(BlockPos pos)
 	{
 		return brightnessCache.computeIfAbsent(pos.asLong(), l ->
-		{
-			BlockPos ipos = pos.immutable();
-			int max = LevelRenderer.getLightColor(world, ipos);
-			for(var dir : Direction.values())
-			{
-				int cur = LevelRenderer.getLightColor(world, ipos.relative(dir));
-				max = LightTexture.pack(
-						Math.max(LightTexture.block(max), LightTexture.block(cur)),
-						Math.max(LightTexture.sky(max), LightTexture.sky(cur))
-				);
-			}
-			return max;
-		});
+				{
+					BlockPos ipos = pos.immutable();
+					int max = LevelRenderer.getLightColor(world, ipos);
+					for(var dir : Direction.values())
+					{
+						int cur = LevelRenderer.getLightColor(world, ipos.relative(dir));
+						max = LightTexture.pack(
+								Math.max(LightTexture.block(max), LightTexture.block(cur)),
+								Math.max(LightTexture.sky(max), LightTexture.sky(cur))
+						);
+					}
+					return max;
+				}
+		);
 	}
 	
 	@Override

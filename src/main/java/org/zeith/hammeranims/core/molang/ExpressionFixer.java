@@ -1,4 +1,4 @@
-package org.zeith.hammeranims.core.js;
+package org.zeith.hammeranims.core.molang;
 
 import java.util.*;
 import java.util.function.UnaryOperator;

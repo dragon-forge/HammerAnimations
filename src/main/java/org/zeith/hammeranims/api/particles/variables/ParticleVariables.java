@@ -1,17 +1,23 @@
 package org.zeith.hammeranims.api.particles.variables;
 
-import org.joml.Vector3d;
-import org.joml.Vector3f;
-import org.zeith.hammeranims.api.animation.interp.IVariableAccess;
-import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
+import org.joml.*;
+import org.zeith.hammeranims.api.animation.interp.*;
+import org.zeith.hammeranims.api.animation.scope.Variables;
+import org.zeith.hammeranims.api.particles.emitter.*;
+import org.zeith.hammeranims.core.molang.MolangExpressionParser;
+import org.zeith.hammeranims.molang.Expression;
+import org.zeith.hammeranims.molang.runtime.*;
+import org.zeith.hammeranims.molang.runtime.value.MoValue;
 
-import java.util.HashMap;
-import java.util.function.BiConsumer;
+import java.util.List;
+
+import static org.zeith.hammeranims.core.molang.MolangExpressionParser.*;
 
 public class ParticleVariables
-		extends HashMap<String, Object>
 		implements IVariableAccess
 {
+	public final Variables variables = new Variables();
+	
 	public double emitter_age;
 	public double emitter_lifetime;
 	public double emitter_random_1;
@@ -32,24 +38,50 @@ public class ParticleVariables
 	public double particle_random_4;
 	public int particle_bounces;
 	
-	@Override
-	public void putObjects(BiConsumer<String, Object> storage)
+	public ParticleVariables()
 	{
-		storage.accept("v", this);
-		storage.accept("variable", this);
+		MolangExpressionParser.initializeParticleVariables(this);
+	}
+	
+	public void update(BedrockParticle particle, ParticleEmitter emitter, float partialTicks)
+	{
+		addCustomVariables(
+				MolangExpressionParser.getMolangStorage(this),
+				particle,
+				emitter,
+				partialTicks
+		);
+	}
+	
+	protected void addCustomVariables(IVariableStorage env, BedrockParticle particle, ParticleEmitter emitter, float partialTicks)
+	{
+//		env.store(new String[] {"query", "test_value"}, 1);
+	}
+	
+	public void putUpdate(String key, List<Expression> value)
+	{
+		if(!key.startsWith("variable.")) return;
+		MoLangRuntime runtime = variables.computeIfAbsent(RUNTIME_SYMBOL, RUNTIME_FACTORY);
+		MoLangEnvironment env = runtime.getEnvironment();
+		env.setValue(key, runtime.execute(value));
 	}
 	
 	public void putUpdate(String key, InterpolatedDouble.NumberWrapped<ParticleVariables> value)
 	{
 		if(!key.startsWith("variable.")) return;
-		key = key.substring(9);
-		value.update(this);
-		put(key, value);
+		MoLangRuntime runtime = variables.computeIfAbsent(RUNTIME_SYMBOL, RUNTIME_FACTORY);
+		MoLangEnvironment env = runtime.getEnvironment();
+		env.setValue(key, MoValue.of(value.get(this)));
+	}
+	
+	@Override
+	public Variables getVariables()
+	{
+		return variables;
 	}
 	
 	public static class DistantVector
 	{
-		
 		public double x, y, z, distance;
 		
 		public void set(Vector3d vec)

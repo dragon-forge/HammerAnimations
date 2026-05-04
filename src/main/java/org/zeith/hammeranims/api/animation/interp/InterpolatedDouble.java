@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.animation.interp;
 
 import com.google.gson.JsonElement;
-import org.zeith.hammeranims.core.js.ExpressionParser;
+import org.zeith.hammeranims.core.molang.MolangExpressionParser;
 
 @FunctionalInterface
 public interface InterpolatedDouble<T extends IVariableAccess>
@@ -25,7 +25,7 @@ public interface InterpolatedDouble<T extends IVariableAccess>
 	
 	static <T extends IVariableAccess> InterpolatedDouble<T> parse(String expression)
 	{
-		return ExpressionParser.parse(expression);
+		return MolangExpressionParser.parse(expression);
 	}
 	
 	static <T extends IVariableAccess> InterpolatedDouble<T> parse(Object o)

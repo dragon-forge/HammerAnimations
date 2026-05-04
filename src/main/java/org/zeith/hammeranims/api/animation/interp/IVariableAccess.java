@@ -1,8 +1,8 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import java.util.function.BiConsumer;
+import org.zeith.hammeranims.api.animation.scope.Variables;
 
 public interface IVariableAccess
 {
-	void putObjects(BiConsumer<String, Object> storage);
+	Variables getVariables();
 }

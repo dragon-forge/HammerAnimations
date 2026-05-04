@@ -42,7 +42,6 @@ public class HammerAnimations
 		
 		LOG.info("{} is constructing.", MOD_NAME);
 		PROXY.construct(modBus);
-		JsFactory.init(true);
 		
 		LanguageAdapter.registerMod(MOD_ID);
 	}
