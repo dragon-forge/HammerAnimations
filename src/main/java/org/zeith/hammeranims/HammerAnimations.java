@@ -5,12 +5,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.*;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
 import org.zeith.hammeranims.core.impl.api.particles.ParticleDecoder;
-import org.zeith.hammeranims.core.js.JsFactory;
 import org.zeith.hammeranims.core.proxy.*;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.event.fml.FMLFingerprintCheckEvent;
@@ -40,7 +38,6 @@ public class HammerAnimations
 		
 		LOG.info("{} is constructing.", MOD_NAME);
 		PROXY.construct();
-		JsFactory.init(true);
 		
 		LanguageAdapter.registerMod(MOD_ID);
 	}
