@@ -1,18 +1,19 @@
 package org.zeith.hammeranims.core.contents.particles.components.motion;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
+import org.zeith.hammeranims.api.particles.components.IParticleComponent;
+import org.zeith.hammeranims.api.particles.components.inst.IParticleCompInstance;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleInitialize;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
+import org.zeith.hammeranims.api.particles.emitter.*;
 
 public class ParcomInitialSpin
-		implements IParticleInitialize
+		implements IParticleComponent
 {
-	public InterpolatedDouble<ParticleVariables> rotation = InterpolatedDouble.zero();
-	public InterpolatedDouble<ParticleVariables> rate = InterpolatedDouble.zero();
+	public LzFactory rotation = InterpolatedDouble.zero();
+	public LzFactory rate = InterpolatedDouble.zero();
 	
 	public ParcomInitialSpin(JsonElement elem)
 	{
@@ -23,10 +24,31 @@ public class ParcomInitialSpin
 	}
 	
 	@Override
-	public void apply(ParticleEmitter emitter, BedrockParticle particle)
+	public IParticleCompInstance createInstance(LzVariableStore vars)
 	{
-		ParticleVariables v = emitter.vars;
-		particle.initialRotation = (float) this.rotation.get(v);
-		particle.rotationVelocity = (float) this.rate.get(v) / 20;
+		return new ParcomInitialSpinInstance(
+				rotation.instantiate(vars),
+				rate.instantiate(vars)
+		);
+	}
+	
+	public static class ParcomInitialSpinInstance
+			implements IParticleInitialize
+	{
+		public final LzExpression rotation;
+		public final LzExpression rate;
+		
+		public ParcomInitialSpinInstance(LzExpression rotation, LzExpression rate)
+		{
+			this.rotation = rotation;
+			this.rate = rate;
+		}
+		
+		@Override
+		public void apply(ParticleEmitter emitter, BedrockParticle particle)
+		{
+			particle.initialRotation = (float) this.rotation.get();
+			particle.rotationVelocity = (float) this.rate.get() / 20;
+		}
 	}
 }

@@ -1,19 +1,18 @@
 package org.zeith.hammeranims.core.contents.particles.components.rate;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.components.itf.IParticlePostRender;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 
 public class ParcomRateSteady
 		extends ParcomRate
-		implements IParticlePostRender
 {
-	public static final InterpolatedDouble<ParticleVariables> DEFAULT_PARTICLES = InterpolatedDouble.constant(50);
+	public static final LzFactory DEFAULT_PARTICLES = InterpolatedDouble.constant(50);
 	
-	public InterpolatedDouble<ParticleVariables> spawnRate = InterpolatedDouble.one();
+	public LzFactory spawnRate = InterpolatedDouble.one();
 	
 	public ParcomRateSteady(JsonElement elem)
 	{
@@ -25,39 +24,61 @@ public class ParcomRateSteady
 	}
 	
 	@Override
-	public void postRender(ParticleEmitter emitter, float partialTicks)
-	{
-		if(emitter.playing)
-		{
-			double particles = emitter.getAge(partialTicks) * this.spawnRate.get(emitter.vars);
-			double diff = particles - emitter.spawnedParticles;
-			double spawn = Math.round(diff);
-			
-			if(spawn > 0)
-			{
-				emitter.setEmitterVariables(partialTicks);
-				
-				double track = spawn;
-				
-				for(int i = 0; i < spawn; i++)
-				{
-					if(emitter.particles.size() < this.particles.get(emitter.vars))
-					{
-						emitter.spawnParticle();
-					} else
-					{
-						track -= 1;
-					}
-				}
-				
-				emitter.spawnedParticles += track;
-			}
-		}
-	}
-	
-	@Override
 	public int getSortingIndex()
 	{
 		return 10;
+	}
+	
+	@Override
+	public ParcomRateInstance createInstance(LzVariableStore vars)
+	{
+		return new ParcomRateSteadyInstance(
+				particles.instantiate(vars),
+				spawnRate.instantiate(vars)
+		);
+	}
+	
+	public static class ParcomRateSteadyInstance
+			extends ParcomRateInstance
+			implements IParticlePostRender
+	{
+		protected final LzExpression spawnRate;
+		
+		public ParcomRateSteadyInstance(LzExpression particles, LzExpression spawnRate)
+		{
+			super(particles);
+			this.spawnRate = spawnRate;
+		}
+		
+		@Override
+		public void postRender(ParticleEmitter emitter, float partialTicks)
+		{
+			if(emitter.playing)
+			{
+				double particles = emitter.getAge(partialTicks) * this.spawnRate.get();
+				double diff = particles - emitter.spawnedParticles;
+				double spawn = Math.round(diff);
+				
+				if(spawn > 0)
+				{
+					emitter.setEmitterVariables(partialTicks);
+					
+					double track = spawn;
+					
+					for(int i = 0; i < spawn; i++)
+					{
+						if(emitter.particles.size() < this.particles.get())
+						{
+							emitter.spawnParticle();
+						} else
+						{
+							track -= 1;
+						}
+					}
+					
+					emitter.spawnedParticles += track;
+				}
+			}
+		}
 	}
 }

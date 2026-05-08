@@ -1,18 +1,19 @@
 package org.zeith.hammeranims.core.contents.particles.components.meta;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
-import org.zeith.hammeranims.api.particles.components.itf.IEmitterInitialize;
-import org.zeith.hammeranims.api.particles.components.itf.IEmitterUpdate;
+import org.zeith.hammeranims.api.particles.components.IParticleComponent;
+import org.zeith.hammeranims.api.particles.components.inst.IParticleCompInstance;
+import org.zeith.hammeranims.api.particles.components.itf.*;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 
 public class ParcomInitialization
-		implements IEmitterInitialize, IEmitterUpdate
+		implements IParticleComponent
 {
-	public InterpolatedDouble<ParticleVariables> creation = InterpolatedDouble.zero();
-	public InterpolatedDouble<ParticleVariables> update = InterpolatedDouble.zero();
+	public LzFactory creation = InterpolatedDouble.zero();
+	public LzFactory update = InterpolatedDouble.zero();
 	
 	public ParcomInitialization(JsonElement elem)
 	{
@@ -23,16 +24,38 @@ public class ParcomInitialization
 	}
 	
 	@Override
-	public void apply(ParticleEmitter emitter)
+	public IParticleCompInstance createInstance(LzVariableStore vars)
 	{
-		emitter.initialValues.clear();
-		this.creation.get(emitter.vars);
+		return new ParcomInitializationInstance(
+				creation.instantiate(vars),
+				update.instantiate(vars)
+		);
 	}
 	
-	@Override
-	public void update(ParticleEmitter emitter)
+	public static class ParcomInitializationInstance
+			implements IEmitterInitialize, IEmitterUpdate
 	{
-		this.update.get(emitter.vars);
-		emitter.replaceVariables();
+		public final LzExpression creation;
+		public final LzExpression update;
+		
+		public ParcomInitializationInstance(LzExpression creation, LzExpression update)
+		{
+			this.creation = creation;
+			this.update = update;
+		}
+		
+		@Override
+		public void apply(ParticleEmitter emitter)
+		{
+			emitter.initialValues.clear();
+			this.creation.get();
+		}
+		
+		@Override
+		public void update(ParticleEmitter emitter)
+		{
+			this.update.get();
+			emitter.replaceVariables();
+		}
 	}
 }

@@ -1,14 +1,16 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
 import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import org.zeith.hammeranims.api.animation.AnimationLocation;
-import org.zeith.hammeranims.api.animation.LoopMode;
-import org.zeith.hammeranims.api.animation.data.IAnimationData;
+import com.google.common.collect.ImmutableMap;
+import dev.zeith.lzvm.LzVariableStore;
+import net.minecraft.nbt.*;
+import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.animation.data.*;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
+
+import java.util.Map;
 
 public class ActiveAnimation
 		implements ICompoundSerializable
@@ -25,22 +27,30 @@ public class ActiveAnimation
 	
 	public int lastTick;
 	
-	public ActiveAnimation(HolderLookup.Provider lookup, CompoundTag tag)
+	public final Map<String, BoneAnimationInstance> bones;
+	
+	public ActiveAnimation(HolderLookup.Provider lookup, CompoundTag tag, LzVariableStore vars)
 	{
 		deserializeNBT(lookup, tag);
+		this.bones = instantiateBones(this.config, vars);
 	}
 	
-	public ActiveAnimation(ConfiguredAnimation config)
+	public ActiveAnimation(ConfiguredAnimation config, LzVariableStore vars)
 	{
 		this.config = config;
+		this.bones = instantiateBones(config, vars);
+	}
+	
+	public Map<String, BoneAnimationInstance> getBoneAnimations()
+	{
+		return bones;
 	}
 	
 	public boolean isDone(double sysTime)
 	{
-		IAnimationData data;
 		return config.animation == null
 				|| (config.loopMode == LoopMode.ONCE && (
-				(data = config.animation.getData()) == null
+				config.animation.getData() == null
 						|| (sysTime - activationTime) * config.speed >= getLengthSeconds()
 		));
 	}
@@ -70,13 +80,21 @@ public class ActiveAnimation
 		else this.realTimeWeight = 1F;
 	}
 	
+	public double getLengthSeconds()
+	{
+		return config.timeFunction.getLengthSeconds(this);
+	}
+	
 	public float getWeight()
 	{
 		return realTimeWeight * config.weight * config.getAnimation().getData().getWeight();
 	}
 	
-	public double getLengthSeconds()
+	protected Map<String, BoneAnimationInstance> instantiateBones(ConfiguredAnimation config, LzVariableStore vars)
 	{
-		return config.timeFunction.getLengthSeconds(this);
+		ImmutableMap.Builder<String, BoneAnimationInstance> bones = ImmutableMap.builder();
+		for(Map.Entry<String, BoneAnimation> e : config.animation.getData().getBoneAnimations().entrySet())
+			bones.put(e.getKey(), new BoneAnimationInstance(e.getValue(), vars));
+		return bones.build();
 	}
 }

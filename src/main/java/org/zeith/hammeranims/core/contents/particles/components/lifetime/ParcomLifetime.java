@@ -1,17 +1,19 @@
 package org.zeith.hammeranims.core.contents.particles.components.lifetime;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
+import org.zeith.hammeranims.api.particles.components.IParticleComponent;
+import org.zeith.hammeranims.api.particles.components.inst.IParticleCompInstance;
 import org.zeith.hammeranims.api.particles.components.itf.IEmitterUpdate;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 
 public abstract class ParcomLifetime
-		implements IEmitterUpdate
+		implements IParticleComponent
 {
-	public static final InterpolatedDouble<ParticleVariables> DEFAULT_ACTIVE = InterpolatedDouble.constant(10);
+	public static final LzFactory DEFAULT_ACTIVE = InterpolatedDouble.constant(10);
 	
-	public InterpolatedDouble<ParticleVariables> activeTime = DEFAULT_ACTIVE;
+	public LzFactory activeTime = DEFAULT_ACTIVE;
 	
 	public ParcomLifetime(JsonElement elem)
 	{
@@ -29,5 +31,19 @@ public abstract class ParcomLifetime
 	public int getSortingIndex()
 	{
 		return -10;
+	}
+	
+	@Override
+	public abstract ParcomLifetimeInstance createInstance(LzVariableStore vars);
+	
+	public static abstract class ParcomLifetimeInstance
+			implements IEmitterUpdate
+	{
+		public final LzExpression activeTime;
+		
+		public ParcomLifetimeInstance(LzExpression activeTime)
+		{
+			this.activeTime = activeTime;
+		}
 	}
 }

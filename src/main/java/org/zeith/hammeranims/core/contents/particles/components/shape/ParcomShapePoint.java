@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.core.contents.particles.components.shape;
 
 import com.google.gson.JsonElement;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
+import org.zeith.hammeranims.api.particles.emitter.*;
 
 public class ParcomShapePoint
 		extends ParcomShapeBase
@@ -14,16 +14,34 @@ public class ParcomShapePoint
 	}
 	
 	@Override
-	public void apply(ParticleEmitter emitter, BedrockParticle particle)
+	public ParcomShapeBaseInstance createInstance(LzVariableStore vars)
 	{
-		ParticleVariables v = emitter.vars;
-		particle.position.x = (float) this.offset[0].get(v);
-		particle.position.y = (float) this.offset[1].get(v);
-		particle.position.z = (float) this.offset[2].get(v);
-		
-		if(this.direction instanceof ShapeDirection.Vector)
+		return new ParcomShapePointInstance(
+				LzFactory.instantiate(vars, offset),
+				direction.apply(vars),
+				surface
+		);
+	}
+	
+	public static class ParcomShapePointInstance
+			extends ParcomShapeBaseInstance
+	{
+		public ParcomShapePointInstance(LzExpression[] offset, ShapeDirection direction, boolean surface)
 		{
-			this.direction.applyDirection(particle, particle.position.x, particle.position.y, particle.position.z);
+			super(offset, direction, surface);
+		}
+		
+		@Override
+		public void apply(ParticleEmitter emitter, BedrockParticle particle)
+		{
+			particle.position.x = (float) this.offset[0].get();
+			particle.position.y = (float) this.offset[1].get();
+			particle.position.z = (float) this.offset[2].get();
+			
+			if(this.direction instanceof ShapeDirection.Vector)
+			{
+				this.direction.applyDirection(particle, particle.position.x, particle.position.y, particle.position.z);
+			}
 		}
 	}
 }

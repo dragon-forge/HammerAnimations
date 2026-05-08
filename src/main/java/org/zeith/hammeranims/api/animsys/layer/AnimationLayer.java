@@ -1,20 +1,17 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
 import net.minecraft.core.HolderLookup;
-import lombok.val;
+import lombok.*;
 import net.minecraft.nbt.*;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
-import org.zeith.hammeranims.api.animation.data.effects.AnimatedSoundEffect;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.actions.AnimationActionInstance;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
-import org.zeith.hammeranims.core.init.ContainersHA;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
 
@@ -42,6 +39,9 @@ public class AnimationLayer
 	
 	@Setter
 	public float weight = 1F;
+	
+	@Setter
+	public float defaultTransitionTime = 0.25F;
 	
 	public boolean frozen;
 	
@@ -74,7 +74,7 @@ public class AnimationLayer
 	
 	public boolean startAnimation(@Nonnull IAnimationSource animation)
 	{
-		return startAnimation(animation.configure());
+		return startAnimation(animation.configure().transitionTime(defaultTransitionTime));
 	}
 	
 	public boolean startAnimation(@Nonnull ConfiguredAnimation animation)
@@ -98,7 +98,7 @@ public class AnimationLayer
 		
 		lastAnimation = currentAnimation;
 		startTime = system.getTime(0);
-		currentAnimation = animation.activate(this);
+		currentAnimation = animation.activate(this, query);
 		
 		if(system.autoSync && allowAutoSync) system.sync();
 		
@@ -115,16 +115,18 @@ public class AnimationLayer
 		
 		if(lastAnimation != null)
 		{
-			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : 0.25F;
+			ActiveAnimation la = lastAnimation;
+			ActiveAnimation aa = currentAnimation;
+			float transitionTime = aa != null ? aa.config.transitionTime : defaultTransitionTime;
 			float weight = (transitionTime <= 0
 							? 0F
 							: (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime)
-						   ) * this.weight * lastAnimation.getWeight();
+						   ) * this.weight * la.getWeight();
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
 			
-			SerializableMask sm = lastAnimation.config.mask;
-			if(sm != null) pose.apply(sm, lastAnimation.config.getAnimation().getData(), mask, mode, weight, query);
-			else pose.apply(lastAnimation.config.getAnimation().getData(), mask, mode, weight, query);
+			SerializableMask sm = la.config.mask;
+			if(sm != null) pose.apply(sm, lastAnimation, mask, mode, weight, query);
+			else pose.apply(lastAnimation, mask, mode, weight, query);
 		}
 		
 		if(currentAnimation != null)
@@ -137,8 +139,8 @@ public class AnimationLayer
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
 			
 			SerializableMask sm = currentAnimation.config.mask;
-			if(sm != null) pose.apply(sm, currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
-			else pose.apply(currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
+			if(sm != null) pose.apply(sm, currentAnimation, mask, mode, weight, query);
+			else pose.apply(currentAnimation, mask, mode, weight, query);
 		}
 	}
 	
@@ -200,7 +202,7 @@ public class AnimationLayer
 		
 		if(lastAnimation != null)
 		{
-			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : 0.25F;
+			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : defaultTransitionTime;
 			float weight = transitionTime <= 0 ? 0F :
 						   (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime) *
 						   this.weight *
@@ -259,11 +261,11 @@ public class AnimationLayer
 		frozen = tag.getBoolean("Frozen");
 		
 		if(tag.contains("Last", Tag.TAG_COMPOUND))
-			lastAnimation = new ActiveAnimation(provider, tag.getCompound("Last"));
+			lastAnimation = new ActiveAnimation(provider, tag.getCompound("Last"), query);
 		else lastAnimation = null;
 		
 		if(tag.contains("Current", Tag.TAG_COMPOUND))
-			currentAnimation = new ActiveAnimation(provider, tag.getCompound("Current"));
+			currentAnimation = new ActiveAnimation(provider, tag.getCompound("Current"), query);
 		else currentAnimation = null;
 	}
 	
@@ -291,6 +293,7 @@ public class AnimationLayer
 		protected Query query = new Query();
 		protected ILayerMask mask = ILayerMask.TRUE;
 		protected BlendMode blendMode = BlendMode.ADD;
+		protected float defaultTransitionTime = 0.25F;
 		
 		public Builder(String name)
 		{
@@ -312,6 +315,12 @@ public class AnimationLayer
 		public Builder weight(float weight)
 		{
 			this.weight = weight;
+			return this;
+		}
+		
+		public Builder defaultTransitionTime(float defaultTransitionTime)
+		{
+			this.defaultTransitionTime = defaultTransitionTime;
 			return this;
 		}
 		
@@ -349,6 +358,7 @@ public class AnimationLayer
 		{
 			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync, persistent);
 			layer.weight = weight;
+			layer.defaultTransitionTime = defaultTransitionTime;
 			return layer;
 		}
 	}

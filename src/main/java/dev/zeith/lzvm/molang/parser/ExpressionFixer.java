@@ -1,4 +1,4 @@
-package org.zeith.hammeranims.core.molang;
+package dev.zeith.lzvm.molang.parser;
 
 import java.util.*;
 import java.util.function.UnaryOperator;

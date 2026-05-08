@@ -4,6 +4,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.animsys.actions.AnimationActionInstance;
 import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
@@ -215,9 +216,9 @@ public class ConfiguredAnimation
 		return new ConfiguredAnimation(this);
 	}
 	
-	public ActiveAnimation activate(AnimationLayer layer)
+	public ActiveAnimation activate(AnimationLayer layer, Query query)
 	{
-		ActiveAnimation aa = new ActiveAnimation(this);
+		ActiveAnimation aa = new ActiveAnimation(this, query);
 		aa.activationTime = layer.startTime;
 		return aa;
 	}

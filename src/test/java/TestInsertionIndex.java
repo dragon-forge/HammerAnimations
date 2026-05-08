@@ -57,7 +57,7 @@ public class TestInsertionIndex
 		aCtr.reload(TestInsertionIndex::read);
 		gCtr.reload(TestInsertionIndex::read);
 		
-//		testAnim(aCtr);
+		testAnim(aCtr);
 	}
 	
 	public static void testAnim(IAnimationContainer aCtr)
@@ -68,17 +68,17 @@ public class TestInsertionIndex
 		
 		IAnimationData anim = aCtr.getAnimations().get(animation).getData();
 		
-		BoneAnimation boneAnimation = anim.getBoneAnimations().get(boneName);
+		Query q = new Query();
+		BoneAnimationInstance boneAnimation = new BoneAnimationInstance(anim.getBoneAnimations().get(boneName), q);
 		
 		System.out.println("Animating " + boneName + " for " + frames + " frames:");
 		float seconds = anim.getLength().toMillis() / 1000F;
 		float sample = seconds / frames;
 		
-		Query q = new Query();
 		for(int i = 0; i < frames; i++)
 		{
 			q.anim_time = sample * i;
-			System.out.println("S[" + i + "] = " + boneAnimation.getScale(q));
+			System.out.println("S[" + i + "] = " + boneAnimation.getScale());
 		}
 		
 		System.out.println("Start");
@@ -88,7 +88,7 @@ public class TestInsertionIndex
 		Stopwatch sw = Stopwatch.createStarted();
 		do
 		{
-			boneAnimation.getScale(q);
+			boneAnimation.getScale();
 			++count;
 		} while(sw.elapsed(TimeUnit.SECONDS) < 10);
 		count /= 5;

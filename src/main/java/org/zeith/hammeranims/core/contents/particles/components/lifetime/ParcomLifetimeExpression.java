@@ -2,6 +2,8 @@ package org.zeith.hammeranims.core.contents.particles.components.lifetime;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
@@ -9,7 +11,7 @@ import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 public class ParcomLifetimeExpression
 		extends ParcomLifetime
 {
-	public InterpolatedDouble<ParticleVariables> expiration = InterpolatedDouble.zero();
+	public LzFactory expiration = InterpolatedDouble.zero();
 	
 	public ParcomLifetimeExpression(JsonElement elem)
 	{
@@ -26,16 +28,37 @@ public class ParcomLifetimeExpression
 	}
 	
 	@Override
-	public void update(ParticleEmitter emitter)
+	public ParcomLifetimeInstance createInstance(LzVariableStore vars)
 	{
-		if(this.activeTime.get(emitter.vars) > 0)
+		return new ParcomLifetimeExpressionInstance(
+				activeTime.instantiate(vars),
+				expiration.instantiate(vars)
+		);
+	}
+	
+	public static class ParcomLifetimeExpressionInstance
+			extends ParcomLifetimeInstance
+	{
+		protected final LzExpression expiration;
+		
+		public ParcomLifetimeExpressionInstance(LzExpression activeTime, LzExpression expiration)
 		{
-			emitter.start();
+			super(activeTime);
+			this.expiration = expiration;
 		}
 		
-		if(this.expiration.get(emitter.vars) > 0)
+		@Override
+		public void update(ParticleEmitter emitter)
 		{
-			emitter.stop();
+			if(this.activeTime.get() > 0)
+			{
+				emitter.start();
+			}
+			
+			if(this.expiration.get() > 0)
+			{
+				emitter.stop();
+			}
 		}
 	}
 }

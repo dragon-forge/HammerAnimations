@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.contents.particles.components.shape;
 
+import dev.zeith.lzvm.jvm.*;
 import org.joml.Vector3d;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
@@ -45,9 +46,9 @@ public abstract class ShapeDirection
 	public static class Vector
 			extends ShapeDirection
 	{
-		public InterpolatedDouble<ParticleVariables> x, y, z;
+		public LzExpression x, y, z;
 		
-		public Vector(InterpolatedDouble<ParticleVariables> x, InterpolatedDouble<ParticleVariables> y, InterpolatedDouble<ParticleVariables> z)
+		public Vector(LzExpression x, LzExpression y, LzExpression z)
 		{
 			this.x = x;
 			this.y = y;
@@ -57,8 +58,7 @@ public abstract class ShapeDirection
 		@Override
 		public void applyDirection(BedrockParticle particle, double x, double y, double z)
 		{
-			ParticleVariables v = particle.owner.vars;
-			particle.speed.set((float) this.x.get(v), (float) this.y.get(v), (float) this.z.get(v));
+			particle.speed.set((float) this.x.get(), (float) this.y.get(), (float) this.z.get());
 			
 			if(particle.speed.length() <= 0)
 			{

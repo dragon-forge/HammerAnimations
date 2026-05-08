@@ -2,10 +2,8 @@ package org.zeith.hammeranims.api.particles.event;
 
 import lombok.Getter;
 import net.neoforged.bus.api.Event;
-import org.zeith.hammeranims.api.particles.IParticleContainer;
-import org.zeith.hammeranims.api.particles.ParticleEffect;
-import org.zeith.hammeranims.api.particles.components.IParticleComponent;
-import org.zeith.hammeranims.api.particles.components.IParticleComponentType;
+import org.zeith.hammeranims.api.particles.*;
+import org.zeith.hammeranims.api.particles.components.*;
 
 import java.util.Map;
 import java.util.function.Function;

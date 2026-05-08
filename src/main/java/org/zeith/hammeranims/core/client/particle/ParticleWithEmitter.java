@@ -1,14 +1,12 @@
 package org.zeith.hammeranims.core.client.particle;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.*;
 import lombok.Getter;
-import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.*;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.*;
 import net.minecraft.world.phys.AABB;
+import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
@@ -119,6 +117,15 @@ public class ParticleWithEmitter
 	{
 		if(emitter.generation >= MAX_EMITTER_GENERATIONS) return;
 		Minecraft mc = Minecraft.getInstance();
-		mc.execute(() -> mc.particleEngine.add(this));
+		mc.execute(() ->
+		{
+			try
+			{
+				mc.particleEngine.add(this);
+			} catch(Exception e)
+			{
+				HammerAnimations.LOG.error("Failed to spawn particle", e);
+			}
+		});
 	}
 }

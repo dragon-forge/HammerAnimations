@@ -1,15 +1,20 @@
 package org.zeith.hammeranims.core.contents.particles.components.shape;
 
 import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
+import org.zeith.hammeranims.api.particles.components.IParticleComponent;
+import org.zeith.hammeranims.api.particles.components.inst.IParticleCompInstance;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleInitialize;
 
+import java.util.function.Function;
+
 public abstract class ParcomShapeBase
-		implements IParticleInitialize
+		implements IParticleComponent
 {
-	@SuppressWarnings("rawtypes")
-	public InterpolatedDouble[] offset = { InterpolatedDouble.zero(), InterpolatedDouble.zero(), InterpolatedDouble.zero() };
-	public ShapeDirection direction = ShapeDirection.OUTWARDS;
+	public LzFactory[] offset = {InterpolatedDouble.zero(), InterpolatedDouble.zero(), InterpolatedDouble.zero()};
+	public Function<LzVariableStore, ShapeDirection> direction = f -> ShapeDirection.OUTWARDS;
 	public boolean surface = false;
 	
 	public ParcomShapeBase(JsonElement elem)
@@ -38,18 +43,22 @@ public abstract class ParcomShapeBase
 			{
 				String name = direction.getAsString();
 				
-				if(name.equals("inwards")) this.direction = ShapeDirection.INWARDS;
-				else this.direction = ShapeDirection.OUTWARDS;
+				if(name.equals("inwards")) this.direction = f -> ShapeDirection.INWARDS;
+				else this.direction = f -> ShapeDirection.OUTWARDS;
 			} else if(direction.isJsonArray())
 			{
 				JsonArray array = direction.getAsJsonArray();
 				
 				if(array.size() >= 3)
 				{
-					this.direction = new ShapeDirection.Vector(
-							InterpolatedDouble.parse(array.get(0)),
-							InterpolatedDouble.parse(array.get(1)),
-							InterpolatedDouble.parse(array.get(2))
+					LzFactory x = InterpolatedDouble.parse(array.get(0));
+					LzFactory y = InterpolatedDouble.parse(array.get(1));
+					LzFactory z = InterpolatedDouble.parse(array.get(2));
+					
+					this.direction = vars -> new ShapeDirection.Vector(
+							x.instantiate(vars),
+							y.instantiate(vars),
+							z.instantiate(vars)
 					);
 				}
 			}
@@ -58,6 +67,24 @@ public abstract class ParcomShapeBase
 		if(element.has("surface_only"))
 		{
 			this.surface = element.get("surface_only").getAsBoolean();
+		}
+	}
+	
+	@Override
+	public abstract ParcomShapeBaseInstance createInstance(LzVariableStore vars);
+	
+	public static abstract class ParcomShapeBaseInstance
+			implements IParticleInitialize
+	{
+		protected final LzExpression[] offset;
+		protected final ShapeDirection direction;
+		public final boolean surface;
+		
+		public ParcomShapeBaseInstance(LzExpression[] offset, ShapeDirection direction, boolean surface)
+		{
+			this.offset = offset;
+			this.direction = direction;
+			this.surface = surface;
 		}
 	}
 }
