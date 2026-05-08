@@ -18,13 +18,18 @@ import java.util.function.Supplier;
 public class MolangExpressionParser
 {
 	static IClassDefiner CLASS_LOADER = new LzJVM.LzClassLoader();
-	static LzJvmCompiler JVM_COMPILER = new LzJvmCompiler();
-	static MoLangCompiler MOLANG_COMPILER = new MoLangCompiler();
+	static final LzJvmCompiler JVM_COMPILER = new LzJvmCompiler();
+	static final MoLangCompiler MOLANG_COMPILER = new MoLangCompiler();
 	static Map<String, FactoryReference> CACHE = new ConcurrentHashMap<>();
 	
 	static
 	{
 		HammerAnimationsApi.EVENT_BUS.register(MolangExpressionParser.class);
+		
+		// Include minimal set of classes required to provide functionality.
+		Set<String> permittedClasses = new HashSet<>();
+		MOLANG_COMPILER.includeRequiredClasses(permittedClasses);
+		JVM_COMPILER.addJCallShutter(new ClassSetJCallShutter(permittedClasses));
 	}
 	
 	public static LzFactory parse(String expression)
@@ -52,7 +57,6 @@ public class MolangExpressionParser
 	public static void reload(ReloadHammerAnimationsEvent e)
 	{
 		CLASS_LOADER = new LzJVM.LzClassLoader();
-		MOLANG_COMPILER = new MoLangCompiler();
 		CACHE.clear();
 	}
 	

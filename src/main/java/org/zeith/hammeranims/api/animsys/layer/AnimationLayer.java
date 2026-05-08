@@ -120,7 +120,7 @@ public class AnimationLayer
 			float weight = (transitionTime <= 0
 							? 0F
 							: (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime)
-						   ) * this.weight * la.getWeight();
+			) * this.weight * la.getWeight();
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
 			
 			SerializableMask sm = la.config.mask;
@@ -134,7 +134,7 @@ public class AnimationLayer
 			float weight = (transitionTime <= 0
 							? 1F
 							: (float) Math.min(sysTime - startTime, transitionTime) / transitionTime
-						   ) * this.weight * currentAnimation.getWeight();
+			) * this.weight * currentAnimation.getWeight();
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
 			
 			SerializableMask sm = currentAnimation.config.mask;
@@ -204,8 +204,8 @@ public class AnimationLayer
 			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : defaultTransitionTime;
 			float weight = transitionTime <= 0 ? 0F :
 						   (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime) *
-						   this.weight *
-						   lastAnimation.config.weight;
+								   this.weight *
+								   lastAnimation.config.weight;
 			if(weight <= 0)
 				lastAnimation = null;
 		}
@@ -289,7 +289,7 @@ public class AnimationLayer
 		protected float weight = 1F;
 		protected boolean allowAutoSync = true;
 		protected boolean persistent = true;
-		protected Query query = new Query();
+		protected Query query;
 		protected ILayerMask mask = ILayerMask.TRUE;
 		protected BlendMode blendMode = BlendMode.ADD;
 		protected float defaultTransitionTime = 0.25F;
@@ -297,6 +297,13 @@ public class AnimationLayer
 		public Builder(String name)
 		{
 			this.name = name;
+		}
+		
+		public Builder defaultQuery(Query query)
+		{
+			if(this.query == null)
+				this.query = query;
+			return this;
 		}
 		
 		public Builder query(Query query)
@@ -355,6 +362,7 @@ public class AnimationLayer
 		
 		public AnimationLayer build(AnimationSystem sys)
 		{
+			if(query == null) query = new Query();
 			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync, persistent);
 			layer.weight = weight;
 			layer.defaultTransitionTime = defaultTransitionTime;

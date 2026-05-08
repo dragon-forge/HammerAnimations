@@ -34,7 +34,7 @@ public class LzVM
 			jcallShutter = shutter;
 			return this;
 		}
-		jcallShutter = jcallShutter.and(shutter);
+		jcallShutter = jcallShutter.or(shutter);
 		return this;
 	}
 	

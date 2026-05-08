@@ -13,4 +13,10 @@ public interface LzJCallShutter
 		LzJCallShutter dis = this;
 		return (className, call) -> dis.permits(className, call) && other.permits(className, call);
 	}
+	
+	default LzJCallShutter or(LzJCallShutter other)
+	{
+		LzJCallShutter dis = this;
+		return (className, call) -> dis.permits(className, call) || other.permits(className, call);
+	}
 }

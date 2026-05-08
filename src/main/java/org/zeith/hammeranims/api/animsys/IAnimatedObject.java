@@ -12,6 +12,7 @@ import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
 import org.zeith.hammeranims.api.animation.data.effects.AnimatedSoundEffect;
+import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
@@ -61,6 +62,11 @@ public interface IAnimatedObject
 	Level getAnimatedObjectWorld();
 	
 	Vec3 getAnimatedObjectPosition();
+	
+	default Query createQuery()
+	{
+		return new QueryWorld(getAnimatedObjectWorld());
+	}
 	
 	default IGeometryContainer getObjectModel()
 	{
