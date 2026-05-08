@@ -1,13 +1,19 @@
 package org.zeith.hammeranims.api.animation.interp;
 
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
+
 import java.util.Arrays;
 
 public class DoubleInterpolation
 		extends BaseInterpolation
 {
-	protected final InterpolatedDouble[] doubles;
+	public static final DoubleInterpolation ZERO = new DoubleInterpolation(InterpolatedDouble.constant(0));
+	public static final DoubleInterpolation ONE = new DoubleInterpolation(InterpolatedDouble.constant(1));
 	
-	public DoubleInterpolation(InterpolatedDouble... doubles)
+	protected final LzFactory[] doubles;
+	
+	public DoubleInterpolation(LzFactory... doubles)
 	{
 		this.doubles = doubles;
 	}
@@ -19,11 +25,9 @@ public class DoubleInterpolation
 	}
 	
 	@Override
-	public double[] get(Query q)
+	public LzExpression[] instantiate(LzVariableStore query)
 	{
-		double[] arr = new double[doubles.length];
-		for(int i = 0; i < arr.length; i++) arr[i] = doubles[i].get(q);
-		return arr;
+		return LzFactory.instantiate(query, doubles);
 	}
 	
 	@Override

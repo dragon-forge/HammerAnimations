@@ -1,11 +1,10 @@
 package org.zeith.hammeranims.api.particles.components.itf;
 
-import org.zeith.hammeranims.api.particles.components.IParticleComponent;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
+import org.zeith.hammeranims.api.particles.components.inst.IParticleCompInstance;
+import org.zeith.hammeranims.api.particles.emitter.*;
 
 public interface IParticleUpdate
-		extends IParticleComponent
+		extends IParticleCompInstance
 {
 	void update(ParticleEmitter emitter, BedrockParticle particle);
 }

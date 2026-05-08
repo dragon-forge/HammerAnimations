@@ -5,18 +5,12 @@ import com.google.gson.JsonNull;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
-import org.zeith.hammeranims.api.particles.components.IParticleComponent;
-import org.zeith.hammeranims.api.particles.components.IParticleComponentType;
-import org.zeith.hammeranims.api.particles.components.itf.*;
+import org.zeith.hammeranims.api.particles.components.*;
 import org.zeith.hammeranims.api.particles.curve.ParticleCurve;
 import org.zeith.hammeranims.api.particles.event.CreateParticleEffectEvent;
-import org.zeith.hammeranims.api.utils.InstanceGatherer;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
-import org.zeith.hammerlib.util.java.Cast;
 
 import java.util.*;
-
-import static org.zeith.hammeranims.api.utils.InstanceGatherer.getComponents;
 
 public class ParticleEffect
 {
@@ -28,14 +22,6 @@ public class ParticleEffect
 	public final List<ParticleCurve> curves;
 	
 	public final Map<IParticleComponentType, IParticleComponent> components;
-	public final List<IEmitterInitialize> emitterInitializes;
-	public final List<IEmitterUpdate> emitterUpdates;
-	public final List<IParticleInitialize> particleInitializes;
-	public final List<IParticleUpdate> particleUpdates;
-	public final List<IParticleRender> particleRender;
-	public final List<IParticlePreRender> particlePreRender;
-	public final List<IParticlePostRender> particlePostRender;
-	public final List<IParticleExpiry> particleExpiry;
 	
 	public ParticleEffect(IParticleContainer container, ParticleMaterial material, ResourceLocation texture, List<ParticleCurve> curves, ImmutableMap.Builder<IParticleComponentType, IParticleComponent> components)
 	{
@@ -43,18 +29,7 @@ public class ParticleEffect
 		this.material = material;
 		this.texture = texture;
 		this.curves = curves;
-		
 		this.components = components.build();
-		
-		Collection<IParticleComponent> coms = this.components.values();
-		this.emitterInitializes = getComponents(coms, IEmitterInitialize.class);
-		this.emitterUpdates = getComponents(coms, IEmitterUpdate.class);
-		this.particleInitializes = getComponents(coms, IParticleInitialize.class);
-		this.particleUpdates = getComponents(coms, IParticleUpdate.class);
-		this.particleRender = getComponents(coms, IParticleRender.class);
-		this.particlePreRender = getComponents(coms, IParticlePreRender.class);
-		this.particlePostRender = getComponents(coms, IParticlePostRender.class);
-		this.particleExpiry = getComponents(coms, IParticleExpiry.class);
 	}
 	
 	public static ParticleEffect empty(IParticleContainer container)
@@ -65,11 +40,6 @@ public class ParticleEffect
 	public static Builder builder()
 	{
 		return new Builder();
-	}
-	
-	public <T extends IParticleComponent> T get(Class<T> base, IParticleComponentType type)
-	{
-		return Cast.cast(components.get(type), base);
 	}
 	
 	public static class Builder

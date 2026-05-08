@@ -1,14 +1,13 @@
 package org.zeith.hammeranims.api.particles.emitter;
 
+import dev.zeith.lzvm.jvm.LzMath;
 import net.minecraft.world.entity.Entity;
 import org.joml.*;
-import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionAppearance;
-import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionTinting;
+import org.zeith.hammeranims.core.contents.particles.components.appearance.*;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
 import org.zeith.hammeranims.joml.Math;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BedrockParticle
 {
@@ -110,14 +109,14 @@ public class BedrockParticle
 	
 	public boolean isCollisionTexture(ParticleEmitter emitter)
 	{
-		ParcomCollisionAppearance a = emitter.effect.get(ParcomCollisionAppearance.class, ParticleComponentsHA.PARTICLE_COLLISION_APPEARANCE);
-		return a != null && a.enabled.get(owner.vars) >= 1 && this.intersected;
+		ParcomCollisionAppearance.ParcomCollisionAppearanceInstance a = emitter.effect.get(ParcomCollisionAppearance.ParcomCollisionAppearanceInstance.class, ParticleComponentsHA.PARTICLE_COLLISION_APPEARANCE);
+		return a != null && a.enabled.get() >= 1 && this.intersected;
 	}
 	
 	public boolean isCollisionTinting(ParticleEmitter emitter)
 	{
-		ParcomCollisionTinting a = emitter.effect.get(ParcomCollisionTinting.class, ParticleComponentsHA.PARTICLE_COLLISION_TINTING);
-		return a != null && a.enabled.get(owner.vars) >= 1 && this.intersected;
+		ParcomCollisionTinting.ParcomCollisionTintingInstance a = emitter.effect.get(ParcomCollisionTinting.ParcomCollisionTintingInstance.class, ParticleComponentsHA.PARTICLE_COLLISION_TINTING);
+		return a != null && LzMath.isNotZero(a.enabled.get()) && this.intersected;
 	}
 	
 	public int getExpireAge()

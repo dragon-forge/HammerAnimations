@@ -2,6 +2,8 @@ package org.zeith.hammeranims.core.contents.particles.components.shape;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.joml.Vector3f;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
@@ -11,7 +13,7 @@ import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 public class ParcomShapeSphere
 		extends ParcomShapeBase
 {
-	public InterpolatedDouble<ParticleVariables> radius = InterpolatedDouble.zero();
+	public LzFactory radius = InterpolatedDouble.zero();
 	
 	public ParcomShapeSphere(JsonElement elem)
 	{
@@ -22,28 +24,47 @@ public class ParcomShapeSphere
 	}
 	
 	@Override
-	public void apply(ParticleEmitter emitter, BedrockParticle particle)
+	public ParcomShapeBaseInstance createInstance(LzVariableStore vars)
 	{
-		ParticleVariables v = emitter.vars;
-		float centerX = (float) this.offset[0].get(v);
-		float centerY = (float) this.offset[1].get(v);
-		float centerZ = (float) this.offset[2].get(v);
-		float radius = (float) this.radius.get(v);
+		return new ParcomShapeSphereInstance(
+				LzFactory.instantiate(vars, offset),
+				direction.apply(vars),
+				surface,
+				radius.instantiate(vars)
+		);
+	}
+	
+	public static class ParcomShapeSphereInstance
+			extends ParcomShapeBaseInstance
+	{
+		public final LzExpression radius;
 		
-		Vector3f direction = new Vector3f((float) Math.random() * 2 - 1, (float) Math.random() * 2 - 1, (float) Math.random() * 2 - 1);
-		direction.normalize();
-		
-		if(!this.surface)
+		public ParcomShapeSphereInstance(LzExpression[] offset, ShapeDirection direction, boolean surface, LzExpression radius)
 		{
-			radius *= Math.random();
+			super(offset, direction, surface);
+			this.radius = radius;
 		}
 		
-		direction.mul(radius);
-		
-		particle.position.x = centerX + direction.x;
-		particle.position.y = centerY + direction.y;
-		particle.position.z = centerZ + direction.z;
-		
-		this.direction.applyDirection(particle, centerX, centerY, centerZ);
+		@Override
+		public void apply(ParticleEmitter emitter, BedrockParticle particle)
+		{
+			float centerX = (float) this.offset[0].get();
+			float centerY = (float) this.offset[1].get();
+			float centerZ = (float) this.offset[2].get();
+			float radius = (float) this.radius.get();
+			
+			Vector3f direction = new Vector3f((float) Math.random() * 2 - 1, (float) Math.random() * 2 - 1, (float) Math.random() * 2 - 1);
+			direction.normalize();
+			
+			if(!this.surface) radius *= Math.random();
+			
+			direction.mul(radius);
+			
+			particle.position.x = centerX + direction.x;
+			particle.position.y = centerY + direction.y;
+			particle.position.z = centerZ + direction.z;
+			
+			this.direction.applyDirection(particle, centerX, centerY, centerZ);
+		}
 	}
 }

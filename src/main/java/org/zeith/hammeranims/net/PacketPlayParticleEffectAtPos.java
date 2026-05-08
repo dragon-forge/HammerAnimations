@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Vector3d;
+import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
 import org.zeith.hammerlib.api.lighting.ColoredLightManager;
@@ -58,10 +59,16 @@ public class PacketPlayParticleEffectAtPos
 		var player = ColoredLightManager.getClientPlayer();
 		if(player == null || !(player.level() instanceof ClientLevel cl) || container == null) return;
 		if(source == null) return;
-		new ParticleWithEmitter(
-				cl,
-				source.x, source.y, source.z,
-				container
-		).spawn();
+		try
+		{
+			new ParticleWithEmitter(
+					cl,
+					source.x, source.y, source.z,
+					container
+			).spawn();
+		} catch(Throwable e)
+		{
+			HammerAnimations.LOG.error("Failed to spawn particle {}", this.container, e);
+		}
 	}
 }

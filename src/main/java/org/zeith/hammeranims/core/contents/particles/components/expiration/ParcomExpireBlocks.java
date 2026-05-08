@@ -2,22 +2,18 @@ package org.zeith.hammeranims.core.contents.particles.components.expiration;
 
 import com.google.gson.JsonElement;
 import net.minecraft.core.BlockPos;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.tags.*;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.zeith.hammeranims.api.particles.components.IParticleComponent;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
+import org.zeith.hammeranims.api.particles.components.*;
+import org.zeith.hammeranims.api.particles.emitter.*;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ParcomExpireBlocks
-		implements IParticleComponent
+		implements INonAnimatedParticleComponent, IParticleComponent
 {
 	public List<Block> blocks = new ArrayList<>();
 	public List<TagKey<Block>> blockTags = new ArrayList<>();

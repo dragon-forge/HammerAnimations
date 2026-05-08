@@ -2,6 +2,7 @@ package org.zeith.hammeranims.api.animsys;
 
 import net.minecraft.nbt.*;
 import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.actions.*;
 import org.zeith.hammeranims.api.animsys.layer.*;
 import org.zeith.hammeranims.api.time.*;
@@ -194,9 +195,9 @@ public class ConfiguredAnimation
 		return new ConfiguredAnimation(this);
 	}
 	
-	public ActiveAnimation activate(AnimationLayer layer)
+	public ActiveAnimation activate(AnimationLayer layer, Query query)
 	{
-		ActiveAnimation aa = new ActiveAnimation(this);
+		ActiveAnimation aa = new ActiveAnimation(this, query);
 		aa.activationTime = layer.startTime;
 		return aa;
 	}

@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
+import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
@@ -118,6 +119,15 @@ public class ParticleWithEmitter
 	{
 		if(emitter.generation >= MAX_EMITTER_GENERATIONS) return;
 		Minecraft mc = Minecraft.getInstance();
-		mc.execute(() -> mc.particleEngine.add(this));
+		mc.execute(() ->
+		{
+			try
+			{
+				mc.particleEngine.add(this);
+			} catch(Exception e)
+			{
+				HammerAnimations.LOG.error("Failed to spawn particle", e);
+			}
+		});
 	}
 }

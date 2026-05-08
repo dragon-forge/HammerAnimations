@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.api.geometry.model;
 
-import org.zeith.hammeranims.api.animation.data.*;
+import org.zeith.hammeranims.api.animation.data.BoneAnimationInstance;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.SerializableMask;
-import org.zeith.hammeranims.api.animsys.layer.ILayerMask;
+import org.zeith.hammeranims.api.animsys.layer.*;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -29,25 +29,25 @@ public class GeometryPose
 		boneTransforms.clear();
 	}
 	
-	public void apply(IAnimationData animation, ILayerMask mask, BlendMode mode, float weight, Query query)
+	public void apply(ActiveAnimation animation, ILayerMask mask, BlendMode mode, float weight, Query query)
 	{
-		for(Map.Entry<String, BoneAnimation> entry : animation.getBoneAnimations().entrySet())
+		for(Map.Entry<String, BoneAnimationInstance> entry : animation.getBoneAnimations().entrySet())
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone)) continue;
-			boneTransforms.put(bone, entry.getValue().apply(query, mode, weight, boneTransforms.get(bone)));
+			boneTransforms.put(bone, entry.getValue().apply(mode, weight, boneTransforms.get(bone)));
 		}
 	}
 	
-	public void apply(SerializableMask animationMask, IAnimationData animation, ILayerMask mask, BlendMode mode, float weight, Query query)
+	public void apply(SerializableMask animationMask, ActiveAnimation animation, ILayerMask mask, BlendMode mode, float weight, Query query)
 	{
 		Set<String> excludes = animationMask.getExcludes();
 		SerializableMask.WeightFunction weightFun = animationMask.getBoneWeight();
-		for(Map.Entry<String, BoneAnimation> entry : animation.getBoneAnimations().entrySet())
+		for(Map.Entry<String, BoneAnimationInstance> entry : animation.getBoneAnimations().entrySet())
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone) || excludes.contains(bone)) continue;
-			boneTransforms.put(bone, entry.getValue().apply(query, mode, weight * weightFun.get(bone), boneTransforms.get(bone)));
+			boneTransforms.put(bone, entry.getValue().apply(mode, weight * weightFun.get(bone), boneTransforms.get(bone)));
 		}
 	}
 	

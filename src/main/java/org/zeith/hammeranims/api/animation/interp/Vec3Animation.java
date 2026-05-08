@@ -1,54 +1,40 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import net.minecraft.world.phys.Vec3;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.LzExpression;
+import org.joml.Vector3d;
 
-import java.util.function.Function;
+import javax.annotation.Nonnull;
+import java.util.function.*;
 
 public class Vec3Animation
 {
-	public static final Vec3Animation ZERO = new Vec3Animation(new DoubleInterpolation(InterpolatedDouble.constant(0)));
-	public static final Vec3Animation ONE = new Vec3Animation(new DoubleInterpolation(InterpolatedDouble.constant(1)));
+	protected final LzExpression[] expressions;
 	
-	protected final BaseInterpolation animation;
-	protected final Function<Query, Vec3> eval;
+	protected final Supplier<Vector3d> eval;
+	protected final IntToDoubleFunction byComponent;
 	
-	public Vec3Animation(BaseInterpolation a)
+	public Vec3Animation(final @Nonnull BaseInterpolation animation, LzVariableStore vars)
 	{
-		this.animation = a;
-		
-		int c = animation.getDoubleCount();
-		if(c >= 3)
+		expressions = animation.instantiate(vars);
+		if(expressions.length >= 3)
 		{
-			this.eval = q ->
-			{
-				double[] data = animation.get(q);
-				return new Vec3(data[0], data[1], data[2]);
-			};
+			this.byComponent = i -> expressions[i].get();
+			this.eval = () -> new Vector3d(expressions[0].get(), expressions[1].get(), expressions[2].get());
 		} else
 		{
-			this.eval = q ->
-			{
-				double i = animation.get(q)[0];
-				return new Vec3(i, i, i);
-			};
+			this.byComponent = i -> expressions[0].get();
+			this.eval = () -> new Vector3d(expressions[0].get());
 		}
 	}
 	
-	public Vec3 get(Query q)
+	public double get(int component)
 	{
-		return eval.apply(q);
+		return byComponent.applyAsDouble(component);
 	}
 	
-	public static Vec3Animation parse(Object obj)
+	public Vector3d get()
 	{
-		BaseInterpolation parse = BaseInterpolation.parse(obj);
-		if(parse == null) return null;
-		return new Vec3Animation(parse);
-	}
-	
-	@Override
-	public String toString()
-	{
-		return "Vec3Animation{" + animation + '}';
+		return eval.get();
 	}
 }

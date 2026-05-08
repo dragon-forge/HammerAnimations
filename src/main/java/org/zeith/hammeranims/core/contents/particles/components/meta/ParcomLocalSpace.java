@@ -1,13 +1,14 @@
 package org.zeith.hammeranims.core.contents.particles.components.meta;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import org.zeith.hammeranims.api.particles.components.INonAnimatedParticleComponent;
+import org.zeith.hammeranims.api.particles.components.inst.IParticleCompInstance;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleInitialize;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
+import org.zeith.hammeranims.api.particles.emitter.*;
 
 public class ParcomLocalSpace
-		implements IParticleInitialize
+		implements IParticleInitialize, INonAnimatedParticleComponent
 {
 	public boolean position;
 	public boolean rotation;
@@ -54,5 +55,11 @@ public class ParcomLocalSpace
 	public int getSortingIndex()
 	{
 		return 6;
+	}
+	
+	@Override
+	public IParticleCompInstance createInstance(LzVariableStore vars)
+	{
+		return this;
 	}
 }

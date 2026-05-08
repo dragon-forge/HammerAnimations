@@ -1,99 +1,83 @@
 package org.zeith.hammeranims.core.molang;
 
-import org.zeith.hammeranims.api.animation.interp.*;
-import org.zeith.hammeranims.api.animation.scope.VarSymbol;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
-import org.zeith.hammeranims.molang.*;
-import org.zeith.hammeranims.molang.runtime.*;
-import org.zeith.hammeranims.molang.runtime.struct.*;
-import org.zeith.hammeranims.molang.runtime.value.DoubleSupplierValue;
+import dev.zeith.lzvm.jvm.*;
+import dev.zeith.lzvm.molang.compiler.MoLangCompiler;
+import dev.zeith.lzvm.molang.expression.MLExpression;
+import dev.zeith.lzvm.program.LzProgramBody;
+import lombok.extern.slf4j.Slf4j;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.zeith.hammeranims.api.HammerAnimationsApi;
+import org.zeith.hammeranims.api.event.ReloadHammerAnimationsEvent;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+@Slf4j
 public class MolangExpressionParser
 {
-	public static final VarSymbol<MoLangRuntime> RUNTIME_SYMBOL = VarSymbol.of("molang_runtime");
-	public static final Supplier<MoLangRuntime> RUNTIME_FACTORY = () -> MoLang.createRuntime(false);
+	static IClassDefiner CLASS_LOADER = new LzJVM.LzClassLoader();
+	static LzJvmCompiler JVM_COMPILER = new LzJvmCompiler();
+	static MoLangCompiler MOLANG_COMPILER = new MoLangCompiler();
+	static Map<String, FactoryReference> CACHE = new ConcurrentHashMap<>();
 	
-	private static final String[][] PARTICLE_POS = {
-			{"particle_pos", "x"},
-			{"particle_pos", "y"},
-			{"particle_pos", "z"},
-			{"particle_pos", "distance"}
-	};
-	
-	private static final String[][] PARTICLE_SPEED = {
-			{"particle_speed", "x"},
-			{"particle_speed", "y"},
-			{"particle_speed", "z"},
-			{"particle_speed", "distance"}
-	};
-	
-	public static <T extends IVariableAccess> InterpolatedDouble<T> parse(String expression)
+	static
 	{
-		expression = ExpressionFixer.fixExpression(expression);
-		
-		// Try parsing expression as constant first.
-		try
+		HammerAnimationsApi.EVENT_BUS.register(MolangExpressionParser.class);
+	}
+	
+	public static LzFactory parse(String expression)
+	{
+		// Constant expressions don't need caching since they don't involve any class generation.
+		ArrayList<MLExpression> parsed = MOLANG_COMPILER.parse(expression);
+		if(parsed.size() == 1)
 		{
-			return InterpolatedDouble.constant(Double.parseDouble(expression));
-		} catch(Throwable e)
-		{
+			OptionalDouble exp = parsed.get(0).asOptimizedDouble();
+			if(exp.isPresent()) return new ConstantExpression(exp.getAsDouble());
 		}
 		
-		List<Expression> exprs = MoLang.parse(expression);
+		LzProgramBody program = MOLANG_COMPILER.compile(parsed);
+		return CACHE.computeIfAbsent(program.disassemble(false),
+				k -> new FactoryReference(LzJVM.compile(JVM_COMPILER, program, 0, CLASS_LOADER))
+		).get();
+	}
+	
+	public static int getDedupedExpressions()
+	{
+		return CACHE.values().stream().mapToInt(f -> f.dupCounter.get() - 1).sum();
+	}
+	
+	@SubscribeEvent
+	public static void reload(ReloadHammerAnimationsEvent e)
+	{
+		CLASS_LOADER = new LzJVM.LzClassLoader();
+		MOLANG_COMPILER = new MoLangCompiler();
+		CACHE.clear();
+	}
+	
+	@SubscribeEvent
+	public static void postReload(ReloadHammerAnimationsEvent.Post e)
+	{
+		log.info("Parsed {} expressions, {} deduped.", CACHE.size(), getDedupedExpressions());
+	}
+	
+	static class FactoryReference
+			implements Supplier<LzFactory>
+	{
+		final AtomicInteger dupCounter = new AtomicInteger();
+		final LzFactory factory;
 		
-		return vars -> vars
-				.getVariables()
-				.computeIfAbsent(RUNTIME_SYMBOL, RUNTIME_FACTORY)
-				.execute(exprs)
-				.asDouble();
-	}
-	
-	public static void initializeQuery(Query query)
-	{
-		MoLangRuntime runtime = query.getVariables().computeIfAbsent(RUNTIME_SYMBOL, RUNTIME_FACTORY);
-		MoLangEnvironment env = runtime.getEnvironment();
-		QueryStruct q = env.query;
-		q.setFunction("anim_duration", (a) -> query.anim_duration);
-		q.setFunction("anim_time", (a) -> query.anim_time);
-		q.setFunction("anim_length", (a) -> query.anim_length);
-	}
-	
-	public static void initializeParticleVariables(ParticleVariables vars)
-	{
-		MoLangRuntime runtime = vars.getVariables().computeIfAbsent(RUNTIME_SYMBOL, RUNTIME_FACTORY);
-		MoLangEnvironment env = runtime.getEnvironment();
-		VariableStruct v = env.variable;
+		FactoryReference(LzFactory factory)
+		{
+			this.factory = factory;
+		}
 		
-		v.setValue("emitter_age", new DoubleSupplierValue(() -> vars.emitter_age));
-		v.setValue("emitter_lifetime", new DoubleSupplierValue(() -> vars.emitter_lifetime));
-		v.setValue("emitter_random_1", new DoubleSupplierValue(() -> vars.emitter_random_1));
-		v.setValue("emitter_random_2", new DoubleSupplierValue(() -> vars.emitter_random_2));
-		v.setValue("emitter_random_3", new DoubleSupplierValue(() -> vars.emitter_random_3));
-		v.setValue("emitter_random_4", new DoubleSupplierValue(() -> vars.emitter_random_4));
-		v.setValue(PARTICLE_POS[0], new DoubleSupplierValue(() -> vars.particle_pos.x));
-		v.setValue(PARTICLE_POS[1], new DoubleSupplierValue(() -> vars.particle_pos.y));
-		v.setValue(PARTICLE_POS[2], new DoubleSupplierValue(() -> vars.particle_pos.z));
-		v.setValue(PARTICLE_POS[3], new DoubleSupplierValue(() -> vars.particle_pos.distance));
-		v.setValue(PARTICLE_SPEED[0], new DoubleSupplierValue(() -> vars.particle_speed.x));
-		v.setValue(PARTICLE_SPEED[1], new DoubleSupplierValue(() -> vars.particle_speed.y));
-		v.setValue(PARTICLE_SPEED[2], new DoubleSupplierValue(() -> vars.particle_speed.z));
-		v.setValue(PARTICLE_SPEED[3], new DoubleSupplierValue(() -> vars.particle_speed.distance));
-		v.setValue("entity_scale", new DoubleSupplierValue(() -> vars.entity_scale));
-		v.setValue("particle_age", new DoubleSupplierValue(() -> vars.particle_age));
-		v.setValue("particle_lifetime", new DoubleSupplierValue(() -> vars.particle_lifetime));
-		v.setValue("particle_random_1", new DoubleSupplierValue(() -> vars.particle_random_1));
-		v.setValue("particle_random_2", new DoubleSupplierValue(() -> vars.particle_random_2));
-		v.setValue("particle_random_3", new DoubleSupplierValue(() -> vars.particle_random_3));
-		v.setValue("particle_random_4", new DoubleSupplierValue(() -> vars.particle_random_4));
-		v.setValue("particle_bounces", new DoubleSupplierValue(() -> vars.particle_bounces));
-	}
-	
-	public static IVariableStorage getMolangStorage(IVariableAccess vars)
-	{
-		MoLangRuntime runtime = vars.getVariables().computeIfAbsent(RUNTIME_SYMBOL, RUNTIME_FACTORY);
-		return runtime.getEnvironment();
+		@Override
+		public LzFactory get()
+		{
+			dupCounter.incrementAndGet();
+			return factory;
+		}
 	}
 }

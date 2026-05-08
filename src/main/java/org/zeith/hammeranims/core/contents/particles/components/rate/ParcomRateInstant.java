@@ -1,17 +1,16 @@
 package org.zeith.hammeranims.core.contents.particles.components.rate;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.components.itf.IEmitterUpdate;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 
 public class ParcomRateInstant
 		extends ParcomRate
-		implements IEmitterUpdate
 {
-	public static final InterpolatedDouble<ParticleVariables> DEFAULT_PARTICLES = InterpolatedDouble.constant(10);
+	public static final LzFactory DEFAULT_PARTICLES = InterpolatedDouble.constant(10);
 	
 	public ParcomRateInstant(JsonElement elem)
 	{
@@ -22,17 +21,33 @@ public class ParcomRateInstant
 	}
 	
 	@Override
-	public void update(ParticleEmitter emitter)
+	public ParcomRateInstance createInstance(LzVariableStore vars)
 	{
-		double age = emitter.getAge();
-		
-		if(emitter.playing && Math.abs(age) < 0.0001)
+		return new ParcomRateInstantInstance(particles.instantiate(vars));
+	}
+	
+	public static class ParcomRateInstantInstance
+			extends ParcomRateInstance
+			implements IEmitterUpdate
+	{
+		public ParcomRateInstantInstance(LzExpression particles)
 		{
-			emitter.setEmitterVariables(0);
+			super(particles);
+		}
+		
+		@Override
+		public void update(ParticleEmitter emitter)
+		{
+			double age = emitter.getAge();
 			
-			int pc = (int) this.particles.get(emitter.vars);
-			for(int i = 0; i < pc; i++)
-				emitter.spawnParticle();
+			if(emitter.playing && Math.abs(age) < 0.0001)
+			{
+				emitter.setEmitterVariables(0);
+				
+				int pc = (int) this.particles.get();
+				for(int i = 0; i < pc; i++)
+					emitter.spawnParticle();
+			}
 		}
 	}
 }
