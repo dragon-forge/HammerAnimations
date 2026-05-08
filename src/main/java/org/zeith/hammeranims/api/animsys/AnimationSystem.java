@@ -1,29 +1,24 @@
 package org.zeith.hammeranims.api.animsys;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import org.zeith.hammeranims.api.animation.AnimationLocation;
-import org.zeith.hammeranims.api.animation.IAnimationSource;
+import net.minecraft.nbt.*;
+import net.minecraft.world.level.Level;
+import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
-import org.zeith.hammeranims.net.PacketRequestAnimationSystemSync;
-import org.zeith.hammeranims.net.PacketSyncAnimationSystem;
-import org.zeith.hammerlib.net.IPacket;
-import org.zeith.hammerlib.net.Network;
+import org.zeith.hammeranims.net.*;
+import org.zeith.hammerlib.net.*;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import javax.annotation.*;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import static org.zeith.hammeranims.core.utils.InstanceHelpers.*;
 
@@ -50,6 +45,12 @@ public class AnimationSystem
 		this.owner = owner;
 		this.layers = layers;
 		this.layerMap = Collections.unmodifiableMap(layerMap);
+	}
+	
+	public void setWorld(Level world)
+	{
+		for(AnimationLayer layer : layers)
+			layer.query.setWorld(world);
 	}
 	
 	public IPacket createSyncPacket()
@@ -129,8 +130,10 @@ public class AnimationSystem
 		if(!hasTicked)
 		{
 			hasTicked = true;
-			if(canSync && owner.getAnimatedObjectWorld().isClientSide()) // Request animations from server on load
+			val world = owner.getAnimatedObjectWorld();
+			if(canSync && world.isClientSide()) // Request animations from server on load
 				Network.sendToServer(new PacketRequestAnimationSystemSync(this));
+			setWorld(world);
 		}
 		
 		time += 0.05; // add a tick
@@ -262,12 +265,13 @@ public class AnimationSystem
 		
 		public AnimationSystem build()
 		{
+			Query q = owner.createQuery();
 			AnimationLayer[] layers = new AnimationLayer[this.layers.size()];
 			Map<String, AnimationLayer> layerMap = new HashMap<>();
 			AnimationSystem sys = new AnimationSystem(owner, layers, layerMap);
 			for(int i = 0; i < layers.length; i++)
 			{
-				AnimationLayer al = layers[i] = this.layers.get(i).build(sys);
+				AnimationLayer al = layers[i] = this.layers.get(i).defaultQuery(q).build(sys);
 				layerMap.put(al.name, al);
 			}
 			sys.canSync = canSync;
