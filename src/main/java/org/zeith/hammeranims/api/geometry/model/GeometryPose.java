@@ -40,7 +40,7 @@ public class GeometryPose
 		this.boneTransformsView = Collections.unmodifiableMap(boneTransforms);
 	}
 	
-	protected GeometryTransforms createTransforms(String bone)
+	public GeometryTransforms createTransforms(String bone)
 	{
 		GeometryTransforms gtf = GeometryTransforms.createDefault();
 		if(boneRenderTypes != null)
@@ -62,7 +62,7 @@ public class GeometryPose
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone)) continue;
-			boneTransforms.put(bone, entry.getValue().apply(mode, weight, boneTransforms.get(bone)));
+			boneTransforms.put(bone, entry.getValue().apply(mode, weight, getTransform(bone)));
 		}
 	}
 	
@@ -74,16 +74,29 @@ public class GeometryPose
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone) || excludes.contains(bone)) continue;
-			boneTransforms.put(bone, entry.getValue().apply(mode, weight * weightFun.get(bone), boneTransforms.get(bone)));
+			boneTransforms.put(bone, entry.getValue().apply(mode, weight * weightFun.get(bone), getTransform(bone)));
 		}
+	}
+	
+	protected GeometryPose newInstance()
+	{
+		GeometryPose origin = this;
+		return new GeometryPose(availableBones)
+		{
+			@Override
+			public GeometryTransforms createTransforms(String bone)
+			{
+				return origin.createTransforms(bone);
+			}
+		};
 	}
 	
 	public GeometryPose copy()
 	{
-		GeometryPose c = new GeometryPose(availableBones);
+		GeometryPose copy = newInstance();
 		for(Map.Entry<String, GeometryTransforms> bone : boneTransforms.entrySet())
-			c.boneTransforms.put(bone.getKey(), bone.getValue().copy());
-		return c;
+			copy.boneTransforms.put(bone.getKey(), bone.getValue().copy());
+		return copy;
 	}
 	
 	public GeometryTransforms getTransform(String bone)

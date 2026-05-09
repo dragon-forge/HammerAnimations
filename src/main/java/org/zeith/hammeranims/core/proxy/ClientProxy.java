@@ -68,7 +68,7 @@ public class ClientProxy
 	protected final Map<ResourceLocation, ITextureAccess> textureCache = new HashMap<>();
 	
 	@Override
-	public @NotNull ITextureAccess loadTextureAccess(ResourceLocation texture)
+	public @NotNull ITextureAccess getTextureAccess(ResourceLocation texture)
 	{
 		return textureCache.computeIfAbsent(texture, this::createTextureAccess);
 	}
@@ -79,7 +79,8 @@ public class ClientProxy
 		textureCache.clear();
 	}
 	
-	private ITextureAccess createTextureAccess(ResourceLocation texture)
+	@Override
+	public @NotNull ITextureAccess createTextureAccess(ResourceLocation texture)
 	{
 		try
 		{

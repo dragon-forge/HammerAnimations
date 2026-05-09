@@ -53,6 +53,8 @@ public class CommonProxy
 		
 		HammerAnimations.LOG.info("Reloading {} registries...", HammerAnimations.MOD_NAME);
 		
+		purgeTextureAccessCache();
+		
 		Stream.Builder<CompletableFuture<?>> tasks = Stream.builder();
 		ReloadHammerAnimationsEvent.EnqueueReloads queues = new ReloadHammerAnimationsEvent.EnqueueReloads(
 				provider, clientSide, tasks::add,
@@ -138,8 +140,12 @@ public class CommonProxy
 		return null;
 	}
 	
-	@NotNull
-	public ITextureAccess loadTextureAccess(ResourceLocation texture)
+	public @NotNull ITextureAccess getTextureAccess(ResourceLocation texture)
+	{
+		return ITextureAccess.MISSING_TEXTURE;
+	}
+	
+	public @NotNull ITextureAccess createTextureAccess(ResourceLocation texture)
 	{
 		return ITextureAccess.MISSING_TEXTURE;
 	}
