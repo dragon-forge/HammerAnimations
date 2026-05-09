@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.geometry.model;
 
+import lombok.*;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.core.*;
 import org.teavm.jso.impl.JS;
@@ -8,13 +9,18 @@ import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 
 import static org.zeith.hammeranims.standalone.mc.math.Vec3d.ZERO;
 
+@With
+@AllArgsConstructor
 public class GeometryTransforms
+	implements Cloneable
 {
 	public static final Vec3d ONE = new Vec3d(1, 1, 1);
 	
 	public Vec3d translation;
 	public Vec3d rotation; // (in degrees)
 	public Vec3d scale;
+	public boolean skipGeometry;
+	public VertexType forceVertexType;
 	
 	public GeometryTransforms(Vec3d translation, Vec3d rotation, Vec3d scale)
 	{
@@ -53,15 +59,20 @@ public class GeometryTransforms
 			double z = Math.max(constraints.getMinScaleZ(), Math.min(constraints.getMaxScaleZ(), scale.z));
 			scale = new Vec3d(x, y, z);
 		}
+		
+		// If the scale is zero or so, we don't need to render geometry
+		skipGeometry = scale.length() < 1.0E-10;
 	}
 	
 	public GeometryTransforms copy()
 	{
-		return new GeometryTransforms(
-				translation,
-				rotation,
-				scale
-		);
+		return withSkipGeometry(skipGeometry);
+	}
+	
+	@Override
+	protected GeometryTransforms clone()
+	{
+		return copy();
 	}
 	
 	public JSObject toJson()

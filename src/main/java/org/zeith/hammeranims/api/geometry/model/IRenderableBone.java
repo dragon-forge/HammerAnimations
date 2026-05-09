@@ -2,10 +2,14 @@ package org.zeith.hammeranims.api.geometry.model;
 
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
+import org.zeith.hammeranims.api.geometry.data.FaceUV;
+import org.zeith.hammeranims.api.utils.IFaceUVPredicate;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.utils.PoseStack;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 
 import java.util.function.Predicate;
+import java.util.function.*;
 
 public interface IRenderableBone
 		extends IBone

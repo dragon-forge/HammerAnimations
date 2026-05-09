@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.client.model;
 
 import org.joml.Vector3f;
+import org.zeith.hammeranims.api.geometry.data.FaceUV;
 import org.zeith.hammeranims.core.client.render.vertex.RenderVertex;
 import org.zeith.hammeranims.core.utils.EnumFacing;
 
@@ -9,9 +10,11 @@ public class TexturedQuadF
 	public final VertexF[] vertices;
 	public final RenderVertex[] renderedVertices;
 	public final Vector3f normal;
+	public final FaceUV uv;
 	
-	public TexturedQuadF(VertexF[] vertices, boolean mirror, EnumFacing direction)
+	public TexturedQuadF(FaceUV uv, boolean mirror, EnumFacing direction, VertexF[] vertices)
 	{
+		this.uv = uv;
 		this.vertices = vertices;
 		this.normal = new Vector3f(direction.offset.x(), direction.offset.y(), direction.offset.z());
 		this.renderedVertices = new RenderVertex[vertices.length];

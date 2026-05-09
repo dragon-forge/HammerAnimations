@@ -3,8 +3,10 @@ package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 import lombok.val;
 import org.joml.Vector3f;
 import org.json.*;
+import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
@@ -116,7 +118,7 @@ public class GsonGeometryDecoder
 		boolean neverRender = GsonHelper.getAsBoolean(bone, "neverRender", false);
 		String name = GsonHelper.getAsString(bone, "name");
 		String parentName = GsonHelper.getAsString(bone, "parent", "root");
-		VertexType boneVertexType = VertexType.byId(GsonHelper.getAsString(bone, "render_type", ""));
+		VertexType boneVertexType = VertexType.byId(GsonHelper.getAsString(bone, "render_type", ""), VertexType.DEFAULT);
 		
 		List<ModelPartInfo> children = new ArrayList<>();
 		
@@ -155,7 +157,6 @@ public class GsonGeometryDecoder
 		List<ModelLocatorInfo> locators = new ArrayList<>();
 		if(bone.has("locators"))
 		{
-			int i = 0;
 			val locs = GsonHelper.getAsJsonObject(bone, "locators");
 			for(val key : locs.keySet())
 			{

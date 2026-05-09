@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.client.render.vertex;
 
+import com.google.common.base.Suppliers;
 import lombok.Getter;
 import org.zeith.hammeranims.standalone.utils.Suppliers;
 
@@ -9,7 +10,7 @@ import java.util.function.Supplier;
 @Getter
 public enum VertexType
 {
-	DIRECT(""),
+	DEFAULT(""),
 	SOLID("solid"),
 	CUTOUT("cutout"),
 	TRANSLUCENT("translucent");
@@ -30,11 +31,21 @@ public enum VertexType
 	
 	public static VertexType byId(String id)
 	{
-		return TYPE_MAP.get().getOrDefault(id, DIRECT);
+		return TYPE_MAP.get().getOrDefault(id, DEFAULT);
 	}
 	
 	public static VertexType byId(String id, VertexType orDefault)
 	{
 		return TYPE_MAP.get().getOrDefault(id, orDefault);
+	}
+	
+	public VertexType max(VertexType type)
+	{
+		return ordinal() > type.ordinal() ? this : type;
+	}
+	
+	public static VertexType ofAlpha(int alpha)
+	{
+		return alpha == 0 ? CUTOUT : alpha < 255 ? TRANSLUCENT : SOLID;
 	}
 }

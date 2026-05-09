@@ -5,8 +5,7 @@ import lombok.val;
 import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
-import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
-import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
+import org.zeith.hammeranims.api.geometry.constrains.*;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
@@ -79,13 +78,10 @@ public class GeometricModelImpl
 			s.reset();
 	}
 	
-	GeometryPose emptyPose = new GeometryPose(this::hasBone);
-	
 	@Override
 	public GeometryPose emptyPose()
 	{
-		emptyPose.reset();
-		return emptyPose;
+		return new GeometryPose(this::hasBone);
 	}
 	
 	@Override
@@ -124,6 +120,9 @@ public class GeometricModelImpl
 					(float) scale.y,
 					(float) scale.z
 			);
+			
+			if(add.forceVertexType != null) bone.forceVertexType = add.forceVertexType;
+			bone.renderCubes = !add.skipGeometry;
 		}
 	}
 	

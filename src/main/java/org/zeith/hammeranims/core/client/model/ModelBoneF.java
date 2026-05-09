@@ -8,6 +8,7 @@ import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;
 import org.zeith.hammeranims.core.utils.PoseStack;
 
 import java.util.*;
+import java.util.function.*;
 
 public class ModelBoneF
 		implements IRenderableBone
@@ -174,10 +175,17 @@ public class ModelBoneF
 	public void renderCubes(PoseStack.Entry matrixEntryIn, IVertexOutput bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
 		if(renderCubes)
+		{
+			VertexType typeThisTime = forceVertexType != null ? forceVertexType : defaultVertexType;
 			for(ModelCubeF cube : cubes)
-				cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+				cube.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha, typeThisTime);
+		}
+		
 		if(renderHookAfterCubes)
 			renderHook.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		
+		// Reset forced vertex type post-render
+		forceVertexType = null;
 	}
 	
 	public void applyTransform(PoseStack stack)
