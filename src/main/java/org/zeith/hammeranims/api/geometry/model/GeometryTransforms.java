@@ -10,7 +10,6 @@ import static net.minecraft.world.phys.Vec3.ZERO;
 @With
 @AllArgsConstructor
 public class GeometryTransforms
-	implements Cloneable
 {
 	public static final Vec3 ONE = new Vec3(1, 1, 1);
 	
@@ -58,18 +57,13 @@ public class GeometryTransforms
 			scale = new Vec3(x, y, z);
 		}
 		
-		// If the scale is zero or so, we don't need to render geometry
-		skipGeometry = scale.length() < 1.0E-10;
+		// If the scale is zero or so, we don't need to render it
+		if(!skipGeometry)
+			skipGeometry = scale.length() < 1.0E-10;
 	}
 	
 	public GeometryTransforms copy()
 	{
-		return withSkipGeometry(skipGeometry);
-	}
-	
-	@Override
-	protected GeometryTransforms clone()
-	{
-		return copy();
+		return withTranslation(translation.add(ZERO));
 	}
 }
