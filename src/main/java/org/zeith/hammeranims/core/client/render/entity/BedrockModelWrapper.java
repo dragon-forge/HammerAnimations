@@ -25,7 +25,7 @@ public class BedrockModelWrapper<T extends Entity & IAnimatedEntity>
 	
 	protected final RenderData renderData = new RenderData();
 	
-	public MultiBufferSource buffers;
+	public ISplitVertexConsumer buffers;
 	public LivingEntity entity;
 	
 	public BedrockModelWrapper(Function<ResourceLocation, RenderType> pRenderType, IGeometryContainer geometry)
@@ -62,7 +62,10 @@ public class BedrockModelWrapper<T extends Entity & IAnimatedEntity>
 	@Override
 	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, int colorIn)
 	{
-		renderData.apply(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn).applyColor(colorIn);
+		if(buffers != null)
+			renderData.apply(matrixStackIn, buffers, packedLightIn, packedOverlayIn);
+		else
+			renderData.apply(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn).applyColor(colorIn);
 		model.renderModel(renderData);
 	}
 }

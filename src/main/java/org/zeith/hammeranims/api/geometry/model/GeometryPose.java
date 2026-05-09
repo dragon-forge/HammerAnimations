@@ -1,27 +1,54 @@
 package org.zeith.hammeranims.api.geometry.model;
 
+import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.api.animation.data.BoneAnimationInstance;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.SerializableMask;
 import org.zeith.hammeranims.api.animsys.layer.*;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 
 import java.util.*;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 public class GeometryPose
 {
-	protected final Map<String, GeometryTransforms> boneTransforms = new HashMap<>();
-	protected final Map<String, GeometryTransforms> boneTransformsView = Collections.unmodifiableMap(boneTransforms);
+	protected static final Predicate<String> ALLOW_ALL_BONES = b -> true;
+	protected final Function<String, GeometryTransforms> TRANSFORM_FACTORY = this::createTransforms;
+	protected final Map<String, GeometryTransforms> boneTransforms;
+	protected final Map<String, GeometryTransforms> boneTransformsView;
 	protected final Predicate<String> availableBones;
+	
+	protected @Setter Function<String, @Nullable VertexType> boneRenderTypes;
 	
 	public GeometryPose()
 	{
-		this(b -> true);
+		this(ALLOW_ALL_BONES);
 	}
 	
 	public GeometryPose(Predicate<String> availableBones)
 	{
 		this.availableBones = availableBones;
+		this.boneTransforms = new HashMap<>();
+		this.boneTransformsView = Collections.unmodifiableMap(boneTransforms);
+	}
+	
+	public GeometryPose(Predicate<String> availableBones, int prealloc)
+	{
+		this.availableBones = availableBones;
+		this.boneTransforms = new HashMap<>(prealloc);
+		this.boneTransformsView = Collections.unmodifiableMap(boneTransforms);
+	}
+	
+	protected GeometryTransforms createTransforms(String bone)
+	{
+		GeometryTransforms gtf = GeometryTransforms.createDefault();
+		if(boneRenderTypes != null)
+		{
+			VertexType type = boneRenderTypes.apply(bone);
+			if(type != null) gtf.forceVertexType = type;
+		}
+		return gtf;
 	}
 	
 	public void reset()
@@ -62,7 +89,7 @@ public class GeometryPose
 	public GeometryTransforms getTransform(String bone)
 	{
 		if(!availableBones.test(bone)) return null;
-		return boneTransforms.computeIfAbsent(bone, key -> GeometryTransforms.createDefault());
+		return boneTransforms.computeIfAbsent(bone, TRANSFORM_FACTORY);
 	}
 	
 	public Map<String, GeometryTransforms> getBoneTransforms()

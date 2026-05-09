@@ -4,8 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 
 import javax.annotation.Nullable;
+import java.util.function.*;
 
 public interface IRenderableBone
 		extends IBone
@@ -30,6 +32,13 @@ public interface IRenderableBone
 		// Then apply current bone transforms
 		applyBoneTransforms(pose);
 	}
+	
+	// Can be used to
+	boolean anyUVMatch(IFaceUVPredicate filter);
+	boolean allUVMatch(IFaceUVPredicate filter);
+	<STATE> STATE visitUVs(STATE state, BiFunction<STATE, FaceUV, STATE> walker, Predicate<STATE> isDone);
+	
+	void setDefaultVertexType(VertexType defaultVertexType);
 	
 	void renderCubes(boolean b);
 	

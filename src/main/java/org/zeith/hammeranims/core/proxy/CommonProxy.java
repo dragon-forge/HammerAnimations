@@ -8,6 +8,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.neoforged.bus.api.IEventBus;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3f;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
@@ -19,6 +20,7 @@ import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
+import org.zeith.hammeranims.api.texture.ITextureAccess;
 import org.zeith.hammeranims.api.utils.IExtendedResourceProvider;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
@@ -71,18 +73,19 @@ public class CommonProxy
 		HammerAnimationsApi.EVENT_BUS.post(queues);
 		
 		return CompletableFuture.allOf(tasks.build().toArray(CompletableFuture[]::new))
-				.thenCompose(pStage::wait)
-				.thenRunAsync(() ->
-				{
-					if(clientSide)
-						HammerAnimationsApi.EVENT_BUS.post(new RefreshStaleModelsEvent());
-					
-					HammerAnimationsApi.EVENT_BUS.post(new ReloadHammerAnimationsEvent.Post(provider, clientSide));
-					HammerAnimations.LOG.info("{} registries reloaded in {} ms",
-							HammerAnimations.MOD_NAME,
-							sw.stop().elapsed(TimeUnit.MILLISECONDS)
-					);
-				}, gameExecutor);
+								.thenCompose(pStage::wait)
+								.thenRunAsync(() ->
+										{
+											if(clientSide)
+												HammerAnimationsApi.EVENT_BUS.post(new RefreshStaleModelsEvent());
+											
+											HammerAnimationsApi.EVENT_BUS.post(new ReloadHammerAnimationsEvent.Post(provider, clientSide));
+											HammerAnimations.LOG.info("{} registries reloaded in {} ms",
+													HammerAnimations.MOD_NAME,
+													sw.stop().elapsed(TimeUnit.MILLISECONDS)
+											);
+										}, gameExecutor
+								);
 	}
 	
 	public static IExtendedResourceProvider wrapVanillaResources(ResourceManager manager)
@@ -132,5 +135,15 @@ public class CommonProxy
 	public ExtraParticleEffects getExtraParticles()
 	{
 		return null;
+	}
+	
+	@NotNull
+	public ITextureAccess loadTextureAccess(ResourceLocation texture)
+	{
+		return ITextureAccess.MISSING_TEXTURE;
+	}
+	
+	public void purgeTextureAccessCache()
+	{
 	}
 }

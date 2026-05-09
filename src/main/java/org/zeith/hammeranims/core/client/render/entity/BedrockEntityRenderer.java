@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.api.geometry.model.ISplitVertexConsumer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.client.render.entity.proc.HeadLookProcessor;
 import org.zeith.hammeranims.core.client.render.vertex.AccumulatingVertexConsumer;
@@ -51,14 +52,15 @@ public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEn
 	public void render(@NotNull T pEntity, float pEntityYaw, float pPartialTicks, @NotNull PoseStack pMatrixStack, @NotNull MultiBufferSource pBuffer, int pPackedLight)
 	{
 		var rp = getRenderPasses(pEntity);
-		var entType = getRenderType(getTextureLocation(pEntity));
+		final int passCount = rp != null ? rp.size() : 0;
+		RenderType entType = getRenderType(getTextureLocation(pEntity));
 		
 		List<AccumulatingVertexConsumer.IntoSource> accumulators = rp != null ? new ArrayList<>() : null;
 		MultiBufferSource multiBuffer = rp != null ? type ->
 		{
 			if(type == entType)
 			{
-				return switch(rp.size())
+				return switch(passCount)
 				{
 					case 0 -> VertexMultiConsumer.create(new VertexConsumer[0]);
 					case 1 -> pBuffer.getBuffer(rp.get(0));
@@ -70,7 +72,7 @@ public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEn
 		} : pBuffer;
 		
 		model.entity = pEntity;
-		model.buffers = multiBuffer;
+		model.buffers = ISplitVertexConsumer.unary(multiBuffer.getBuffer(entType));
 		super.render(pEntity, pEntityYaw, pPartialTicks, pMatrixStack, multiBuffer, pPackedLight);
 		model.entity = null;
 		model.buffers = null;

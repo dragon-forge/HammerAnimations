@@ -32,8 +32,8 @@ public class SpriteRemapVertexOp
 	public IVertexRenderer apply(IVertexRenderer renderer)
 	{
 		TextureAtlasSprite s = sprite.get();
-		return (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz) ->
-				renderer.vertex(x, y, z, red, green, blue, alpha, s.getU(u * 16F), s.getV(v * 16F), packedOverlay, packedLight, nx, ny, nz);
+		return (x, y, z, red, green, blue, alpha, u, v, packedOverlay, packedLight, nx, ny, nz, vType) ->
+				renderer.vertex(x, y, z, red, green, blue, alpha, s.getU(u * 16F), s.getV(v * 16F), packedOverlay, packedLight, nx, ny, nz, vType);
 	}
 	
 	@Override
