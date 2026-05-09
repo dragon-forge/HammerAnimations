@@ -173,9 +173,6 @@ public class ModelBoneF
 		
 		if(renderHookAfterCubes)
 			renderHook.render(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		
-		// Reset forced vertex type post-render
-		forceVertexType = null;
 	}
 	
 	@Override
@@ -220,6 +217,7 @@ public class ModelBoneF
 		renderCubes = true;
 		renderHookAfterCubes = true;
 		renderChildren = true;
+		forceVertexType = null;
 		rotation.set(startRotationRadians.x, startRotationRadians.y, startRotationRadians.z);
 		offset.set(0, 0, 0);
 		scale.set(1, 1, 1);

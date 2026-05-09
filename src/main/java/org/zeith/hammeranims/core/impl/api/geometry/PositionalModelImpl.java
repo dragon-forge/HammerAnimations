@@ -6,13 +6,11 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
-import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
-import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
+import org.zeith.hammeranims.api.geometry.constrains.*;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.ModelMeshInfo;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import javax.annotation.*;
 import java.util.*;
 
 public class PositionalModelImpl
@@ -90,13 +88,10 @@ public class PositionalModelImpl
 			s.reset();
 	}
 	
-	GeometryPose emptyPose = new GeometryPose(this::hasBone);
-	
 	@Override
 	public GeometryPose emptyPose()
 	{
-		emptyPose.reset();
-		return emptyPose;
+		return new GeometryPose(this::hasBone);
 	}
 	
 	@Override
