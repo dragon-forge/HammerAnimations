@@ -8,7 +8,7 @@ import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @ToString
@@ -16,20 +16,26 @@ import java.util.function.Function;
 public class GeometricModelVertexTypes
 		implements Function<String, @Nullable VertexType>
 {
-	public final Map<String, VertexType> bones;
+	private static final Optional<VertexType> DEF = Optional.of(VertexType.DEFAULT);
+	public final Map<String, Optional<VertexType>> bones;
 	
 	public static GeometricModelVertexTypes forModelAndTexture(IGeometricModel model, ResourceLocation texture)
 	{
-		ITextureAccess tex = HammerAnimations.PROXY.loadTextureAccess(texture);
-		ImmutableMap.Builder<String, VertexType> builder = ImmutableMap.builder();
+		ITextureAccess tex = HammerAnimations.PROXY.getTextureAccess(texture);
+		ImmutableMap.Builder<String, Optional<VertexType>> builder = ImmutableMap.builder();
 		for(IRenderableBone bone : model.getBones())
 			builder.put(bone.getName(), ITextureAccess.determineBoneType(bone, tex));
 		return new GeometricModelVertexTypes(builder.build());
 	}
 	
+	public boolean isInvisible(String bone)
+	{
+		return bones.getOrDefault(bone, DEF).isEmpty();
+	}
+	
 	@Override
 	public @Nullable VertexType apply(String s)
 	{
-		return bones.get(s);
+		return bones.getOrDefault(s, Optional.empty()).orElse(null);
 	}
 }
