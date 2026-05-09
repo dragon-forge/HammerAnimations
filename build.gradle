@@ -160,8 +160,8 @@ dependencies {
 
     ////// UTILITY STUFF //////
     // implementation 'java-oo:javac-oo-plugin:0.5'
-    compileOnly 'org.projectlombok:lombok:1.18.32'
-    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+    compileOnly "org.projectlombok:lombok:$lombok"
+    annotationProcessor "org.projectlombok:lombok:$lombok"
     compileOnly 'org.jetbrains:annotations:24.0.1'
     ///////////////////////////
 

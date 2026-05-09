@@ -1,8 +1,9 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
 import net.minecraftforge.api.distmarker.*;
-import org.zeith.hammeranims.core.client.model.ModelCubeF;
 import org.joml.Vector3f;
+import org.zeith.hammeranims.core.client.model.ModelCubeF;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 
 public class ModelCubeInfo
 {
@@ -11,14 +12,16 @@ public class ModelCubeInfo
 	private final UVDefinition uv;
 	private final float inflate;
 	private final boolean mirrored;
+	private final VertexType vertexType;
 	
-	public ModelCubeInfo(Vector3f origin, Vector3f size, UVDefinition uv, float inflate, boolean mirrored)
+	public ModelCubeInfo(Vector3f origin, Vector3f size, UVDefinition uv, float inflate, boolean mirrored, VertexType vertexType)
 	{
 		this.origin = origin;
 		this.size = size;
 		this.uv = uv;
 		this.inflate = inflate;
 		this.mirrored = mirrored;
+		this.vertexType = vertexType;
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -26,7 +29,8 @@ public class ModelCubeInfo
 	{
 		//The position of the cube, relative to the entity origin - located at the bottom front left point of the cube.
 		Vector3f origin = new Vector3f(-(this.origin.x() + this.size.x() - ownerPart.getPivot().x()), (this.origin.y() -
-				ownerPart.getPivot().y()), this.origin.z() - ownerPart.getPivot().z());
+				ownerPart.getPivot().y()), this.origin.z() - ownerPart.getPivot().z()
+		);
 		
 		float inflate = this.inflate;
 		if(size.x() == 0 || size.y() == 0 || size.z() == 0)
@@ -34,6 +38,6 @@ public class ModelCubeInfo
 			inflate = Math.max(0.008F, inflate);
 		}
 		
-		return ModelCubeF.make(origin, size, uv.bake(size), inflate, mirrored, textureWidth, textureHeight);
+		return ModelCubeF.make(origin, size, uv.bake(size), inflate, mirrored, textureWidth, textureHeight, vertexType);
 	}
 }

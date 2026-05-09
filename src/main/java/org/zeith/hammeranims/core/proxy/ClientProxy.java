@@ -3,30 +3,32 @@ package org.zeith.hammeranims.core.proxy;
 import lombok.val;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3f;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
-import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
+import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
-import org.zeith.hammeranims.core.client.CommandReloadHA;
+import org.zeith.hammeranims.api.texture.*;
+import org.zeith.hammeranims.core.client.*;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
+import org.zeith.hammeranims.core.init.ContainersHA;
 import org.zeith.hammeranims.net.PacketProvideCustomParticleEffectList;
-import org.zeith.hammerlib.net.Network;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class ClientProxy
@@ -61,6 +63,31 @@ public class ClientProxy
 	public ExtraParticleEffects getExtraParticles()
 	{
 		return extraEffects;
+	}
+	
+	protected final Map<ResourceLocation, ITextureAccess> textureCache = new HashMap<>();
+	
+	@Override
+	public @NotNull ITextureAccess loadTextureAccess(ResourceLocation texture)
+	{
+		return textureCache.computeIfAbsent(texture, this::createTextureAccess);
+	}
+	
+	@Override
+	public void purgeTextureAccessCache()
+	{
+		textureCache.clear();
+	}
+	
+	private ITextureAccess createTextureAccess(ResourceLocation texture)
+	{
+		try
+		{
+			return McTextureAccess.getPixels(Minecraft.getInstance().getResourceManager(), texture);
+		} catch(Exception e)
+		{
+			return ITextureAccess.MISSING_TEXTURE;
+		}
 	}
 	
 	@Override
@@ -144,13 +171,13 @@ public class ClientProxy
 						mc,
 						Util.backgroundExecutor()
 				)
-		).thenRun(() ->
-				Minecraft.getInstance().execute(() ->
+		).thenRunAsync(() ->
 				{
 					var net = Minecraft.getInstance().getConnection();
 					if(net == null || Minecraft.getInstance().level == null) return;
 					PacketProvideCustomParticleEffectList.toServer();
-				})
+				},
+				Minecraft.getInstance()
 		);
 	}
 }

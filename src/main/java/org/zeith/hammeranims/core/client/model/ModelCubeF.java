@@ -1,23 +1,32 @@
 package org.zeith.hammeranims.core.client.model;
 
+import com.google.common.base.MoreObjects;
 import com.mojang.blaze3d.vertex.PoseStack;
+import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
+import org.zeith.hammeranims.api.geometry.data.FaceUV;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.utils.*;
 
 import java.lang.Math;
 import java.util.*;
 
+@Getter
 public class ModelCubeF
 {
+	private static final TexturedQuadF[] EMPTY_QUAD_ARRAY = new TexturedQuadF[0];
 	private final TexturedQuadF[] quads;
+	public final VertexType vType;
 	
-	private ModelCubeF(TexturedQuadF[] quads)
+	private ModelCubeF(TexturedQuadF[] quads, VertexType vType)
 	{
 		this.quads = quads;
+		this.vType = vType;
 	}
 	
-	public static ModelCubeF make(Vector3f origin, Vector3f size, CubeUVs uvResolver, float inflate, boolean mirror, int textureWidth, int textureHeight)
+	public static ModelCubeF make(Vector3f origin, Vector3f size, CubeUVs uvResolver, float inflate, boolean mirror, int textureWidth, int textureHeight, VertexType vType)
 	{
 		float width = size.x();
 		float height = size.y();
@@ -26,8 +35,6 @@ public class ModelCubeF
 		float x1 = origin.x();
 		float y1 = origin.y();
 		float z1 = origin.z();
-		
-		List<TexturedQuadF> quads = new ArrayList<>(6);
 		
 		float x2 = x1 + Math.max(width, 0.008F);
 		float y2 = y1 + Math.max(height, 0.008F);
@@ -49,6 +56,8 @@ public class ModelCubeF
 		Vector3f v7 = new Vector3f(x2, y2, z2);
 		Vector3f v8 = new Vector3f(x2, y1, z2);
 		
+		List<TexturedQuadF> quads = new ArrayList<>(6);
+		
 		if(width != 0 && height != 0)
 		{
 			addQuad(quads, v3, v2, v1, v4, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.NORTH);
@@ -67,7 +76,7 @@ public class ModelCubeF
 			addQuad(quads, v7, v3, v4, v6, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.UP);
 		}
 		
-		return new ModelCubeF(quads.toArray(new TexturedQuadF[0]));
+		return new ModelCubeF(quads.toArray(EMPTY_QUAD_ARRAY), vType);
 	}
 	
 	private static void addQuad(List<TexturedQuadF> quads, Vector3f pos1, Vector3f pos2, Vector3f pos3, Vector3f pos4, CubeUVs uvResolver, int textureWidth, int textureHeight, boolean mirror, EnumFacing direction)
@@ -93,12 +102,13 @@ public class ModelCubeF
 			u2 = temp;
 		}
 		
-		return new TexturedQuadF(new VertexF[] {
+		return new TexturedQuadF(new FaceUV(u1, u2, v1, v2, direction), mirror, direction, new VertexF[] {
 				makeVertex(pos1, u1, v1),
 				makeVertex(pos2, u1, v2),
 				makeVertex(pos3, u2, v2),
 				makeVertex(pos4, u2, v1),
-		}, mirror, direction);
+		}
+		);
 	}
 	
 	private static VertexF makeVertex(Vector3f pos, float u, float v)
@@ -106,7 +116,7 @@ public class ModelCubeF
 		return new VertexF(pos, u, v);
 	}
 	
-	public void render(PoseStack.Pose pose, IVertexRenderer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha)
+	public void render(PoseStack.Pose pose, IVertexRenderer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha, @Nullable VertexType forceVType)
 	{
 		Matrix4f po = pose.pose();
 		Matrix3f no = pose.normal();
@@ -117,18 +127,15 @@ public class ModelCubeF
 			
 			for(VertexF vertex : quad.vertices)
 			{
-				float x = vertex.getPos().x() / 16.0F;
-				float y = vertex.getPos().y() / 16.0F;
-				float z = vertex.getPos().z() / 16.0F;
-				Vector3f pos = new Vector3f(x, y, z);
-				po.transformPosition(pos);
+				Vector3f pos = po.transformPosition(new Vector3f(vertex.getPos()).mul(0.0625f));
 				
 				vertexConsumer.vertex(
-						pos.x(), pos.y(), pos.z(),
+						pos.x, pos.y, pos.z,
 						red, green, blue, alpha,
 						vertex.getU(), vertex.getV(),
 						packedOverlay, packedLight,
-						normal.x(), normal.y(), normal.z()
+						normal.x(), normal.y(), normal.z(),
+						MoreObjects.firstNonNull(forceVType, vType)
 				);
 			}
 		}

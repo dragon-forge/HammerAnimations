@@ -4,15 +4,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.*;
 import lombok.val;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.utils.EmbeddedLocation;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
-import org.zeith.hammeranims.core.impl.api.geometry.constrains.BoneConstraintsImpl;
-import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
+import org.zeith.hammeranims.core.impl.api.geometry.constrains.*;
 import org.zeith.hammeranims.core.jomljson.*;
 import org.zeith.hammeranims.core.utils.GsonHelper;
-import org.joml.*;
 import org.zeith.hammerlib.util.java.tuples.*;
 
 import java.util.*;
@@ -102,10 +102,7 @@ public class GsonGeometryDecoder
 					parent.addChild(value);
 				} else
 				{
-					throw new JsonSyntaxException("Can't find parent '"
-												  + value.getParentName() + "' for bone '"
-												  + value.getName() + "'"
-					);
+					throw new JsonSyntaxException("Can't find parent '" + value.getParentName() + "' for bone '" + value.getName() + "'");
 				}
 			} else
 			{
@@ -132,6 +129,7 @@ public class GsonGeometryDecoder
 		boolean neverRender = GsonHelper.getAsBoolean(bone, "neverRender", false);
 		String name = GsonHelper.getAsString(bone, "name");
 		String parentName = GsonHelper.getAsString(bone, "parent", "root");
+		VertexType boneVertexType = VertexType.byId(GsonHelper.getAsString(bone, "render_type", ""), VertexType.DEFAULT);
 		
 		List<ModelPartInfo> children = new ArrayList<>();
 		
@@ -147,8 +145,9 @@ public class GsonGeometryDecoder
 				UVDefinition uv = GSON.fromJson(cubeObject.get("uv"), UVDefinition.class);
 				boolean cubeMirror = GsonHelper.getAsBoolean(cubeObject, "mirror", mirror);
 				float inflate = GsonHelper.getAsFloat(cubeObject, "inflate", 0F);
+				VertexType vertexType = VertexType.byId(GsonHelper.getAsString(cubeObject, "render_type", null), boneVertexType);
 				
-				ModelCubeInfo cube = new ModelCubeInfo(origin, size, uv, inflate, cubeMirror);
+				ModelCubeInfo cube = new ModelCubeInfo(origin, size, uv, inflate, cubeMirror, vertexType);
 				
 				if(cubeObject.has("rotation"))
 				{
@@ -169,7 +168,6 @@ public class GsonGeometryDecoder
 		List<ModelLocatorInfo> locators = new ArrayList<>();
 		if(bone.has("locators"))
 		{
-			int i = 0;
 			val locs = GsonHelper.getAsJsonObject(bone, "locators");
 			for(val locEntry : locs.entrySet())
 			{

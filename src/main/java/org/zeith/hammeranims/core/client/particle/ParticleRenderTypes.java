@@ -24,7 +24,7 @@ public class ParticleRenderTypes
 				.createCompositeState(true);
 		
 		return RenderType.create("particle_solid",
-				DefaultVertexFormat.PARTICLE, VertexFormat.Mode.QUADS, 256,
+				DefaultVertexFormat.PARTICLE, VertexFormat.Mode.QUADS, 8192,
 				true, false,
 				state
 		);
@@ -41,7 +41,7 @@ public class ParticleRenderTypes
 				.createCompositeState(outline);
 		
 		return RenderType.create("particle_cutout_no_cull",
-				DefaultVertexFormat.PARTICLE, VertexFormat.Mode.QUADS, 256,
+				DefaultVertexFormat.PARTICLE, VertexFormat.Mode.QUADS, 8192,
 				true, false,
 				state
 		);
@@ -58,7 +58,7 @@ public class ParticleRenderTypes
 				.createCompositeState(outline);
 		
 		return RenderType.create("particle_translucent",
-				DefaultVertexFormat.PARTICLE, VertexFormat.Mode.QUADS, 256,
+				DefaultVertexFormat.PARTICLE, VertexFormat.Mode.QUADS, 8192,
 				true, true,
 				state
 		);
@@ -75,7 +75,7 @@ public class ParticleRenderTypes
 				.createCompositeState(outline);
 		
 		return RenderType.create("particle_translucent_additive",
-				DefaultVertexFormat.PARTICLE, VertexFormat.Mode.QUADS, 256,
+				DefaultVertexFormat.PARTICLE, VertexFormat.Mode.QUADS, 8192,
 				true, true,
 				state
 		);

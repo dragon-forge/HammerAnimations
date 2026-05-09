@@ -1,17 +1,24 @@
 package org.zeith.hammeranims.api.geometry.model;
 
+import lombok.*;
 import net.minecraft.world.phys.Vec3;
 import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 
 import static net.minecraft.world.phys.Vec3.ZERO;
 
+@With
+@AllArgsConstructor
 public class GeometryTransforms
+	implements Cloneable
 {
 	public static final Vec3 ONE = new Vec3(1, 1, 1);
 	
 	public Vec3 translation;
 	public Vec3 rotation; // (in degrees)
 	public Vec3 scale;
+	public boolean skipGeometry;
+	public VertexType forceVertexType;
 	
 	public GeometryTransforms(Vec3 translation, Vec3 rotation, Vec3 scale)
 	{
@@ -50,14 +57,19 @@ public class GeometryTransforms
 			double z = Math.max(constraints.getMinScaleZ(), Math.min(constraints.getMaxScaleZ(), scale.z));
 			scale = new Vec3(x, y, z);
 		}
+		
+		// If the scale is zero or so, we don't need to render geometry
+		skipGeometry = scale.length() < 1.0E-10;
 	}
 	
 	public GeometryTransforms copy()
 	{
-		return new GeometryTransforms(
-				translation,
-				rotation,
-				scale
-		);
+		return withSkipGeometry(skipGeometry);
+	}
+	
+	@Override
+	protected GeometryTransforms clone()
+	{
+		return copy();
 	}
 }
