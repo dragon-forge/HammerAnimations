@@ -1,4 +1,3 @@
-import dev.zeith.lzvm.LzVMVariableStore;
 import dev.zeith.lzvm.jvm.*;
 import dev.zeith.lzvm.molang.compiler.MoLangCompiler;
 import dev.zeith.lzvm.molang.expression.MLExpression;

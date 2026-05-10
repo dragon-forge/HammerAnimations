@@ -153,6 +153,12 @@ public class ClientProxy
 		return Minecraft.getInstance().level;
 	}
 	
+	@Override
+	public boolean isGamePaused()
+	{
+		return Minecraft.getInstance().isPaused();
+	}
+	
 	public static CompletableFuture<Void> performReload()
 	{
 		return performReload(CompletableFuture::completedFuture);
@@ -172,13 +178,13 @@ public class ClientProxy
 						mc,
 						Util.backgroundExecutor()
 				)
-		).thenRunAsync(() ->
+		).thenRun(() ->
+				Minecraft.getInstance().execute(() ->
 				{
 					var net = Minecraft.getInstance().getConnection();
 					if(net == null || Minecraft.getInstance().level == null) return;
 					PacketProvideCustomParticleEffectList.toServer();
-				},
-				Minecraft.getInstance()
+				})
 		);
 	}
 }

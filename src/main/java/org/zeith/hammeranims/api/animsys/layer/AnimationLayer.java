@@ -13,6 +13,7 @@ import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
+import org.zeith.hammeranims.net.PacketStartAnimation;
 
 import javax.annotation.*;
 import java.time.Duration;
@@ -31,6 +32,7 @@ public class AnimationLayer
 	
 	public ActiveAnimation lastAnimation;
 	
+	public long startTimeNano;
 	public double startTime;
 	public ActiveAnimation currentAnimation;
 	
@@ -42,7 +44,8 @@ public class AnimationLayer
 	@Setter
 	public float defaultTransitionTime = 0.25F;
 	
-	public boolean frozen;
+	protected boolean useNanoTime;
+	protected boolean frozen;
 	
 	public AnimationLayer(AnimationSystem sys, ILayerMask mask, Query query, String name, BlendMode mode, boolean allowAutoSync, boolean persistent)
 	{
@@ -73,10 +76,15 @@ public class AnimationLayer
 	
 	public boolean startAnimation(@Nonnull IAnimationSource animation)
 	{
-		return startAnimation(animation.configure().transitionTime(defaultTransitionTime));
+		return startAnimation(animation instanceof ConfiguredAnimation ? (ConfiguredAnimation) animation : animation.configure().transitionTime(defaultTransitionTime));
 	}
 	
 	public boolean startAnimation(@Nonnull ConfiguredAnimation animation)
+	{
+		return startAnimationSync(animation, true);
+	}
+	
+	public boolean startAnimationSync(@Nonnull ConfiguredAnimation animation, boolean doSync)
 	{
 		check:
 		{
@@ -97,11 +105,32 @@ public class AnimationLayer
 		
 		lastAnimation = currentAnimation;
 		startTime = system.getTime(0);
+		startTimeNano = System.nanoTime();
 		currentAnimation = animation.activate(this, query);
 		
-		if(system.autoSync && allowAutoSync) system.sync();
+		currentAnimation.useNanoTime = useNanoTime;
+		
+		if(doSync && system.autoSync && allowAutoSync)
+		{
+			if(!system.syncTime)
+				system.sendPacketToTracking(new PacketStartAnimation(this, animation));
+			else
+				system.sync();
+		}
 		
 		return true;
+	}
+	
+	protected float getFadeOut(double sysTime, float transitionTime)
+	{
+		double time = currentAnimation != null ? currentAnimation.elapsedSeconds(sysTime) : (sysTime - startTime);
+		return transitionTime <= 0 ? 0F : 1.0F - Math.min(Math.max(0, (float) time), transitionTime) / transitionTime;
+	}
+	
+	protected float getFadeIn(double sysTime, float transitionTime)
+	{
+		double time = currentAnimation != null ? currentAnimation.elapsedSeconds(sysTime) : (sysTime - startTime);
+		return transitionTime <= 0 ? 1F : Math.min(Math.max(0, (float) time), transitionTime) / transitionTime;
 	}
 	
 	public void applyAnimation(double sysTime, float partialTicks, GeometryPose pose)
@@ -117,10 +146,7 @@ public class AnimationLayer
 			ActiveAnimation la = lastAnimation;
 			ActiveAnimation aa = currentAnimation;
 			float transitionTime = aa != null ? aa.config.transitionTime : defaultTransitionTime;
-			float weight = (transitionTime <= 0
-							? 0F
-							: (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime)
-			) * this.weight * la.getWeight();
+			float weight = getFadeOut(sysTime, transitionTime) * this.weight * la.getWeight();
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
 			
 			SerializableMask sm = la.config.mask;
@@ -131,10 +157,7 @@ public class AnimationLayer
 		if(currentAnimation != null)
 		{
 			float transitionTime = currentAnimation.config.transitionTime;
-			float weight = (transitionTime <= 0
-							? 1F
-							: (float) Math.min(sysTime - startTime, transitionTime) / transitionTime
-			) * this.weight * currentAnimation.getWeight();
+			float weight = getFadeIn(sysTime, transitionTime) * this.weight * currentAnimation.getWeight();
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
 			
 			SerializableMask sm = currentAnimation.config.mask;
@@ -189,23 +212,42 @@ public class AnimationLayer
 		if(frozen)
 		{
 			startTime += 0.05;
+			
+			long nt = System.nanoTime();
+			
 			if(currentAnimation != null)
+			{
+				currentAnimation.useNanoTime = useNanoTime;
 				currentAnimation.activationTime += 0.05;
+				if(currentAnimation.freezeRelativeNanoTime <= 0L) currentAnimation.freezeRelativeNanoTime = nt - currentAnimation.activationTimeNanos;
+			}
+			
 			if(lastAnimation != null)
+			{
+				lastAnimation.useNanoTime = useNanoTime;
 				lastAnimation.activationTime += 0.05;
+				if(lastAnimation.freezeRelativeNanoTime <= 0L) lastAnimation.freezeRelativeNanoTime = nt - lastAnimation.activationTimeNanos;
+			}
 		} else
 		{
-			if(currentAnimation != null) processEffects(sysTime, currentAnimation);
-			if(lastAnimation != null) processEffects(sysTime, lastAnimation);
+			if(currentAnimation != null)
+			{
+				currentAnimation.useNanoTime = useNanoTime;
+				currentAnimation.freezeRelativeNanoTime = -1L;
+				processEffects(sysTime, currentAnimation);
+			}
+			if(lastAnimation != null)
+			{
+				lastAnimation.useNanoTime = useNanoTime;
+				lastAnimation.freezeRelativeNanoTime = -1L;
+				processEffects(sysTime, lastAnimation);
+			}
 		}
 		
 		if(lastAnimation != null)
 		{
 			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : defaultTransitionTime;
-			float weight = transitionTime <= 0 ? 0F :
-						   (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime) *
-								   this.weight *
-								   lastAnimation.config.weight;
+			float weight = getFadeOut(sysTime, transitionTime) * this.weight * lastAnimation.config.weight;
 			if(weight <= 0)
 				lastAnimation = null;
 		}
@@ -220,7 +262,7 @@ public class AnimationLayer
 			}
 			
 			if(currentAnimation.config.next != null)
-				startAnimation(currentAnimation.config.next);
+				startAnimationSync(currentAnimation.config.next, false);
 		}
 	}
 	
@@ -257,7 +299,7 @@ public class AnimationLayer
 	{
 		weight = tag.getFloat("Weight");
 		startTime = tag.getDouble("StartTime");
-		frozen = tag.getBoolean("Frozen");
+		setFrozen(tag.getBoolean("Frozen"));
 		
 		if(tag.contains("Last", Tag.TAG_COMPOUND))
 			lastAnimation = new ActiveAnimation(tag.getCompound("Last"), query);
@@ -273,12 +315,27 @@ public class AnimationLayer
 		return new Builder(name);
 	}
 	
-	public void freeze(boolean b)
+	public void freeze(boolean shouldFreeze)
 	{
-		if(frozen != b)
+		if(frozen != shouldFreeze)
 		{
-			frozen = b;
+			setFrozen(shouldFreeze);
 			system.sync();
+		}
+	}
+	
+	protected void setFrozen(boolean shouldFreeze)
+	{
+		frozen = shouldFreeze;
+		if(frozen)
+		{
+			long nt = System.nanoTime();
+			if(lastAnimation != null) lastAnimation.freezeRelativeNanoTime = nt - lastAnimation.activationTimeNanos;
+			if(currentAnimation != null) currentAnimation.freezeRelativeNanoTime = nt - currentAnimation.activationTimeNanos;
+		} else
+		{
+			if(lastAnimation != null) lastAnimation.freezeRelativeNanoTime = -1L;
+			if(currentAnimation != null) currentAnimation.freezeRelativeNanoTime = -1L;
 		}
 	}
 	
@@ -289,6 +346,7 @@ public class AnimationLayer
 		protected float weight = 1F;
 		protected boolean allowAutoSync = true;
 		protected boolean persistent = true;
+		protected Boolean useNanoTime;
 		protected Query query;
 		protected ILayerMask mask = ILayerMask.TRUE;
 		protected BlendMode blendMode = BlendMode.ADD;
@@ -354,6 +412,12 @@ public class AnimationLayer
 			return this;
 		}
 		
+		public Builder useNanoTime(boolean useNanoTime)
+		{
+			this.useNanoTime = useNanoTime;
+			return this;
+		}
+		
 		public Builder nonPersistent()
 		{
 			this.persistent = false;
@@ -366,6 +430,7 @@ public class AnimationLayer
 			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync, persistent);
 			layer.weight = weight;
 			layer.defaultTransitionTime = defaultTransitionTime;
+			layer.useNanoTime = useNanoTime != null ? useNanoTime : sys.isDefaultUseNanoTime();
 			return layer;
 		}
 	}

@@ -3,6 +3,7 @@ package org.zeith.hammeranims.api.animsys.layer;
 import com.google.common.collect.ImmutableMap;
 import dev.zeith.lzvm.LzVariableStore;
 import net.minecraft.nbt.*;
+import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.*;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
@@ -10,11 +11,18 @@ import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class ActiveAnimation
 		implements ICompoundSerializable
 {
 	public double activationTime;
+	
+	// Nano time implementation
+	public boolean useNanoTime;
+	public long freezeRelativeNanoTime = -1L;
+	public long gameFreezeNanos = -1L;
+	public long activationTimeNanos;
 	
 	// Properties
 	public ConfiguredAnimation config;
@@ -40,6 +48,33 @@ public class ActiveAnimation
 		this.bones = instantiateBones(config, vars);
 	}
 	
+	public double elapsedSeconds(double sysTime)
+	{
+		if(!useNanoTime)
+			return sysTime - activationTime;
+		
+		long now = System.nanoTime();
+		
+		// Add support for game pausing
+		if(HammerAnimations.PROXY.isGamePaused())
+		{
+			if(gameFreezeNanos <= 0L)
+				gameFreezeNanos = now;
+			now = gameFreezeNanos;
+		} else if(gameFreezeNanos > 0L)
+		{
+			long passsed = System.nanoTime() - gameFreezeNanos;
+			this.activationTimeNanos += passsed;
+			gameFreezeNanos = -1L;
+		}
+		
+		long nt = now - this.activationTimeNanos;
+		
+		if(freezeRelativeNanoTime > 0) nt = freezeRelativeNanoTime;
+		
+		return TimeUnit.NANOSECONDS.toMicros(nt) / 1_000_000D;
+	}
+	
 	public Map<String, BoneAnimationInstance> getBoneAnimations()
 	{
 		return bones;
@@ -50,7 +85,7 @@ public class ActiveAnimation
 		return config.animation == null
 				|| (config.loopMode == LoopMode.ONCE && (
 				config.animation.getData() == null
-						|| (sysTime - activationTime) * config.speed >= getLengthSeconds()
+						|| elapsedSeconds(sysTime) * config.speed >= getLengthSeconds()
 		));
 	}
 	
@@ -64,6 +99,7 @@ public class ActiveAnimation
 	{
 		var tag = config.serializeNBT();
 		tag.putDouble("ActivationTime", activationTime);
+		if(useNanoTime && tag.contains("FrozenRelativeNanoTime")) this.freezeRelativeNanoTime = tag.getLong("FrozenRelativeNanoTime");
 		tag.putBoolean("FiredActions", firedActions);
 		tag.putFloat("ActiveWeight", realTimeWeight);
 		return tag;
@@ -74,6 +110,7 @@ public class ActiveAnimation
 	{
 		config = new ConfiguredAnimation(tag);
 		this.activationTime = tag.getDouble("ActivationTime");
+		if(useNanoTime) this.freezeRelativeNanoTime = tag.getLong("FrozenRelativeNanoTime");
 		this.firedActions = tag.getBoolean("FiredActions");
 		if(tag.contains("ActiveWeight", Tag.TAG_ANY_NUMERIC)) this.realTimeWeight = tag.getFloat("ActiveWeight");
 		else this.realTimeWeight = 1F;

@@ -7,6 +7,8 @@ import org.zeith.hammeranims.core.client.ClientHammerHooks;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 import org.zeith.hammerlib.net.*;
 
+import static org.zeith.hammeranims.core.client.ClientHammerHooks.DEFAULT_TIMEOUT;
+
 @MainThreaded
 public class PacketSyncAnimationSystem
 		implements INBTPacket
@@ -42,6 +44,6 @@ public class PacketSyncAnimationSystem
 	@OnlyIn(Dist.CLIENT)
 	public void clientExecute(PacketContext ctx)
 	{
-		ClientHammerHooks.applySystem(source, tag, 100);
+		ClientHammerHooks.applySystem(source, DEFAULT_TIMEOUT, tag);
 	}
 }

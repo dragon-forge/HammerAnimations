@@ -6,7 +6,7 @@ import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.core.client.render.tile.RenderTileBilly;
-import org.zeith.hammeranims.core.contents.actions.PrintHelloWorldAction;
+import org.zeith.hammeranims.core.contents.actions.*;
 import org.zeith.hammeranims.core.contents.blocks.*;
 import org.zeith.hammeranims.core.contents.entity.EntityBilly;
 import org.zeith.hammerlib.annotations.*;
@@ -35,8 +35,8 @@ public interface ContainersHA
 	@RegistryName("billy")
 	IGeometryContainer BILLY_GEOM = IGeometryContainer.create();
 	
-	@RegistryName("hello_world")
-	PrintHelloWorldAction HELLO_WORLD_ACTION = new PrintHelloWorldAction();
+	@RegistryName("method_call")
+	MethodAnimAction METHOD_CALL = new MethodAnimAction();
 	
 	@RegistryName("rainbow")
 	IParticleContainer RAINBOW_PARTICLES = IParticleContainer.create();

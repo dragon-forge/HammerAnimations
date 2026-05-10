@@ -47,6 +47,11 @@ public class CommonProxy
 		return null;
 	}
 	
+	public boolean isGamePaused()
+	{
+		return false;
+	}
+	
 	protected CompletableFuture<Void> reloadRegistries(PreparableReloadListener.PreparationBarrier pStage, IResourceProvider provider, boolean clientSide, Executor gameExecutor, Executor backgroundExecutor)
 	{
 		Stopwatch sw = Stopwatch.createStarted();

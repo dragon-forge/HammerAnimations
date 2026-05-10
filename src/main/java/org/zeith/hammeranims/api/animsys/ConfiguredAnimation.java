@@ -41,7 +41,18 @@ public class ConfiguredAnimation
 	
 	public ConfiguredAnimation(ConfiguredAnimation toCopy)
 	{
-		this(toCopy.serializeNBT());
+		this.animation = toCopy.animation;
+		this.weight = toCopy.weight;
+		this.speed = toCopy.speed;
+		this.startTime = toCopy.startTime;
+		this.reverse = toCopy.reverse;
+		this.transitionTime = toCopy.transitionTime;
+		this.timeFunction = toCopy.timeFunction;
+		this.important = toCopy.important;
+		this.loopMode = toCopy.loopMode;
+		this.mask = toCopy.mask;
+		this.next = toCopy.next != null ? new ConfiguredAnimation(toCopy.next) : null;
+		this.onFinish.addAll(toCopy.onFinish);
 	}
 	
 	public ConfiguredAnimation(CompoundTag tag)
@@ -199,6 +210,7 @@ public class ConfiguredAnimation
 	{
 		ActiveAnimation aa = new ActiveAnimation(this, query);
 		aa.activationTime = layer.startTime;
+		aa.activationTimeNanos = layer.startTimeNano;
 		return aa;
 	}
 	

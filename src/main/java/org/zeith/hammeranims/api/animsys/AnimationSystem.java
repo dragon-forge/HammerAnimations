@@ -11,6 +11,7 @@ import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.net.*;
+import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 import org.zeith.hammerlib.net.*;
 
 import javax.annotation.*;
@@ -34,6 +35,7 @@ public class AnimationSystem
 	protected boolean hasReceivedTime = false;
 	
 	public boolean canSync = true, autoSync = false, syncTime = true;
+	protected @Getter boolean defaultUseNanoTime = false;
 	
 	@Getter
 	protected final AnimationLayer[] layers;
@@ -60,12 +62,25 @@ public class AnimationSystem
 	public void sync()
 	{
 		var world = owner.getAnimatedObjectWorld();
-		if(owner.getAnimatedObjectWorld().isClientSide || !canSync) // if on server
+		if(world.isClientSide || !canSync) // if on server
 			return;
 		var pos = BlockPos.containing(owner.getAnimatedObjectPosition());
 		if(!world.isLoaded(pos))
 			return;
-		Network.sendToTracking(createSyncPacket(), world.getChunkAt(pos));
+		sendPacketToTracking(createSyncPacket());
+	}
+	
+	public IObjectSource<?> getAnimationSource()
+	{
+		return owner.getAnimationSource();
+	}
+	
+	public void sendPacketToTracking(IPacket packet)
+	{
+		var world = owner.getAnimatedObjectWorld();
+		if(world.isClientSide) return;
+		var pos = BlockPos.containing(owner.getAnimatedObjectPosition());
+		Network.sendToTracking(world.getChunkAt(pos), packet);
 	}
 	
 	@Nullable
@@ -171,7 +186,9 @@ public class AnimationSystem
 	public CompoundTag serializeNBT()
 	{
 		var comp = newNBTCompound();
-		comp.putDouble("Time", time);
+		
+		if(syncTime)
+			comp.putDouble("Time", time);
 		
 		var layers = newNBTList();
 		for(AnimationLayer layer : this.layers)
@@ -187,8 +204,11 @@ public class AnimationSystem
 	{
 		if(syncTime || !hasReceivedTime)
 		{
-			time = nbt.getDouble("Time");
-			hasReceivedTime = true;
+			if(nbt.contains("Time") || !hasReceivedTime)
+			{
+				time = nbt.getDouble("Time");
+				hasReceivedTime = true;
+			}
 		}
 		
 		var layers = nbt.getList("Layers", Tag.TAG_COMPOUND);
@@ -217,8 +237,9 @@ public class AnimationSystem
 		@Nonnull
 		protected final IAnimatedObject owner;
 		protected boolean canSync = true;
-		protected boolean autoSync = false;
-		protected boolean syncTime = true;
+		protected boolean autoSync = true;
+		protected boolean syncTime = false;
+		protected boolean defaultUseNanoTime = true;
 		protected final List<AnimationLayer.Builder> layers = new ArrayList<>();
 		
 		public Builder(@Nonnull IAnimatedObject owner)
@@ -256,6 +277,13 @@ public class AnimationSystem
 			return this;
 		}
 		
+		public Builder defaultUseNanoTime(boolean defaultUseNanoTime)
+		{
+			this.defaultUseNanoTime = defaultUseNanoTime;
+			this.syncTime = false;
+			return this;
+		}
+		
 		public Builder autoSync(boolean autoSync)
 		{
 			this.autoSync = autoSync;
@@ -266,16 +294,19 @@ public class AnimationSystem
 		{
 			Query q = owner.createQuery();
 			AnimationLayer[] layers = new AnimationLayer[this.layers.size()];
+			
 			Map<String, AnimationLayer> layerMap = new HashMap<>();
-			AnimationSystem sys = new AnimationSystem(owner, layers, layerMap);
+			AnimationSystem sys = new AnimationSystem(owner, layers, Collections.unmodifiableMap(layerMap));
+			sys.canSync = canSync;
+			sys.autoSync = autoSync;
+			sys.syncTime = syncTime;
+			sys.defaultUseNanoTime = defaultUseNanoTime;
+			
 			for(int i = 0; i < layers.length; i++)
 			{
 				AnimationLayer al = layers[i] = this.layers.get(i).defaultQuery(q).build(sys);
 				layerMap.put(al.name, al);
 			}
-			sys.canSync = canSync;
-			sys.autoSync = autoSync;
-			sys.syncTime = syncTime;
 			return sys;
 		}
 	}

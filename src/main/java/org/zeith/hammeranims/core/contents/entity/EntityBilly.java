@@ -71,9 +71,9 @@ public class EntityBilly
 	@Override
 	public void setupSystem(AnimationSystem.Builder builder)
 	{
-		builder.autoSync().addLayers(
-				new AnimationLayer.Builder(CommonLayerNames.AMBIENT),
-				new AnimationLayer.Builder(CommonLayerNames.LEGS)
+		builder.addLayers(
+				AnimationLayer.builder(CommonLayerNames.AMBIENT),
+				AnimationLayer.builder(CommonLayerNames.LEGS)
 		);
 	}
 	
