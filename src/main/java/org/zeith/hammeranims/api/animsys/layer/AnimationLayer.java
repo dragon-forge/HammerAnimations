@@ -32,7 +32,6 @@ public class AnimationLayer
 	
 	public ActiveAnimation lastAnimation;
 	
-	public long startTimeNano;
 	public double startTime;
 	public ActiveAnimation currentAnimation;
 	
@@ -105,7 +104,6 @@ public class AnimationLayer
 		
 		lastAnimation = currentAnimation;
 		startTime = system.getTime(0);
-		startTimeNano = System.nanoTime();
 		currentAnimation = animation.activate(this, query);
 		
 		currentAnimation.useNanoTime = useNanoTime;
@@ -183,7 +181,8 @@ public class AnimationLayer
 			
 			val owner = system.owner;
 			
-			for(int i = prev; i < ticks; i++)
+			int maxTicks = Math.min(100, ticks - prev);
+			for(int i = 0; i < maxTicks; i++)
 			{
 				val snds = sounds.get(i);
 				if(snds != null)

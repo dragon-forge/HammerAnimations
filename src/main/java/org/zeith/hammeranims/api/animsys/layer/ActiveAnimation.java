@@ -22,7 +22,7 @@ public class ActiveAnimation
 	public boolean useNanoTime;
 	public long freezeRelativeNanoTime = -1L;
 	public long gameFreezeNanos = -1L;
-	public long activationTimeNanos;
+	public long activationTimeNanos = System.nanoTime();
 	
 	// Properties
 	public ConfiguredAnimation config;
@@ -99,9 +99,14 @@ public class ActiveAnimation
 	{
 		var tag = config.serializeNBT();
 		tag.putDouble("ActivationTime", activationTime);
-		if(useNanoTime && tag.contains("FrozenRelativeNanoTime")) this.freezeRelativeNanoTime = tag.getLong("FrozenRelativeNanoTime");
 		tag.putBoolean("FiredActions", firedActions);
 		tag.putFloat("ActiveWeight", realTimeWeight);
+		if(useNanoTime)
+		{
+			if(this.freezeRelativeNanoTime > 0L)
+				tag.putLong("FrozenRelativeNanoTime", this.freezeRelativeNanoTime);
+			tag.putLong("NanoRelTime", System.nanoTime() - this.activationTimeNanos);
+		}
 		return tag;
 	}
 	
@@ -110,10 +115,15 @@ public class ActiveAnimation
 	{
 		config = new ConfiguredAnimation(tag);
 		this.activationTime = tag.getDouble("ActivationTime");
-		if(useNanoTime) this.freezeRelativeNanoTime = tag.getLong("FrozenRelativeNanoTime");
 		this.firedActions = tag.getBoolean("FiredActions");
 		if(tag.contains("ActiveWeight", Tag.TAG_ANY_NUMERIC)) this.realTimeWeight = tag.getFloat("ActiveWeight");
-		else this.realTimeWeight = 1F;
+		if(useNanoTime)
+		{
+			if(tag.contains("FrozenRelativeNanoTime"))
+				this.freezeRelativeNanoTime = tag.getLong("FrozenRelativeNanoTime");
+			if(tag.contains("NanoRelTime")) this.activationTimeNanos = System.nanoTime() - tag.getLong("NanoRelTime");
+			else this.activationTimeNanos = System.nanoTime();
+		} else this.realTimeWeight = 1F;
 	}
 	
 	public double getLengthSeconds()
