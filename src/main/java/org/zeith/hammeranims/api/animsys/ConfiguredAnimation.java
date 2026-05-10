@@ -215,7 +215,6 @@ public class ConfiguredAnimation
 	{
 		ActiveAnimation aa = new ActiveAnimation(this, query);
 		aa.activationTime = layer.startTime;
-		aa.activationTimeNanos = layer.startTimeNano;
 		return aa;
 	}
 	
