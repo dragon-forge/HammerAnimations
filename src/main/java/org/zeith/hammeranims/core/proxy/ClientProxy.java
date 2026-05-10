@@ -142,6 +142,18 @@ public class ClientProxy
 		return model;
 	}
 	
+	@Override
+	public Level getClientWorld()
+	{
+		return Minecraft.getInstance().level;
+	}
+	
+	@Override
+	public boolean isGamePaused()
+	{
+		return Minecraft.getInstance().isPaused();
+	}
+	
 	public static CompletableFuture<Void> performReload()
 	{
 		return performReload(CompletableFuture::completedFuture);

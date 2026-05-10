@@ -1,6 +1,5 @@
 package org.zeith.hammeranims.core.client;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
@@ -17,29 +16,32 @@ import org.zeith.hammerlib.util.java.tuples.Tuples;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientHammerHooks
 {
-	private static final List<Tuple3.Mutable3<IObjectSource<?>, CompoundTag, Integer>> QUEUED_SYSTEMS = new ArrayList<>();
+	private static final List<Tuple3.Mutable3<IObjectSource<?>, Consumer<AnimationSystem>, Integer>> QUEUED_ACTIONS = new ArrayList<>();
+	
+	public static int DEFAULT_TIMEOUT = 100;
 	
 	@SubscribeEvent
 	public static void clientTick(ClientTickEvent.Pre e)
 	{
-		var w = Minecraft.getInstance().level;
+		var w = HammerAnimations.PROXY.getClientWorld();
 		if(w == null)
 		{
-			QUEUED_SYSTEMS.clear();
+			QUEUED_ACTIONS.clear();
 			return;
 		}
 		
-		QUEUED_SYSTEMS.removeIf(src ->
+		QUEUED_ACTIONS.removeIf(src ->
 		{
 			int ticksAwaiting = src.c();
 			src.setC(ticksAwaiting - 1);
 			if(ticksAwaiting <= 0)
 			{
-				HammerAnimations.LOG.warn("Animation update for {} has timed out.", src.a());
+				HammerAnimations.LOG.warn("Animation action for {} has timed out.", src.a());
 				return true;
 			}
 			return applyAnimationSystem(w, src.a(), src.b());
@@ -48,27 +50,53 @@ public class ClientHammerHooks
 	
 	/**
 	 * Apply animation system client-side for a given animation address with a given timeout.
-	 * This has a
 	 */
-	public static void applySystem(IObjectSource<?> source, CompoundTag tag, int timeout)
+	public static void applySystem(IObjectSource<?> source, int timeout, CompoundTag tag)
 	{
 		if(source == null || tag == null)
 		{
-			HammerAnimations.LOG.error("Completely ignored animation sync with {} or {} being null.", source, tag);
+			HammerAnimations.LOG.error("Completely ignored animation sync with {} being null.", tag);
 			return;
 		}
 		
-		if(!applyAnimationSystem(Minecraft.getInstance().level, source, tag))
-			QUEUED_SYSTEMS.add(Tuples.mutable(source, tag, timeout));
+		enqueueAction(source, timeout, sys -> sys.deserializeNBT(tag));
 	}
 	
-	private static boolean applyAnimationSystem(Level world, IObjectSource<?> source, CompoundTag tag)
+	public static void startAnimation(IObjectSource<?> source, int timeout, String layer, CompoundTag cfgAnim)
+	{
+		if(layer == null || cfgAnim == null)
+		{
+			HammerAnimations.LOG.error("Completely ignored animation activation with layer({}) or cfgAnim({}) being null.", layer, cfgAnim);
+			return;
+		}
+		
+		enqueueAction(source, timeout, sys ->
+				{
+					var l = sys.getLayer(layer);
+					if(l != null) l.startAnimationSync(new ConfiguredAnimation(cfgAnim), false);
+				}
+		);
+	}
+	
+	public static void enqueueAction(IObjectSource<?> source, int timeout, Consumer<AnimationSystem> action)
+	{
+		if(source == null || action == null)
+		{
+			HammerAnimations.LOG.error("Completely ignored queued action with source({}) or action({}) being null.", source, action);
+			return;
+		}
+		
+		if(!applyAnimationSystem(HammerAnimations.PROXY.getClientWorld(), source, action))
+			QUEUED_ACTIONS.add(Tuples.mutable(source, action, timeout));
+	}
+	
+	private static boolean applyAnimationSystem(Level world, IObjectSource<?> source, Consumer<AnimationSystem> handler)
 	{
 		var obj = Cast.cast(source.get(world), IAnimatedObject.class);
 		if(obj == null) return false;
 		AnimationSystem sys = obj.getAnimationSystem();
 		if(sys == null) return true;
-		sys.deserializeNBT(world.registryAccess(), tag);
+		handler.accept(sys);
 		return true;
 	}
 }

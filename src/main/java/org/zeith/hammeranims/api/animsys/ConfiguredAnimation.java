@@ -44,21 +44,6 @@ public class ConfiguredAnimation
 		return DefaultsHA.NULL_ANIMATION_SYNTETIC.configure();
 	}
 	
-	public ConfiguredAnimation(HolderLookup.Provider provider, ConfiguredAnimation toCopy)
-	{
-		this(provider, toCopy.serializeNBT(provider));
-	}
-	
-	public ConfiguredAnimation(HolderLookup.Provider provider, CompoundTag tag)
-	{
-		deserializeNBT(provider, tag);
-	}
-	
-	public ConfiguredAnimation(Animation animation)
-	{
-		setAnimation(animation);
-	}
-	
 	public ConfiguredAnimation(ConfiguredAnimation toCopy)
 	{
 		this.animation = toCopy.animation;
@@ -73,6 +58,16 @@ public class ConfiguredAnimation
 		this.mask = toCopy.mask;
 		this.next = toCopy.next != null ? new ConfiguredAnimation(toCopy.next) : null;
 		this.onFinish.addAll(toCopy.onFinish);
+	}
+	
+	public ConfiguredAnimation(HolderLookup.Provider provider, CompoundTag tag)
+	{
+		deserializeNBT(provider, tag);
+	}
+	
+	public ConfiguredAnimation(Animation animation)
+	{
+		setAnimation(animation);
 	}
 	
 	public Animation getAnimation()
@@ -220,6 +215,7 @@ public class ConfiguredAnimation
 	{
 		ActiveAnimation aa = new ActiveAnimation(this, query);
 		aa.activationTime = layer.startTime;
+		aa.activationTimeNanos = layer.startTimeNano;
 		return aa;
 	}
 	

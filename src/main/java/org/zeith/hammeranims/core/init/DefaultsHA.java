@@ -5,7 +5,7 @@ import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.time.TimeFunction;
-import org.zeith.hammeranims.core.contents.actions.EmptyAnimationAction;
+import org.zeith.hammeranims.core.contents.actions.*;
 import org.zeith.hammeranims.core.contents.time.*;
 import org.zeith.hammerlib.annotations.*;
 

@@ -3,33 +3,27 @@ package org.zeith.hammeranims.core.proxy;
 import com.google.common.base.Stopwatch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.neoforged.bus.api.IEventBus;
+import net.minecraft.server.packs.resources.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.IEventBus;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3f;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
-import org.zeith.hammeranims.api.animation.IAnimationContainer;
 import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
 import org.zeith.hammeranims.api.event.ReloadHammerAnimationsEvent;
-import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
 import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
-import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
 import org.zeith.hammeranims.api.texture.ITextureAccess;
-import org.zeith.hammeranims.api.utils.IExtendedResourceProvider;
-import org.zeith.hammeranims.api.utils.IResourceProvider;
+import org.zeith.hammeranims.api.utils.*;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
 import org.zeith.hammerlib.api.proxy.IProxy;
 import org.zeith.hammerlib.util.java.IOUtils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Stream;
@@ -44,6 +38,16 @@ public class CommonProxy
 	public IGeometricModel createGeometryData(GeometryDataImpl def)
 	{
 		return IGeometricModel.EMPTY;
+	}
+	
+	public Level getClientWorld()
+	{
+		return null;
+	}
+	
+	public boolean isGamePaused()
+	{
+		return false;
 	}
 	
 	protected CompletableFuture<Void> reloadRegistries(PreparableReloadListener.PreparationBarrier pStage, IResourceProvider provider, boolean clientSide, Executor gameExecutor, Executor backgroundExecutor)
