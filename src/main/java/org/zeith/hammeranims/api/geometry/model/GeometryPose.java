@@ -1,12 +1,12 @@
 package org.zeith.hammeranims.api.geometry.model;
 
-import shaded.json.JSONObject;
 import org.teavm.jso.JSObject;
-import org.teavm.jso.json.JSON;
-import org.zeith.hammeranims.api.animation.data.*;
-import org.zeith.hammeranims.api.animation.interp.*;
+import org.teavm.jso.core.*;
+import org.teavm.jso.impl.JS;
+import org.zeith.hammeranims.api.animation.data.BoneAnimationInstance;
+import org.zeith.hammeranims.api.animation.interp.BlendMode;
 import org.zeith.hammeranims.api.animsys.SerializableMask;
-import org.zeith.hammeranims.api.animsys.layer.ILayerMask;
+import org.zeith.hammeranims.api.animsys.layer.*;
 import org.zeith.hammeranims.standalone.wasm.itfs.anim.HAAnimationPose;
 
 import java.util.*;
@@ -34,25 +34,25 @@ public class GeometryPose
 		boneTransforms.clear();
 	}
 	
-	public void apply(IAnimationData animation, ILayerMask mask, BlendMode mode, float weight, Query query)
+	public void apply(ActiveAnimation animation, ILayerMask mask, BlendMode mode, float weight)
 	{
-		for(Map.Entry<String, BoneAnimation> entry : animation.getBoneAnimations().entrySet())
+		for(Map.Entry<String, BoneAnimationInstance> entry : animation.getBoneAnimations().entrySet())
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone)) continue;
-			boneTransforms.put(bone, entry.getValue().apply(query, mode, weight, boneTransforms.get(bone)));
+			boneTransforms.put(bone, entry.getValue().apply(mode, weight, boneTransforms.get(bone)));
 		}
 	}
 	
-	public void apply(SerializableMask animationMask, IAnimationData animation, ILayerMask mask, BlendMode mode, float weight, Query query)
+	public void apply(SerializableMask animationMask, ActiveAnimation animation, ILayerMask mask, BlendMode mode, float weight)
 	{
 		Set<String> excludes = animationMask.getExcludes();
 		SerializableMask.WeightFunction weightFun = animationMask.getBoneWeight();
-		for(Map.Entry<String, BoneAnimation> entry : animation.getBoneAnimations().entrySet())
+		for(Map.Entry<String, BoneAnimationInstance> entry : animation.getBoneAnimations().entrySet())
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone) || excludes.contains(bone)) continue;
-			boneTransforms.put(bone, entry.getValue().apply(query, mode, weight * weightFun.get(bone), boneTransforms.get(bone)));
+			boneTransforms.put(bone, entry.getValue().apply(mode, weight * weightFun.get(bone), boneTransforms.get(bone)));
 		}
 	}
 	
@@ -75,17 +75,12 @@ public class GeometryPose
 		return boneTransformsView;
 	}
 	
-	public JSONObject toJson()
-	{
-		JSONObject o = new JSONObject();
-		for(Map.Entry<String, GeometryTransforms> e : boneTransforms.entrySet())
-			o.put(e.getKey(), e.getValue().toJson());
-		return o;
-	}
-	
 	@Override
 	public JSObject getBones()
 	{
-		return JSON.parse(toJson().toString());
+		JSObject o = JSObjects.create();
+		for(Map.Entry<String, GeometryTransforms> e : boneTransforms.entrySet())
+			JS.set(o, JSString.valueOf(e.getKey()),  e.getValue().toJson());
+		return o;
 	}
 }

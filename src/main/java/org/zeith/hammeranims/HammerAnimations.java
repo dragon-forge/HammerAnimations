@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public class HammerAnimations
 {
+	public static final String VERSION = "v47";
+	
 	public static final Log LOG = new Log();
 	
 	private static boolean initialized = false;
@@ -19,7 +21,7 @@ public class HammerAnimations
 		if(initialized) return;
 		long start = System.currentTimeMillis();
 		initialized = true;
-		LOG.info("HammerAnimations initialized in {} ms.", System.currentTimeMillis() - start);
+		LOG.info("HammerAnimations {} initialized in {} ms.", VERSION, System.currentTimeMillis() - start);
 	}
 	
 	public static IGeometryContainer loadGeo(String id, String json)

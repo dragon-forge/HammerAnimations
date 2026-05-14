@@ -1,6 +1,7 @@
 package shaded.util.math;
 
 import org.jetbrains.annotations.Nullable;
+import org.teavm.jso.core.*;
 import shaded.joml.Vector3f;
 
 public class Vec3d
@@ -9,6 +10,11 @@ public class Vec3d
 	public final double x;
 	public final double y;
 	public final double z;
+	
+	public JSArray<JSNumber> toJson()
+	{
+		return JSArray.of(JSNumber.valueOf(x), JSNumber.valueOf(y), JSNumber.valueOf(z));
+	}
 	
 	public Vec3d(double xIn, double yIn, double zIn)
 	{

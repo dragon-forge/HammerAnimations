@@ -1,11 +1,9 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 import org.zeith.hammeranims.api.animation.*;
-import org.zeith.hammeranims.api.animation.interp.BlendMode;
-import org.zeith.hammeranims.api.animation.interp.Query;
+import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.core.init.DefaultsHA;
@@ -30,6 +28,9 @@ public class AnimationLayer
 	
 	@Setter
 	public float weight = 1F;
+	
+	@Setter
+	public float defaultTransitionTime = 0.25F;
 	
 	public boolean frozen;
 	
@@ -62,7 +63,7 @@ public class AnimationLayer
 	
 	public boolean startAnimation(@NotNull IAnimationSource animation)
 	{
-		return startAnimation(animation.configure());
+		return startAnimation(animation instanceof ConfiguredAnimation ? (ConfiguredAnimation) animation : animation.configure().transitionTime(defaultTransitionTime));
 	}
 	
 	public boolean startAnimation(@NotNull ConfiguredAnimation animation)
@@ -86,9 +87,21 @@ public class AnimationLayer
 		
 		lastAnimation = currentAnimation;
 		startTime = system.getTime(0);
-		currentAnimation = animation.activate(this);
+		currentAnimation = animation.activate(this, query);
 		
 		return true;
+	}
+	
+	protected float getFadeOut(double sysTime, float transitionTime)
+	{
+		double time = currentAnimation != null ? currentAnimation.elapsedSeconds(sysTime) : (sysTime - startTime);
+		return transitionTime <= 0 ? 0F : 1.0F - Math.min(Math.max(0, (float) time), transitionTime) / transitionTime;
+	}
+	
+	protected float getFadeIn(double sysTime, float transitionTime)
+	{
+		double time = currentAnimation != null ? currentAnimation.elapsedSeconds(sysTime) : (sysTime - startTime);
+		return transitionTime <= 0 ? 1F : Math.min(Math.max(0, (float) time), transitionTime) / transitionTime;
 	}
 	
 	public void applyAnimation(double sysTime, float partialTicks, GeometryPose pose)
@@ -101,30 +114,26 @@ public class AnimationLayer
 		
 		if(lastAnimation != null)
 		{
-			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : 0.25F;
-			float weight = (transitionTime <= 0
-							? 0F
-							: (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime)
-						   ) * this.weight * lastAnimation.getWeight();
+			ActiveAnimation la = lastAnimation;
+			ActiveAnimation aa = currentAnimation;
+			float transitionTime = aa != null ? aa.config.transitionTime : defaultTransitionTime;
+			float weight = getFadeOut(sysTime, transitionTime) * this.weight * la.getWeight();
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
 			
-			SerializableMask sm = lastAnimation.config.mask;
-			if(sm != null) pose.apply(sm, lastAnimation.config.getAnimation().getData(), mask, mode, weight, query);
-			else pose.apply(lastAnimation.config.getAnimation().getData(), mask, mode, weight, query);
+			SerializableMask sm = la.config.mask;
+			if(sm != null) pose.apply(sm, lastAnimation, mask, mode, weight);
+			else pose.apply(lastAnimation, mask, mode, weight);
 		}
 		
 		if(currentAnimation != null)
 		{
 			float transitionTime = currentAnimation.config.transitionTime;
-			float weight = (transitionTime <= 0
-							? 1F
-							: (float) Math.min(sysTime - startTime, transitionTime) / transitionTime
-						   ) * this.weight * currentAnimation.getWeight();
+			float weight = getFadeIn(sysTime, transitionTime) * this.weight * currentAnimation.getWeight();
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
 			
 			SerializableMask sm = currentAnimation.config.mask;
-			if(sm != null) pose.apply(sm, currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
-			else pose.apply(currentAnimation.config.getAnimation().getData(), mask, mode, weight, query);
+			if(sm != null) pose.apply(sm, currentAnimation, mask, mode, weight);
+			else pose.apply(currentAnimation, mask, mode, weight);
 		}
 	}
 	
@@ -143,7 +152,7 @@ public class AnimationLayer
 		{
 			float transitionTime = currentAnimation != null ? currentAnimation.config.transitionTime : 0.25F;
 			float weight = transitionTime <= 0 ? 0F :
-						   (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime) *
+			               (float) (1.0 - Math.min(sysTime - startTime, transitionTime) / transitionTime) *
 						   this.weight *
 						   lastAnimation.config.weight;
 			if(weight <= 0)
@@ -197,13 +206,21 @@ public class AnimationLayer
 		protected float weight = 1F;
 		protected boolean allowAutoSync = true;
 		protected boolean persistent = true;
-		protected Query query = new Query();
+		protected Query query;
 		protected ILayerMask mask = ILayerMask.TRUE;
 		protected BlendMode blendMode = BlendMode.ADD;
+		protected float defaultTransitionTime = 0.25F;
 		
 		public Builder(String name)
 		{
 			this.name = name;
+		}
+		
+		public Builder defaultQuery(Query query)
+		{
+			if(this.query == null)
+				this.query = query;
+			return this;
 		}
 		
 		public Builder query(Query query)
@@ -221,6 +238,12 @@ public class AnimationLayer
 		public Builder weight(float weight)
 		{
 			this.weight = weight;
+			return this;
+		}
+		
+		public Builder defaultTransitionTime(float defaultTransitionTime)
+		{
+			this.defaultTransitionTime = defaultTransitionTime;
 			return this;
 		}
 		
@@ -256,8 +279,10 @@ public class AnimationLayer
 		
 		public AnimationLayer build(AnimationSystem sys)
 		{
+			if(query == null) query = new Query();
 			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync, persistent);
 			layer.weight = weight;
+			layer.defaultTransitionTime = defaultTransitionTime;
 			return layer;
 		}
 	}

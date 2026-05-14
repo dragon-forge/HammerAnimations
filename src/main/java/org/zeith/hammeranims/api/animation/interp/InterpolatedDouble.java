@@ -1,84 +1,38 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import org.zeith.hammeranims.core.js.ExpressionParser;
+import dev.zeith.lzvm.jvm.*;
+import org.zeith.hammeranims.core.molang.MolangExpressionParser;
 
-@FunctionalInterface
-public interface InterpolatedDouble<T extends IVariableAccess>
+import java.util.Objects;
+
+public interface InterpolatedDouble
 {
-	double get(T query);
-	
-	static <T extends IVariableAccess> InterpolatedDouble<T> one()
+	static LzExpression one()
 	{
 		return constant(1);
 	}
 	
-	static <T extends IVariableAccess> InterpolatedDouble<T> zero()
+	static LzExpression zero()
 	{
 		return constant(0);
 	}
 	
-	static <T extends IVariableAccess> InterpolatedDouble<T> constant(double d)
+	static LzExpression constant(double d)
 	{
-		return query -> d;
+		return new ConstantExpression(d);
 	}
 	
-	static <T extends IVariableAccess> InterpolatedDouble<T> parse(String expression)
+	static LzFactory parse(String expression)
 	{
-		return ExpressionParser.parse(expression);
+		return MolangExpressionParser.parse(expression);
 	}
 	
-	static <T extends IVariableAccess> InterpolatedDouble<T> parse(Object o)
+	static LzFactory parse(Object o)
 	{
-		if(o instanceof Number) return constant(((Number) o).doubleValue());
-		if(o instanceof String) return parse((String) o);
-		return null;
-	}
-	
-	class NumberWrapped<T extends IVariableAccess>
-			extends Number
-			implements InterpolatedDouble<T>
-	{
-		protected final InterpolatedDouble<T> id;
-		protected Double value = 0D;
-		
-		public NumberWrapped(InterpolatedDouble<T> id)
-		{
-			this.id = id;
-		}
-		
-		public void update(T access)
-		{
-			this.value = id.get(access);
-		}
-		
-		@Override
-		public int intValue()
-		{
-			return value.intValue();
-		}
-		
-		@Override
-		public long longValue()
-		{
-			return value.longValue();
-		}
-		
-		@Override
-		public float floatValue()
-		{
-			return value.floatValue();
-		}
-		
-		@Override
-		public double doubleValue()
-		{
-			return value;
-		}
-		
-		@Override
-		public double get(T query)
-		{
-			return id.get(query);
-		}
+		if(o instanceof Number)
+			return constant(((Number) o).doubleValue());
+		if(o instanceof String)
+			return parse((String) o);
+		return parse(Objects.toString(o));
 	}
 }

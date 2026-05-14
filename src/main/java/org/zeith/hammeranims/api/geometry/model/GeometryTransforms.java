@@ -1,9 +1,10 @@
 package org.zeith.hammeranims.api.geometry.model;
 
-import shaded.util.math.Vec3d;
-import shaded.json.JSONArray;
-import shaded.json.JSONObject;
+import org.teavm.jso.JSObject;
+import org.teavm.jso.core.*;
+import org.teavm.jso.impl.JS;
 import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
+import shaded.util.math.Vec3d;
 
 import static shaded.util.math.Vec3d.ZERO;
 
@@ -63,11 +64,12 @@ public class GeometryTransforms
 		);
 	}
 	
-	public JSONObject toJson()
+	public JSObject toJson()
 	{
-		return new JSONObject()
-				.put("translation", new JSONArray().put(translation.x).put(translation.y).put(translation.z))
-				.put("rotation", new JSONArray().put(rotation.x).put(rotation.y).put(rotation.z))
-				.put("scale", new JSONArray().put(scale.x).put(scale.y).put(scale.z));
+		JSObject obj = JSObjects.create();
+		JS.set(obj, JSString.valueOf("translation"), translation.toJson());
+		JS.set(obj, JSString.valueOf("rotation"), rotation.toJson());
+		JS.set(obj, JSString.valueOf("scale"), scale.toJson());
+		return obj;
 	}
 }

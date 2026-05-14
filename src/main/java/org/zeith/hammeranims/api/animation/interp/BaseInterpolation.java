@@ -1,20 +1,21 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import shaded.json.JSONArray;
-import shaded.json.JSONObject;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.HammerAnimations;
+import shaded.json.*;
 
 public abstract class BaseInterpolation
 {
 	public abstract int getDoubleCount();
 	
-	public abstract double[] get(Query query);
+	public abstract LzExpression[] instantiate(LzVariableStore query);
 	
 	public static BaseInterpolation parse(Object o)
 	{
 		if(o instanceof Number || o instanceof String)
 		{
-			InterpolatedDouble id = InterpolatedDouble.parse(o);
+			LzFactory id = InterpolatedDouble.parse(o);
 			if(id == null) return null;
 			return new DoubleInterpolation(id);
 		}
@@ -22,7 +23,7 @@ public abstract class BaseInterpolation
 		if(o instanceof JSONArray)
 		{
 			JSONArray arr = (JSONArray) o;
-			InterpolatedDouble[] ids = new InterpolatedDouble[arr.length()];
+			LzFactory[] ids = new LzFactory[arr.length()];
 			for(int i = 0; i < ids.length; i++)
 			{
 				ids[i] = InterpolatedDouble.parse(arr.get(i));

@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.animsys;
 
+import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.standalone.utils.Cast;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
@@ -14,6 +15,7 @@ import java.util.Objects;
 import static org.zeith.hammeranims.core.contents.time.LinearTimeFunction.FREEZE_SPEED;
 
 public class ConfiguredAnimation
+	implements IAnimationSource
 {
 	public Animation animation;
 	public float weight = 1F; // [0; 1]
@@ -169,14 +171,21 @@ public class ConfiguredAnimation
 		return this;
 	}
 	
+	@Override
 	public AnimationLocation getLocation()
 	{
 		return animation != null ? animation.getLocation() : null;
 	}
 	
-	public ActiveAnimation activate(AnimationLayer layer)
+	@Override
+	public ConfiguredAnimation configure()
 	{
-		ActiveAnimation aa = new ActiveAnimation(this);
+		return copy();
+	}
+	
+	public ActiveAnimation activate(AnimationLayer layer, Query query)
+	{
+		ActiveAnimation aa = new ActiveAnimation(this, query);
 		aa.activationTime = layer.startTime;
 		return aa;
 	}

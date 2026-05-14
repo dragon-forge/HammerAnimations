@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.animsys;
 
+import org.zeith.hammeranims.api.animation.interp.Query;
 import shaded.util.math.Vec3d;
 
 public interface IAnimatedObject
@@ -34,4 +35,9 @@ public interface IAnimatedObject
 	AnimationSystem getAnimationSystem();
 	
 	Vec3d getAnimatedObjectPosition();
+	
+	default Query createQuery()
+	{
+		return new Query();
+	}
 }

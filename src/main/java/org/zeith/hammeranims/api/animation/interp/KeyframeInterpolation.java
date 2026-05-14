@@ -1,14 +1,15 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import org.zeith.hammeranims.standalone.utils.MathHelper;
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
-import it.unimi.dsi.fastutil.doubles.DoubleList;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.LzExpression;
+import dev.zeith.lzvm.molang.compiler.libs.MoMathLibrary;
+import dev.zeith.lzvm.op.LzVarOp;
+import it.unimi.dsi.fastutil.doubles.*;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animation.interp.keyframes.*;
 import shaded.json.*;
-import shaded.tuples.Tuple2;
-import shaded.tuples.Tuples;
+import shaded.tuples.*;
 
 import java.util.*;
 
@@ -56,70 +57,112 @@ public class KeyframeInterpolation
 	}
 	
 	@Override
-	public double[] get(Query query)
+	public LzExpression[] instantiate(LzVariableStore query)
 	{
-		int index = findInsertionIndex(keyframeTimes, query.anim_time);
+		LzExpression[] exprs = new LzExpression[doubleCount];
 		
-		int fromIdx = index - 1;
-		int toIdx = index % keyframes.size();
-		if(fromIdx < 0) fromIdx += keyframes.size();
+		List<IKeyFrameInstance> kfInst = keyframes.stream().map(f -> f.newInstance(query)).toList();
 		
-		IKeyFrame prev = keyframes.get(fromIdx),
-				next = toIdx > fromIdx ? keyframes.get(toIdx) : null;
+		for(int i = 0; i < exprs.length; i++)
+			exprs[i] = new KeyframeInterpolationInstance(
+					this,
+					query,
+					kfInst,
+					i
+			);
 		
-		if(next == null)
-			return prev.getVec(IKeyFrame.KeyFrameState.PREV).get(query);
-		else if(prev == null)
-			return next.getVec(IKeyFrame.KeyFrameState.NEXT).get(query);
-		
-		if(prev instanceof CatmullRomKeyFrame || next instanceof CatmullRomKeyFrame)
-			return interpolateSmoothly(prev, next, fromIdx, toIdx, query);
-		else
-			return interpolateLinear(prev, next, query);
+		return exprs;
 	}
 	
-	public static double[] interpolateLinear(IKeyFrame prev, IKeyFrame next, Query query)
+	public static class KeyframeInterpolationInstance
+			implements LzExpression
 	{
-		if(next == null) return prev.getVec(IKeyFrame.KeyFrameState.PREV).get(query);
+		protected final KeyframeInterpolation owner;
+		protected final List<IKeyFrameInstance> keyframes;
+		protected final LzVarOp anim_time, anim_duration;
+		protected final int component;
+		
+		public KeyframeInterpolationInstance(KeyframeInterpolation owner, LzVariableStore store, List<IKeyFrameInstance> keyframes, int component)
+		{
+			this.owner = owner;
+			this.keyframes = keyframes;
+			this.anim_time = store.findVar("query.anim_time");
+			this.anim_duration = store.findVar("query.anim_duration");
+			this.component = component;
+		}
+		
+		@Override
+		public double get(double... args)
+		{
+			double anim_time = this.anim_time.get();
+			
+			DoubleList keyframeTimes = owner.keyframeTimes;
+			int index = findInsertionIndex(keyframeTimes, anim_time);
+			
+			int fromIdx = index - 1;
+			int toIdx = index % keyframes.size();
+			if(fromIdx < 0) fromIdx += keyframes.size();
+			
+			IKeyFrameInstance prev = keyframes.get(fromIdx),
+					next = toIdx > fromIdx ? keyframes.get(toIdx) : null;
+			
+			if(next == null)
+				return prev.getVec(IKeyFrame.KeyFrameState.PREV).get(component);
+			else if(prev == null)
+				return next.getVec(IKeyFrame.KeyFrameState.NEXT).get(component);
+			
+			if(prev instanceof CatmullRomKeyFrame.CatmullRomKeyFrameInstance || next instanceof CatmullRomKeyFrame.CatmullRomKeyFrameInstance)
+				return interpolateSmoothly(prev, next, fromIdx, toIdx, anim_time, this.anim_duration.get());
+			else
+				return interpolateLinear(prev, next, anim_time, component);
+		}
+		
+		@Override
+		public LzExpression instantiate(LzVariableStore store)
+		{
+			return owner.instantiate(store)[component];
+		}
+		
+		private double interpolateSmoothly(IKeyFrameInstance prev, IKeyFrameInstance next, int prevIndex, int nextIndex, double anim_time, double anim_duration)
+		{
+			IKeyFrameInstance beforeMinus = null;
+			if(prevIndex > 0) beforeMinus = keyframes.get(prevIndex - 1);
+			
+			IKeyFrameInstance afterPlus = null;
+			if(nextIndex < keyframes.size() - 1) afterPlus = keyframes.get(nextIndex + 1);
+			
+			return catmullRom(beforeMinus, prev, next, afterPlus, anim_time, anim_duration, component);
+		}
+	}
+	
+	public static double interpolateLinear(IKeyFrameInstance prev, IKeyFrameInstance next, double anim_time, int component)
+	{
+		if(next == null) return prev.getVec(IKeyFrame.KeyFrameState.PREV).get(component);
 		double duration = next.getTime() - prev.getTime();
-		double iv = (query.anim_time - prev.getTime()) / duration;
-		double[] a = prev.getVec(IKeyFrame.KeyFrameState.PREV).get(query);
-		double[] b = next.getVec(IKeyFrame.KeyFrameState.NEXT).get(query);
-		double[] res = new double[Math.min(a.length, b.length)];
-		for(int i = 0; i < res.length; i++)
-			res[i] = MathHelper.interpolate(a[i], b[i], iv);
-		return res;
+		double iv = (anim_time - prev.getTime()) / duration;
+		double a = prev.getVec(IKeyFrame.KeyFrameState.PREV).get(component);
+		double b = next.getVec(IKeyFrame.KeyFrameState.NEXT).get(component);
+		return MoMathLibrary.lerp(a, b, iv);
 	}
 	
-	private double[] interpolateSmoothly(IKeyFrame prev, IKeyFrame next, int prevIndex, int nextIndex, Query query)
+	private static double catmullRom(@Nullable IKeyFrameInstance beforeMinus, @Nullable IKeyFrameInstance before, @Nullable IKeyFrameInstance after, @Nullable IKeyFrameInstance afterPlus, double anim_time, double anim_duration, int component)
 	{
-		IKeyFrame beforeMinus = null;
-		if(prevIndex > 0) beforeMinus = keyframes.get(prevIndex - 1);
-		
-		IKeyFrame afterPlus = null;
-		if(nextIndex < keyframes.size() - 1) afterPlus = keyframes.get(nextIndex + 1);
-		
-		return catmullRom(beforeMinus, prev, next, afterPlus, query);
-	}
-	
-	private static double[] catmullRom(@Nullable IKeyFrame beforeMinus, @Nullable IKeyFrame before, @Nullable IKeyFrame after, @Nullable IKeyFrame afterPlus, Query query)
-	{
-		double factor = percentage(query.anim_time,
+		double factor = percentage(anim_time,
 				before != null
 				? before.getTime()
 				: 0,
 				after != null
 				? after.getTime()
-				: query.anim_duration
+				: anim_duration
 		);
 		
-		return catmullRom(beforeMinus, before, after, afterPlus, factor, query);
+		return catmullRom(beforeMinus, before, after, afterPlus, factor, component);
 	}
 	
-	private static double[] catmullRom(@Nullable IKeyFrame beforeMinus, @Nullable IKeyFrame before, @Nullable IKeyFrame after, @Nullable IKeyFrame afterPlus, double factor, Query query)
+	private static double catmullRom(@Nullable IKeyFrameInstance beforeMinus, @Nullable IKeyFrameInstance before, @Nullable IKeyFrameInstance after, @Nullable IKeyFrameInstance afterPlus, double factor, int component)
 	{
 		int allocatedSize = countNonNls(beforeMinus, before, after, afterPlus);
-		BaseInterpolation[] points = new BaseInterpolation[allocatedSize];
+		Vec3Animation[] points = new Vec3Animation[allocatedSize];
 		
 		int index = 0;
 		if(beforeMinus != null) points[index++] = beforeMinus.getVec(IKeyFrame.KeyFrameState.PREV);
@@ -129,7 +172,7 @@ public class KeyframeInterpolation
 		
 		double time = (factor + (beforeMinus != null ? 1 : 0)) / (allocatedSize - 1);
 		
-		return catmullRom(time, points, query);
+		return catmullRom(time, points, component);
 	}
 	
 	private static int countNonNls(@Nullable Object o1, @Nullable Object o2, @Nullable Object o3, @Nullable Object o4)
@@ -145,21 +188,16 @@ public class KeyframeInterpolation
 	/**
 	 * <a href="https://github.com/mrdoob/three.js/blob/e48fc94dfeaecfcbfa977ba67549e6108b370cbf/src/extras/curves/SplineCurve.js#L17">...</a>
 	 */
-	private static double[] catmullRom(double weightIn, BaseInterpolation[] points, Query query)
+	private static double catmullRom(double weightIn, Vec3Animation[] points, int component)
 	{
 		double p = (points.length - 1) * weightIn;
 		int intPoint = (int) Math.floor(p);
-		
 		double weight = p - intPoint;
-		
-		double[] p0 = points[intPoint == 0 ? intPoint : intPoint - 1].get(query);
-		double[] p1 = points[intPoint].get(query);
-		double[] p2 = points[intPoint > points.length - 2 ? points.length - 1 : intPoint + 1].get(query);
-		double[] p3 = points[intPoint > points.length - 3 ? points.length - 1 : intPoint + 2].get(query);
-		double[] iv = new double[p0.length];
-		for(int i = 0; i < iv.length; i++)
-			iv[i] = catmullRom(weight, p0[i], p1[i], p2[i], p3[i]);
-		return iv;
+		double p0 = points[intPoint == 0 ? intPoint : intPoint - 1].get(component);
+		double p1 = points[intPoint].get(component);
+		double p2 = points[intPoint > points.length - 2 ? points.length - 1 : intPoint + 1].get(component);
+		double p3 = points[intPoint > points.length - 3 ? points.length - 1 : intPoint + 2].get(component);
+		return catmullRom(weight, p0, p1, p2, p3);
 	}
 	
 	/**
@@ -184,7 +222,8 @@ public class KeyframeInterpolation
 		DoubleList keyframeTimes = new DoubleArrayList(json.length());
 		List<IKeyFrame> keyframes = new ArrayList<>(json.length());
 		
-		Iterator<Tuple2<String, Double>> itr = json.keySet()
+		Iterator<Tuple2<String, Double>> itr = json
+				.keySet()
 				.stream()
 				.map(str -> Tuples.immutable(str, Double.parseDouble(str)))
 				.sorted(Comparator.comparingDouble(Tuple2::b))

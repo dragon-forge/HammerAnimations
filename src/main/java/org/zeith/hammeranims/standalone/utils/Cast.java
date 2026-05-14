@@ -1,10 +1,8 @@
 package org.zeith.hammeranims.standalone.utils;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 
-import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.Optional;
 import java.util.function.*;
 
 public class Cast
@@ -85,50 +83,6 @@ public class Cast
 		} catch(Throwable err)
 		{
 			return null;
-		}
-	}
-	
-	static final Map<Class, Constructor> emptyCtors = new HashMap<>();
-	
-	public static <T> Supplier<T> newInstanceSupplier(Class<T> type)
-	{
-		return () -> newInstance(type);
-	}
-	
-	public static <T> T newInstance(Class<T> type)
-	{
-		try
-		{
-			Constructor<T> gen = emptyCtors.get(type);
-			if(gen == null)
-			{
-				gen = type.getDeclaredConstructor();
-				gen.setAccessible(true);
-				emptyCtors.put(type, gen);
-			}
-			return gen.newInstance();
-		} catch(Throwable err)
-		{
-			return null;
-		}
-	}
-	
-	public static <T> T newInstanceWithRE(Class<T> type)
-			throws RuntimeException
-	{
-		try
-		{
-			Constructor<T> gen = emptyCtors.get(type);
-			if(gen == null)
-			{
-				gen = type.getDeclaredConstructor();
-				gen.setAccessible(true);
-				emptyCtors.put(type, gen);
-			}
-			return gen.newInstance();
-		} catch(Throwable err)
-		{
-			throw new RuntimeException(err);
 		}
 	}
 }
