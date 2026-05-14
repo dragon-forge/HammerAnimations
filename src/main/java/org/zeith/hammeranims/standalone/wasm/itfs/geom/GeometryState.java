@@ -1,16 +1,14 @@
 package org.zeith.hammeranims.standalone.wasm.itfs.geom;
 
-import shaded.joml.Vector3f;
-import org.teavm.jso.core.JSArray;
-import org.teavm.jso.core.JSNumber;
+import org.teavm.jso.JSObject;
 import org.teavm.jso.impl.JS;
 import org.teavm.jso.typedarrays.Float32Array;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
-import org.zeith.hammeranims.core.client.render.vertex.RenderVertex;
-import org.zeith.hammeranims.core.client.render.vertex.VertexType;
+import org.zeith.hammeranims.core.client.render.vertex.*;
 import org.zeith.hammeranims.standalone.hammeranims.CountingVertexOutput;
+import shaded.joml.Vector3f;
 
 public class GeometryState
 		implements HAGeoState, IVertexOutput
@@ -62,13 +60,13 @@ public class GeometryState
 	}
 	
 	@Override
-	public JSArray<JSNumber> getMinBound()
+	public JSObject getMinBound()
 	{
 		return JS.wrap(new float[] { min.x, min.y, min.z });
 	}
 	
 	@Override
-	public JSArray<JSNumber> getMaxBound()
+	public JSObject getMaxBound()
 	{
 		return JS.wrap(new float[] { max.x, max.y, max.z });
 	}

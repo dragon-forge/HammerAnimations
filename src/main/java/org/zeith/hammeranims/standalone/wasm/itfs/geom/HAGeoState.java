@@ -1,8 +1,6 @@
 package org.zeith.hammeranims.standalone.wasm.itfs.geom;
 
 import org.teavm.jso.*;
-import org.teavm.jso.core.JSArray;
-import org.teavm.jso.core.JSNumber;
 import org.teavm.jso.typedarrays.Float32Array;
 
 @JSClass(name = "GeometryState")
@@ -22,11 +20,11 @@ public interface HAGeoState
 	
 	@JSProperty
 	@JSExport
-	JSArray<JSNumber> getMinBound();
+	JSObject getMinBound();
 	
 	@JSProperty
 	@JSExport
-	JSArray<JSNumber> getMaxBound();
+	JSObject getMaxBound();
 	
 	@JSProperty
 	@JSExport
