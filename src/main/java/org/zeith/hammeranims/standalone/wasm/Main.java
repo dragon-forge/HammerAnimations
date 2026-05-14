@@ -19,6 +19,12 @@ import java.util.*;
 public class Main
 {
 	@JSExport
+	public static JSString core_getVersion()
+	{
+		return JSString.valueOf(HammerAnimations.VERSION);
+	}
+	
+	@JSExport
 	public static void core_init()
 	{
 		HammerAnimations.init();
