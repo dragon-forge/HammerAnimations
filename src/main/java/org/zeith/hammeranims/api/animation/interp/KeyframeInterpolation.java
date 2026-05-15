@@ -17,10 +17,10 @@ public class KeyframeInterpolation
 		extends BaseInterpolation
 {
 	public final int doubleCount;
-	public final DoubleList keyframeTimes;
+	public final double[] keyframeTimes;
 	public final List<IKeyFrame> keyframes;
 	
-	public KeyframeInterpolation(int doubleCount, DoubleList keyframeTimes, List<IKeyFrame> keyframes)
+	public KeyframeInterpolation(int doubleCount, double[] keyframeTimes, List<IKeyFrame> keyframes)
 	{
 		this.doubleCount = doubleCount;
 		this.keyframeTimes = keyframeTimes;
@@ -96,8 +96,7 @@ public class KeyframeInterpolation
 		{
 			double anim_time = this.anim_time.get();
 			
-			DoubleList keyframeTimes = owner.keyframeTimes;
-			int index = findInsertionIndex(keyframeTimes, anim_time);
+			int index = findInsertionIndex(owner.keyframeTimes, anim_time);
 			
 			int fromIdx = index - 1;
 			int toIdx = index % keyframes.size();
@@ -219,7 +218,8 @@ public class KeyframeInterpolation
 	
 	public static KeyframeInterpolation parse(int doubleCount, JSONObject json)
 	{
-		DoubleList keyframeTimes = new DoubleArrayList(json.length());
+		int keyFramePtr = 0;
+		double[] keyframeTimes = new double[json.length()];
 		List<IKeyFrame> keyframes = new ArrayList<>(json.length());
 		
 		Iterator<Tuple2<String, Double>> itr = json
@@ -276,25 +276,25 @@ public class KeyframeInterpolation
 			if(keyframes.isEmpty() && time > 0)
 			{
 				keyframes.add(kf.withNewTime(0));
-				keyframeTimes.add(0);
+				keyframeTimes[keyFramePtr++] = 0;
 			}
 			
 			keyframes.add(kf);
-			keyframeTimes.add(time);
+			keyframeTimes[keyFramePtr++] = time;
 		}
 		
 		return new KeyframeInterpolation(doubleCount, keyframeTimes, keyframes);
 	}
 	
-	private static int findInsertionIndex(DoubleList list, double x)
+	private static int findInsertionIndex(double[] list, double x)
 	{
 		int low = 0;
-		int high = list.size();
+		int high = list.length;
 		
 		while(low < high)
 		{
 			int mid = low + (high - low) / 2;
-			if(list.getDouble(mid) < x) low = mid + 1;
+			if(list[mid] < x) low = mid + 1;
 			else high = mid;
 		}
 		
