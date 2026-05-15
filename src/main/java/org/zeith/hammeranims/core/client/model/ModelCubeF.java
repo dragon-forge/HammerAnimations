@@ -1,5 +1,9 @@
 package org.zeith.hammeranims.core.client.model;
 
+import com.google.common.base.MoreObjects;
+import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
+import org.zeith.hammeranims.api.geometry.data.FaceUV;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.client.render.vertex.*;
 import org.zeith.hammeranims.core.utils.*;
@@ -8,8 +12,10 @@ import org.zeith.hammeranims.joml.*;
 import java.lang.Math;
 import java.util.*;
 
+@Getter
 public class ModelCubeF
 {
+	private static final TexturedQuadF[] EMPTY_QUAD_ARRAY = new TexturedQuadF[0];
 	private final TexturedQuadF[] quads;
 	public final VertexType vType;
 	
@@ -69,7 +75,7 @@ public class ModelCubeF
 			addQuad(quads, v7, v3, v4, v6, uvResolver, textureWidth, textureHeight, mirror, EnumFacing.UP);
 		}
 		
-		return new ModelCubeF(quads.toArray(new TexturedQuadF[0]), vType);
+		return new ModelCubeF(quads.toArray(EMPTY_QUAD_ARRAY), vType);
 	}
 	
 	private static void addQuad(List<TexturedQuadF> quads, Vector3f pos1, Vector3f pos2, Vector3f pos3, Vector3f pos4, CubeUVs uvResolver, int textureWidth, int textureHeight, boolean mirror, EnumFacing direction)
@@ -95,7 +101,7 @@ public class ModelCubeF
 			u2 = temp;
 		}
 		
-		return new TexturedQuadF(new VertexF[] {
+		return new TexturedQuadF(new FaceUV(u1, u2, v1, v2, direction), new VertexF[] {
 				makeVertex(pos1, u1, v1),
 				makeVertex(pos2, u1, v2),
 				makeVertex(pos3, u2, v2),
@@ -108,7 +114,7 @@ public class ModelCubeF
 		return new VertexF(pos, u, v);
 	}
 	
-	public void render(IPoseEntry pose, IVertexRenderer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha)
+	public void render(IPoseEntry pose, IVertexRenderer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha, @Nullable VertexType forceVType)
 	{
 		Matrix4f po = pose.getPose();
 		Matrix3f no = pose.getNormal();
@@ -139,7 +145,7 @@ public class ModelCubeF
 				);
 			}
 			
-			vertexConsumer.vertex(vType, vts);
+			vertexConsumer.vertex(MoreObjects.firstNonNull(forceVType, vType), vts);
 		}
 	}
 }

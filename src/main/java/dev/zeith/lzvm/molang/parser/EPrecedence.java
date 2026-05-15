@@ -1,0 +1,31 @@
+package dev.zeith.lzvm.molang.parser;
+
+public enum EPrecedence
+{
+	ANYTHING,
+	
+	SCOPE,
+	STATEMENT,
+	
+	ASSIGNMENT,
+	CONDITIONAL,
+	
+	NULLISH_COALESCING,
+	
+	AND,
+	OR,
+	
+	EQUALS_COMPARE,
+	COMPARE,
+	
+	SUM,
+	PRODUCT,
+	EXPONENT,
+	
+	ARRAY_ACCESS,
+	PREFIX,
+	POSTFIX,
+	FUNCTION,
+	
+//	ARROW,
+}

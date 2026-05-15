@@ -2,16 +2,13 @@ package org.zeith.hammeranims.api.animsys;
 
 import com.zeitheron.hammercore.utils.base.Cast;
 import lombok.var;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.*;
 import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
-import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
-import org.zeith.hammeranims.api.animsys.actions.AnimationActionInstance;
-import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
-import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
-import org.zeith.hammeranims.api.time.TimeFunction;
-import org.zeith.hammeranims.api.time.TimeFunctionInstance;
+import org.zeith.hammeranims.api.animation.interp.Query;
+import org.zeith.hammeranims.api.animsys.actions.*;
+import org.zeith.hammeranims.api.animsys.layer.*;
+import org.zeith.hammeranims.api.time.*;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
@@ -22,7 +19,7 @@ import java.util.*;
 import static org.zeith.hammeranims.core.contents.time.LinearTimeFunction.FREEZE_SPEED;
 
 public class ConfiguredAnimation
-		implements ICompoundSerializable
+		implements ICompoundSerializable, IAnimationSource
 {
 	public Animation animation;
 	public float weight = 1F; // [0; 1]
@@ -47,7 +44,18 @@ public class ConfiguredAnimation
 	
 	public ConfiguredAnimation(ConfiguredAnimation toCopy)
 	{
-		this(toCopy.serializeNBT());
+		this.animation = toCopy.animation;
+		this.weight = toCopy.weight;
+		this.speed = toCopy.speed;
+		this.startTime = toCopy.startTime;
+		this.reverse = toCopy.reverse;
+		this.transitionTime = toCopy.transitionTime;
+		this.timeFunction = toCopy.timeFunction;
+		this.important = toCopy.important;
+		this.loopMode = toCopy.loopMode;
+		this.mask = toCopy.mask;
+		this.next = toCopy.next != null ? new ConfiguredAnimation(toCopy.next) : null;
+		this.onFinish.addAll(toCopy.onFinish);
 	}
 	
 	public ConfiguredAnimation(NBTTagCompound tag)
@@ -189,14 +197,21 @@ public class ConfiguredAnimation
 		return this;
 	}
 	
+	@Override
 	public AnimationLocation getLocation()
 	{
 		return animation != null ? animation.getLocation() : null;
 	}
 	
-	public ActiveAnimation activate(AnimationLayer layer)
+	@Override
+	public ConfiguredAnimation configure()
 	{
-		ActiveAnimation aa = new ActiveAnimation(this);
+		return new ConfiguredAnimation(this);
+	}
+	
+	public ActiveAnimation activate(AnimationLayer layer, Query query)
+	{
+		ActiveAnimation aa = new ActiveAnimation(this, query);
 		aa.activationTime = layer.startTime;
 		return aa;
 	}

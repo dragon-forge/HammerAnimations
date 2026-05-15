@@ -1,23 +1,23 @@
 package org.zeith.hammeranims.core.contents.particles.components.extra;
 
 import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
+import org.zeith.hammeranims.api.particles.components.IParticleComponent;
+import org.zeith.hammeranims.api.particles.components.inst.IParticleCompInstance;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleExpiry;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
+import org.zeith.hammeranims.api.particles.emitter.*;
 import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
-import org.zeith.hammeranims.core.utils.GsonHelper;
-import org.zeith.hammeranims.core.utils.InstanceHelpers;
+import org.zeith.hammeranims.core.utils.*;
 import org.zeith.hammeranims.joml.Vector3d;
 
 public class ParcomExpirySubEmitter
-		implements IParticleExpiry
+		implements IParticleComponent
 {
-	@SuppressWarnings("rawtypes")
-	public InterpolatedDouble[] offset = { InterpolatedDouble.zero(), InterpolatedDouble.zero(), InterpolatedDouble.zero() };
+	public LzFactory[] offset = {InterpolatedDouble.zero(), InterpolatedDouble.zero(), InterpolatedDouble.zero()};
 	
 	protected ResourceLocation subId;
 	
@@ -43,19 +43,40 @@ public class ParcomExpirySubEmitter
 	}
 	
 	@Override
-	public void expire(ParticleEmitter emitter, BedrockParticle particle)
+	public IParticleCompInstance createInstance(LzVariableStore vars)
 	{
-		ParticleVariables v = emitter.vars;
-		
-		Vector3d spawnPos = new Vector3d(particle.getGlobalPosition(emitter))
-				.add(offset[0].get(v), offset[1].get(v), offset[2].get(v));
-		
-		ParticleWithEmitter pwe = new ParticleWithEmitter(
-				emitter.world,
-				spawnPos.x, spawnPos.y, spawnPos.z,
-				IParticleContainer.byRegistryKey(subId)
+		return new ParcomExpirySubEmitterInstance(
+				LzFactory.instantiate(vars, offset),
+				subId
 		);
-		pwe.getEmitter().setParent(emitter);
-		pwe.spawn();
+	}
+	
+	public static class ParcomExpirySubEmitterInstance
+			implements IParticleExpiry
+	{
+		public final LzExpression[] offset;
+		protected final ResourceLocation subId;
+		
+		public ParcomExpirySubEmitterInstance(LzExpression[] offset, ResourceLocation subId)
+		{
+			this.offset = offset;
+			this.subId = subId;
+		}
+		
+		@Override
+		public void expire(ParticleEmitter emitter, BedrockParticle particle)
+		{
+			Vector3d spawnPos = new Vector3d(particle.getGlobalPosition(emitter))
+					.add(offset[0].get(), offset[1].get(), offset[2].get());
+			
+			ParticleWithEmitter pwe = new ParticleWithEmitter(
+					emitter.world,
+					spawnPos.x, spawnPos.y, spawnPos.z,
+					IParticleContainer.byRegistryKey(subId)
+			);
+			
+			pwe.getEmitter().setParent(emitter);
+			pwe.spawn();
+		}
 	}
 }

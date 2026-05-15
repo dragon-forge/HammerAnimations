@@ -10,6 +10,8 @@ import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 
 import java.io.IOException;
 
+import static org.zeith.hammeranims.core.client.ClientHammerHooks.DEFAULT_TIMEOUT;
+
 @MainThreaded
 public class PacketSyncAnimationSystem
 		implements IPacket
@@ -46,6 +48,6 @@ public class PacketSyncAnimationSystem
 	@SideOnly(Side.CLIENT)
 	public void executeOnClient2(PacketContext net)
 	{
-		ClientHammerHooks.applySystem(source, tag, 100);
+		ClientHammerHooks.applySystem(source, DEFAULT_TIMEOUT, tag);
 	}
 }

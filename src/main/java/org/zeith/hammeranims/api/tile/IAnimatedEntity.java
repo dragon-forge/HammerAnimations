@@ -1,15 +1,30 @@
 package org.zeith.hammeranims.api.tile;
 
 import com.zeitheron.hammercore.utils.base.Cast;
+import dev.zeith.lzvm.op.ReadonlyLzVarOp;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammerlib.abstractions.sources.*;
+
+import java.util.function.BiConsumer;
 
 public interface IAnimatedEntity
 		extends IAnimatedObject
 {
+	default void registerEntityProperties(BiConsumer<String, ReadonlyLzVarOp> reg)
+	{
+	}
+	
+	@Override
+	default Query createQuery()
+	{
+		Entity entity = Cast.cast(this);
+		return new QueryEntity(entity);
+	}
+	
 	@Override
 	default IObjectSource<?> getAnimationSource()
 	{

@@ -2,16 +2,23 @@ package org.zeith.hammeranims.core.contents.blocks;
 
 import com.zeitheron.hammercore.tile.TileSyncableTickable;
 import com.zeitheron.hammercore.utils.math.MathHelper;
+import lombok.val;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.text.TextComponentString;
+import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
+import org.zeith.hammeranims.api.annotation.ExposedToAnimAction;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.tile.IAnimatedTile;
+import org.zeith.hammeranims.core.contents.actions.MethodAnimAction;
 import org.zeith.hammeranims.core.init.*;
 import org.zeith.hammeranims.joml.*;
+
+import java.util.Objects;
 
 public class TileBilly
 		extends TileSyncableTickable
@@ -33,6 +40,15 @@ public class TileBilly
 	
 	protected final Matrix4f mat = new Matrix4f();
 	
+	@ExposedToAnimAction
+	public void testCall()
+	{
+		val player = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 32, Objects::nonNull);
+		if(player != null)
+			player.sendMessage(new TextComponentString("[" + (world.isRemote ? "CLIENT" : "SERVER") + "] testCall() called @ " + pos + ", world time is " + (world.getWorldTime() % 24000L)));
+		HammerAnimations.LOG.info("testCall() called @ {}", pos);
+	}
+	
 	@Override
 	public void tick()
 	{
@@ -42,16 +58,16 @@ public class TileBilly
 		int power = world.getRedstonePowerFromNeighbors(pos);
 		
 		if(power > 0)
-			animations.startAnimationAt(CommonLayerNames.LEGS, ContainersHA.BILLY_WALK.configure()
+			animations.startAnimationAt(CommonLayerNames.LEGS, ContainersHA.BILLY_WALK
+					.configure()
 					.speed(power / 15F)
 					.loopMode(LoopMode.ONCE)
-					.next(ContainersHA.BILLY_WALK.configure()
+					.next(ContainersHA.BILLY_WALK
+							.configure()
 							.speed(2F)
 							.loopMode(LoopMode.ONCE)
 							.next(DefaultsHA.NULL_ANIM.configure())
-							.onFinish(ContainersHA.HELLO_WORLD_ACTION.defaultInstance()
-									.withMessage("YOLO")
-							)
+							.onFinish(MethodAnimAction.create(getClass(), "testCall", this))
 					)
 			);
 //		else

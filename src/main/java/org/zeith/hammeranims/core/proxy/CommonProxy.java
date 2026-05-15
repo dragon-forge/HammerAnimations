@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.IAnimationContainer;
@@ -15,6 +16,7 @@ import org.zeith.hammeranims.api.geometry.event.RefreshStaleModelsEvent;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
+import org.zeith.hammeranims.api.texture.ITextureAccess;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.particles.ExtraParticleEffects;
@@ -38,6 +40,11 @@ public class CommonProxy
 	{
 	}
 	
+	public boolean isGamePaused()
+	{
+		return false;
+	}
+	
 	public IParticleRotationUpdater createParticle(AnimatedParticleEffect effect, Matrix3f rotation, Vec3d pos)
 	{
 		return null;
@@ -46,6 +53,20 @@ public class CommonProxy
 	public ExtraParticleEffects getExtraParticles()
 	{
 		return null;
+	}
+	
+	public @NotNull ITextureAccess getTextureAccess(ResourceLocation texture)
+	{
+		return ITextureAccess.MISSING_TEXTURE;
+	}
+	
+	public @NotNull ITextureAccess createTextureAccess(ResourceLocation texture)
+	{
+		return ITextureAccess.MISSING_TEXTURE;
+	}
+	
+	public void purgeTextureAccessCache()
+	{
 	}
 	
 	public IGeometricModel createGeometryData(GeometryDataImpl def)

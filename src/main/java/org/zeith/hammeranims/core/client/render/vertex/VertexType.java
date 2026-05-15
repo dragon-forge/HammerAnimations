@@ -40,4 +40,14 @@ public enum VertexType
 	{
 		return TYPE_MAP.get().getOrDefault(id, orDefault);
 	}
+	
+	public VertexType max(VertexType type)
+	{
+		return ordinal() > type.ordinal() ? this : type;
+	}
+	
+	public static VertexType ofAlpha(int alpha)
+	{
+		return alpha == 0 ? CUTOUT : alpha < 255 ? TRANSLUCENT : SOLID;
+	}
 }

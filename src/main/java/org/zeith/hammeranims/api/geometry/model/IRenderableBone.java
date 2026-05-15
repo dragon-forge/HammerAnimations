@@ -1,10 +1,14 @@
 package org.zeith.hammeranims.api.geometry.model;
 
 import net.minecraftforge.fml.relauncher.*;
+import org.zeith.hammeranims.api.geometry.data.FaceUV;
+import org.zeith.hammeranims.api.utils.IFaceUVPredicate;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.utils.PoseStack;
 
 import javax.annotation.Nullable;
+import java.util.function.*;
 
 public interface IRenderableBone
 		extends IBone
@@ -29,6 +33,12 @@ public interface IRenderableBone
 		// Then apply current bone transforms
 		applyBoneTransforms(pose);
 	}
+	
+	boolean anyUVMatch(IFaceUVPredicate filter);
+	boolean allUVMatch(IFaceUVPredicate filter);
+	<STATE> STATE visitUVs(STATE state, BiFunction<STATE, FaceUV, STATE> walker, Predicate<STATE> isDone);
+	
+	void setDefaultVertexType(VertexType defaultVertexType);
 	
 	void renderCubes(boolean b);
 	

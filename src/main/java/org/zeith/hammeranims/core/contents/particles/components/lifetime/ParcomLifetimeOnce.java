@@ -1,6 +1,8 @@
 package org.zeith.hammeranims.core.contents.particles.components.lifetime;
 
 import com.google.gson.JsonElement;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.LzExpression;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
 
 public class ParcomLifetimeOnce
@@ -12,15 +14,30 @@ public class ParcomLifetimeOnce
 	}
 	
 	@Override
-	public void update(ParticleEmitter emitter)
+	public ParcomLifetimeInstance createInstance(LzVariableStore vars)
 	{
-		double time = this.activeTime.get(emitter.vars);
-		
-		emitter.lifetime = (int) (time * 20);
-		
-		if(emitter.getAge() >= time)
+		return new ParcomLifetimeOnceInstance(activeTime.instantiate(vars));
+	}
+	
+	public static class ParcomLifetimeOnceInstance
+			extends ParcomLifetimeInstance
+	{
+		public ParcomLifetimeOnceInstance(LzExpression activeTime)
 		{
-			emitter.stop();
+			super(activeTime);
+		}
+		
+		@Override
+		public void update(ParticleEmitter emitter)
+		{
+			double time = this.activeTime.get();
+			
+			emitter.lifetime = (int) (time * 20);
+			
+			if(emitter.getAge() >= time)
+			{
+				emitter.stop();
+			}
 		}
 	}
 }

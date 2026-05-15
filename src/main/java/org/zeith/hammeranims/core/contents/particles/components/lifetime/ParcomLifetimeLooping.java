@@ -1,15 +1,15 @@
 package org.zeith.hammeranims.core.contents.particles.components.lifetime;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 
 public class ParcomLifetimeLooping
 		extends ParcomLifetime
 {
-	public InterpolatedDouble<ParticleVariables> sleepTime = InterpolatedDouble.zero();
+	public LzFactory sleepTime = InterpolatedDouble.zero();
 	
 	public ParcomLifetimeLooping(JsonElement elem)
 	{
@@ -20,13 +20,34 @@ public class ParcomLifetimeLooping
 	}
 	
 	@Override
-	public void update(ParticleEmitter emitter)
+	public ParcomLifetimeInstance createInstance(LzVariableStore vars)
 	{
-		double active = this.activeTime.get(emitter.vars);
-		double sleep = this.sleepTime.get(emitter.vars);
-		double age = emitter.getAge();
-		emitter.lifetime = (int) (active * 20);
-		if(age >= active && emitter.playing) emitter.stop();
-		if(age >= sleep && !emitter.playing) emitter.start();
+		return new ParcomLifetimeLoopingInstance(
+				activeTime.instantiate(vars),
+				sleepTime.instantiate(vars)
+		);
+	}
+	
+	public static class ParcomLifetimeLoopingInstance
+			extends ParcomLifetimeInstance
+	{
+		protected final LzExpression sleepTime;
+		
+		public ParcomLifetimeLoopingInstance(LzExpression activeTime, LzExpression sleepTime)
+		{
+			super(activeTime);
+			this.sleepTime = sleepTime;
+		}
+		
+		@Override
+		public void update(ParticleEmitter emitter)
+		{
+			double active = this.activeTime.get();
+			double sleep = this.sleepTime.get();
+			double age = emitter.getAge();
+			emitter.lifetime = (int) (active * 20);
+			if(age >= active && emitter.playing) emitter.stop();
+			if(age >= sleep && !emitter.playing) emitter.start();
+		}
 	}
 }

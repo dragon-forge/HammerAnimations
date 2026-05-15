@@ -1,20 +1,21 @@
 package org.zeith.hammeranims.core.contents.particles.components.motion;
 
 import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
+import org.zeith.hammeranims.api.particles.components.IParticleComponent;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleUpdate;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
+import org.zeith.hammeranims.api.particles.emitter.*;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
 
 public class ParcomMotionDynamic
-		implements IParticleUpdate
+		implements IParticleComponent
 {
-	@SuppressWarnings("rawtypes")
-	public InterpolatedDouble[] motionAcceleration = { InterpolatedDouble.zero(), InterpolatedDouble.zero(), InterpolatedDouble.zero() };
-	public InterpolatedDouble<ParticleVariables> motionDrag = InterpolatedDouble.zero();
-	public InterpolatedDouble<ParticleVariables> rotationAcceleration = InterpolatedDouble.zero();
-	public InterpolatedDouble<ParticleVariables> rotationDrag = InterpolatedDouble.zero();
+	public LzFactory[] motionAcceleration = {InterpolatedDouble.zero(), InterpolatedDouble.zero(), InterpolatedDouble.zero()};
+	public LzFactory motionDrag = InterpolatedDouble.zero();
+	public LzFactory rotationAcceleration = InterpolatedDouble.zero();
+	public LzFactory rotationDrag = InterpolatedDouble.zero();
 	
 	public ParcomMotionDynamic(JsonElement elem)
 	{
@@ -40,16 +41,37 @@ public class ParcomMotionDynamic
 	}
 	
 	@Override
-	public void update(ParticleEmitter emitter, BedrockParticle particle)
+	public ParcomMotionDynamicInstance createInstance(LzVariableStore vars)
 	{
-		ParticleVariables v = emitter.vars;
+		return new ParcomMotionDynamicInstance(this, vars);
+	}
+	
+	public static class ParcomMotionDynamicInstance
+			implements IParticleUpdate
+	{
+		public LzExpression[] motionAcceleration;
+		public LzExpression motionDrag;
+		public LzExpression rotationAcceleration;
+		public LzExpression rotationDrag;
 		
-		particle.acceleration.x += (float) this.motionAcceleration[0].get(v);
-		particle.acceleration.y += (float) this.motionAcceleration[1].get(v);
-		particle.acceleration.z += (float) this.motionAcceleration[2].get(v);
-		particle.drag = (float) this.motionDrag.get(v);
+		public ParcomMotionDynamicInstance(ParcomMotionDynamic o, LzVariableStore vars)
+		{
+			this.motionAcceleration = LzFactory.instantiate(vars, o.motionAcceleration);
+			this.motionDrag = o.motionDrag.instantiate(vars);
+			this.rotationAcceleration = o.rotationAcceleration.instantiate(vars);
+			this.rotationDrag = o.rotationDrag.instantiate(vars);
+		}
 		
-		particle.rotationAcceleration += (float) this.rotationAcceleration.get(v) / 20F;
-		particle.rotationDrag = (float) this.rotationDrag.get(v);
+		@Override
+		public void update(ParticleEmitter emitter, BedrockParticle particle)
+		{
+			particle.acceleration.x += (float) this.motionAcceleration[0].get();
+			particle.acceleration.y += (float) this.motionAcceleration[1].get();
+			particle.acceleration.z += (float) this.motionAcceleration[2].get();
+			particle.drag = (float) this.motionDrag.get();
+			
+			particle.rotationAcceleration += (float) this.rotationAcceleration.get() / 20F;
+			particle.rotationDrag = (float) this.rotationDrag.get();
+		}
 	}
 }

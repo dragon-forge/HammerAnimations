@@ -1,20 +1,20 @@
 package org.zeith.hammeranims.core.contents.particles.components.motion;
 
 import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
-import org.zeith.hammeranims.api.particles.components.itf.IParticleInitialize;
-import org.zeith.hammeranims.api.particles.components.itf.IParticleUpdate;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
-import org.zeith.hammeranims.joml.Vector3f;
+import org.zeith.hammeranims.api.particles.components.IParticleComponent;
+import org.zeith.hammeranims.api.particles.components.inst.IParticleCompInstance;
+import org.zeith.hammeranims.api.particles.components.itf.*;
+import org.zeith.hammeranims.api.particles.emitter.*;
+import org.zeith.hammeranims.joml.Vector3d;
 
 public class ParcomMotionParametric
-		implements IParticleInitialize, IParticleUpdate
+		implements IParticleComponent
 {
-	@SuppressWarnings("rawtypes")
-	public InterpolatedDouble[] position = { InterpolatedDouble.zero(), InterpolatedDouble.zero(), InterpolatedDouble.zero() };
-	public InterpolatedDouble<ParticleVariables> rotation = InterpolatedDouble.zero();
+	public LzFactory[] position = {InterpolatedDouble.zero(), InterpolatedDouble.zero(), InterpolatedDouble.zero()};
+	public LzFactory rotation = InterpolatedDouble.zero();
 	
 	public ParcomMotionParametric(JsonElement elem)
 	{
@@ -35,37 +35,57 @@ public class ParcomMotionParametric
 	}
 	
 	@Override
-	public void apply(ParticleEmitter emitter, BedrockParticle particle)
-	{
-		ParticleVariables v = emitter.vars;
-		Vector3f position = new Vector3f((float) this.position[0].get(v), (float) this.position[1].get(v), (float) this.position[2].get(v));
-		
-		particle.manual = true;
-		particle.initialPosition.set(particle.position);
-		
-		particle.matrix.transform(position);
-		particle.position.x = particle.initialPosition.x + position.x;
-		particle.position.y = particle.initialPosition.y + position.y;
-		particle.position.z = particle.initialPosition.z + position.z;
-		particle.rotation = (float) this.rotation.get(v);
-	}
-	
-	@Override
-	public void update(ParticleEmitter emitter, BedrockParticle particle)
-	{
-		ParticleVariables v = emitter.vars;
-		Vector3f position = new Vector3f((float) this.position[0].get(v), (float) this.position[1].get(v), (float) this.position[2].get(v));
-		
-		particle.matrix.transform(position);
-		particle.position.x = particle.initialPosition.x + position.x;
-		particle.position.y = particle.initialPosition.y + position.y;
-		particle.position.z = particle.initialPosition.z + position.z;
-		particle.rotation = (float) this.rotation.get(v);
-	}
-	
-	@Override
 	public int getSortingIndex()
 	{
 		return 10;
+	}
+	
+	@Override
+	public IParticleCompInstance createInstance(LzVariableStore vars)
+	{
+		return new ParcomMotionParametricInstance(
+				LzFactory.instantiate(vars, position),
+				rotation.instantiate(vars)
+		);
+	}
+	
+	public static class ParcomMotionParametricInstance
+			implements IParticleInitialize, IParticleUpdate
+	{
+		public final LzExpression[] position;
+		public final LzExpression rotation;
+		
+		public ParcomMotionParametricInstance(LzExpression[] position, LzExpression rotation)
+		{
+			this.position = position;
+			this.rotation = rotation;
+		}
+		
+		@Override
+		public void apply(ParticleEmitter emitter, BedrockParticle particle)
+		{
+			Vector3d position = new Vector3d(this.position[0].get(), this.position[1].get(), this.position[2].get());
+			
+			particle.manual = true;
+			particle.initialPosition.set(particle.position);
+			
+			particle.matrix.transform(position);
+			particle.position.x = particle.initialPosition.x + position.x;
+			particle.position.y = particle.initialPosition.y + position.y;
+			particle.position.z = particle.initialPosition.z + position.z;
+			particle.rotation = (float) this.rotation.get();
+		}
+		
+		@Override
+		public void update(ParticleEmitter emitter, BedrockParticle particle)
+		{
+			Vector3d position = new Vector3d(this.position[0].get(), this.position[1].get(), this.position[2].get());
+			
+			particle.matrix.transform(position);
+			particle.position.x = particle.initialPosition.x + position.x;
+			particle.position.y = particle.initialPosition.y + position.y;
+			particle.position.z = particle.initialPosition.z + position.z;
+			particle.rotation = (float) this.rotation.get();
+		}
 	}
 }

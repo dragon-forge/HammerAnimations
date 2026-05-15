@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.api.particles.emitter;
 
 import com.zeitheron.hammercore.client.utils.UtilsFX;
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
-import lombok.Setter;
+import dev.zeith.lzvm.jvm.*;
+import it.unimi.dsi.fastutil.objects.*;
+import lombok.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -12,19 +12,18 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
-import org.zeith.hammeranims.api.particles.ParticleEffect;
+import org.zeith.hammeranims.api.particles.*;
 import org.zeith.hammeranims.api.particles.components.itf.*;
 import org.zeith.hammeranims.api.particles.curve.ParticleCurve;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
-import org.zeith.hammeranims.core.client.render.IVertexOutput;
-import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.client.render.*;
 import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionAppearance;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
+import org.zeith.hammeranims.core.molang.MolangExpressionParser;
 import org.zeith.hammeranims.core.proxy.ClientProxy;
-import org.zeith.hammeranims.joml.Vector3d;
 import org.zeith.hammeranims.joml.*;
+import org.zeith.hammeranims.joml.Vector3d;
 
 import java.lang.Math;
 import java.util.*;
@@ -32,11 +31,11 @@ import java.util.*;
 public class ParticleEmitter
 		implements IParticleRotationUpdater
 {
-	public ParticleEffect effect;
+	public ParticleEffectInstance effect;
 	public List<BedrockParticle> particles = new ArrayList<>();
 	public List<BedrockParticle> splitParticles = new ArrayList<>();
 	
-	public final Map<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> variables = new HashMap<>();
+	public final Map<String, LzExpression> variables = new HashMap<>();
 	public final Object2DoubleMap<String> initialValues = new Object2DoubleOpenHashMap<>();
 	
 	public boolean isRenderingGUI = false;
@@ -147,7 +146,7 @@ public class ParticleEmitter
 	
 	public void setEffect(ParticleEffect effect, Map<String, String> variables)
 	{
-		this.effect = effect;
+		this.effect = effect != null ? new ParticleEffectInstance(effect, this.vars) : null;
 		
 		if(this.effect == null)
 		{
@@ -187,10 +186,8 @@ public class ParticleEmitter
 		vars.particle_speed.set(particle.speed);
 		vars.particle_bounces = particle.bounces;
 		
-		for(Map.Entry<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> e : variables.entrySet())
-		{
+		for(Map.Entry<String, LzExpression> e : variables.entrySet())
 			vars.putUpdate(e.getKey(), e.getValue());
-		}
 	}
 	
 	public void setEmitterVariables(float partialTicks)
@@ -202,10 +199,8 @@ public class ParticleEmitter
 		vars.emitter_random_3 = this.random3;
 		vars.emitter_random_4 = this.random4;
 		
-		for(Map.Entry<String, InterpolatedDouble.NumberWrapped<ParticleVariables>> e : variables.entrySet())
-		{
+		for(Map.Entry<String, LzExpression> e : variables.entrySet())
 			vars.putUpdate(e.getKey(), e.getValue());
-		}
 	}
 	
 	public void parseVariables(Map<String, String> variables)
@@ -213,11 +208,11 @@ public class ParticleEmitter
 		for(Map.Entry<String, String> entry : variables.entrySet())
 		{
 			String name = entry.getKey(), expression = entry.getValue();
-			registerVariable(name, InterpolatedDouble.parse(expression));
+			registerVariable(name, MolangExpressionParser.parse(expression));
 		}
 	}
 	
-	public void registerVariable(String name, InterpolatedDouble<ParticleVariables> expression)
+	public void registerVariable(String name, LzFactory expression)
 	{
 		if(!name.startsWith("variable."))
 		{
@@ -225,7 +220,7 @@ public class ParticleEmitter
 			return;
 		}
 		
-		this.variables.put(name, new InterpolatedDouble.NumberWrapped<>(expression));
+		this.variables.put(name, expression.instantiate(vars));
 	}
 	
 	public void replaceVariables()
@@ -417,7 +412,7 @@ public class ParticleEmitter
 			
 			for(IParticleRender render : listParticle)
 			{
-				render.renderOnScreen(vars, this.guiParticle, x, y, scale, partialTicks);
+				render.renderOnScreen(this.guiParticle, x, y, scale, partialTicks);
 			}
 			
 			this.effect.material.endGL();
@@ -457,7 +452,7 @@ public class ParticleEmitter
 			this.renderParticles(renderer, renders, false, partialTicks);
 			renderer.upload();
 			
-			ParcomCollisionAppearance collisionAppearance = this.effect.get(ParcomCollisionAppearance.class, ParticleComponentsHA.PARTICLE_COLLISION_APPEARANCE);
+			var collisionAppearance = this.effect.get(ParcomCollisionAppearance.ParcomCollisionAppearanceInstance.class, ParticleComponentsHA.PARTICLE_COLLISION_APPEARANCE);
 			
 			/* rendering the collided particles with an extra component */
 			if(collisionAppearance != null && collisionAppearance.texture != null)
@@ -503,7 +498,7 @@ public class ParticleEmitter
 				 * because collisionAppearance.class is rendering
 				 */
 				if(!(collisionStuff && component.supportsCollissionRendering()))
-					component.render(vars, this, particle, builder, partialTicks);
+					component.render(this, particle, builder, partialTicks);
 			}
 		}
 	}

@@ -1,62 +1,22 @@
 package org.zeith.hammeranims.api.animation.data;
 
 import com.zeitheron.hammercore.lib.zlib.json.JSONObject;
-import com.zeitheron.hammercore.utils.java.functions.Function3;
-import net.minecraft.util.math.Vec3d;
 import org.zeith.hammeranims.api.animation.AnimationLocation;
 import org.zeith.hammeranims.api.animation.interp.*;
-import org.zeith.hammeranims.api.geometry.model.GeometryTransforms;
 
 import javax.annotation.*;
 
 public class BoneAnimation
 {
-	public final @Nonnull Vec3Animation rotation;
-	public final @Nonnull Vec3Animation position;
-	public final @Nonnull Vec3Animation scale;
+	public final @Nonnull BaseInterpolation rotation;
+	public final @Nonnull BaseInterpolation position;
+	public final @Nonnull BaseInterpolation scale;
 	
-	public BoneAnimation(@Nullable Vec3Animation rotation, @Nullable Vec3Animation position, @Nullable Vec3Animation scale)
+	public BoneAnimation(@Nullable BaseInterpolation rotation, @Nullable BaseInterpolation position, @Nullable BaseInterpolation scale)
 	{
-		this.rotation = rotation != null ? rotation : Vec3Animation.ZERO;
-		this.position = position != null ? position : Vec3Animation.ZERO;
-		this.scale = scale != null ? scale : Vec3Animation.ONE;
-	}
-	
-	public GeometryTransforms get(Query query)
-	{
-		return new GeometryTransforms(
-				getTranslation(query),
-				getRotation(query),
-				getScale(query)
-		);
-	}
-	
-	public GeometryTransforms apply(Query query, BlendMode blending, float weight, GeometryTransforms transforms)
-	{
-		if(transforms == null) transforms = GeometryTransforms.createDefault();
-		
-		Function3<Vec3d, Vec3d, Float, Vec3d> tf = blending.additiveTransform;
-		transforms.translation = tf.apply(transforms.translation, getTranslation(query), weight);
-		transforms.rotation = tf.apply(transforms.rotation, getRotation(query), weight);
-		
-		transforms.scale = blending.multiplicativeTransform.apply(transforms.scale, getScale(query), weight);
-		
-		return transforms;
-	}
-	
-	public Vec3d getTranslation(Query query)
-	{
-		return position.get(query);
-	}
-	
-	public Vec3d getScale(Query query)
-	{
-		return scale.get(query);
-	}
-	
-	public Vec3d getRotation(Query query)
-	{
-		return rotation.get(query);
+		this.rotation = rotation != null ? rotation : DoubleInterpolation.ZERO;
+		this.position = position != null ? position : DoubleInterpolation.ZERO;
+		this.scale = scale != null ? scale : DoubleInterpolation.ONE;
 	}
 	
 	public static BoneAnimation parse(AnimationLocation anim, JSONObject bone)
@@ -65,9 +25,9 @@ public class BoneAnimation
 			anim.warn(
 					"Warning: Detected unsupported feature: relative_to (" + bone.opt("relative_to") + ")! Ignoring.");
 		
-		Vec3Animation rotation = Vec3Animation.parse(bone.opt("rotation"));
-		Vec3Animation position = Vec3Animation.parse(bone.opt("position"));
-		Vec3Animation scale = Vec3Animation.parse(bone.opt("scale"));
+		BaseInterpolation rotation = BaseInterpolation.parse(bone.opt("rotation"));
+		BaseInterpolation position = BaseInterpolation.parse(bone.opt("position"));
+		BaseInterpolation scale = BaseInterpolation.parse(bone.opt("scale"));
 		if(rotation == null && position == null && scale == null) return null;
 		return new BoneAnimation(rotation, position, scale);
 	}

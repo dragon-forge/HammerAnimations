@@ -1,14 +1,13 @@
 package org.zeith.hammeranims.core.contents.particles.components.expiration;
 
 import com.google.gson.JsonElement;
-import net.minecraft.block.Block;
+import dev.zeith.lzvm.LzVariableStore;
+import lombok.var;
 import org.zeith.hammeranims.api.particles.components.itf.IParticleUpdate;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.emitter.ParticleEmitter;
+import org.zeith.hammeranims.api.particles.emitter.*;
 
 public class ParcomExpireInBlocks
 		extends ParcomExpireBlocks
-		implements IParticleUpdate
 {
 	public ParcomExpireInBlocks(JsonElement element)
 	{
@@ -16,10 +15,26 @@ public class ParcomExpireInBlocks
 	}
 	
 	@Override
-	public void update(ParticleEmitter emitter, BedrockParticle particle)
+	public ParcomExpireBlocksInstance createInstance(LzVariableStore vars)
 	{
-		if(particle.dead || emitter.world == null) return;
-		Block current = this.getBlock(emitter, particle);
-		if(this.blocks.contains(current)) particle.dead = true;
+		return new ParcomExpireInBlocksInstance(this);
+	}
+	
+	public static class ParcomExpireInBlocksInstance
+			extends ParcomExpireBlocksInstance
+			implements IParticleUpdate
+	{
+		public ParcomExpireInBlocksInstance(ParcomExpireBlocks owner)
+		{
+			super(owner);
+		}
+		
+		@Override
+		public void update(ParticleEmitter emitter, BedrockParticle particle)
+		{
+			if(particle.dead || emitter.world == null) return;
+			var current = getBlockState(emitter, particle);
+			if(matches(current)) particle.dead = true;
+		}
 	}
 }

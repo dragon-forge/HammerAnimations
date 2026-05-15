@@ -1,29 +1,25 @@
 package org.zeith.hammeranims.api.animsys;
 
-import com.zeitheron.hammercore.net.HCNet;
-import com.zeitheron.hammercore.net.IPacket;
+import com.zeitheron.hammercore.net.*;
 import lombok.*;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import org.zeith.hammeranims.api.animation.AnimationLocation;
-import org.zeith.hammeranims.api.animation.IAnimationSource;
+import org.zeith.hammeranims.api.animation.*;
+import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
-import org.zeith.hammeranims.net.PacketRequestAnimationSystemSync;
-import org.zeith.hammeranims.net.PacketSyncAnimationSystem;
+import org.zeith.hammeranims.net.*;
+import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import javax.annotation.*;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import static org.zeith.hammeranims.core.utils.InstanceHelpers.*;
 
@@ -40,6 +36,7 @@ public class AnimationSystem
 	protected double time;
 	
 	public boolean canSync = true, autoSync = false, syncTime = true;
+	protected @Getter boolean defaultUseNanoTime = false;
 	
 	@Getter
 	protected final AnimationLayer[] layers;
@@ -65,8 +62,20 @@ public class AnimationSystem
 		BlockPos pos = new BlockPos(owner.getAnimatedObjectPosition());
 		if(!world.isBlockLoaded(pos))
 			return;
+		sendPacketToTracking(createSyncPacket());
+	}
+	
+	public IObjectSource<?> getAnimationSource()
+	{
+		return owner.getAnimationSource();
+	}
+	
+	public void sendPacketToTracking(IPacket packet)
+	{
+		var world = owner.getAnimatedObjectWorld();
+		if(world.isRemote) return;
 		HCNet.INSTANCE.sendToAllAroundTracking(
-				createSyncPacket(),
+				packet,
 				HCNet.point(
 						world,
 						owner.getAnimatedObjectPosition(),
@@ -225,6 +234,7 @@ public class AnimationSystem
 		protected boolean canSync = true;
 		protected boolean autoSync = false;
 		protected boolean syncTime = true;
+		protected boolean defaultUseNanoTime = true;
 		protected final List<AnimationLayer.Builder> layers = new ArrayList<>();
 		
 		public Builder(@Nonnull IAnimatedObject owner)
@@ -262,6 +272,13 @@ public class AnimationSystem
 			return this;
 		}
 		
+		public Builder defaultUseNanoTime(boolean defaultUseNanoTime)
+		{
+			this.defaultUseNanoTime = defaultUseNanoTime;
+			this.syncTime = false;
+			return this;
+		}
+		
 		public Builder autoSync(boolean autoSync)
 		{
 			this.autoSync = autoSync;
@@ -270,17 +287,21 @@ public class AnimationSystem
 		
 		public AnimationSystem build()
 		{
+			Query q = owner.createQuery();
 			AnimationLayer[] layers = new AnimationLayer[this.layers.size()];
+			
 			Map<String, AnimationLayer> layerMap = new HashMap<>();
-			AnimationSystem sys = new AnimationSystem(owner, layers, layerMap);
-			for(int i = 0; i < layers.length; i++)
-			{
-				AnimationLayer al = layers[i] = this.layers.get(i).build(sys);
-				layerMap.put(al.name, al);
-			}
+			AnimationSystem sys = new AnimationSystem(owner, layers, Collections.unmodifiableMap(layerMap));
 			sys.canSync = canSync;
 			sys.autoSync = autoSync;
 			sys.syncTime = syncTime;
+			sys.defaultUseNanoTime = defaultUseNanoTime;
+			
+			for(int i = 0; i < layers.length; i++)
+			{
+				AnimationLayer al = layers[i] = this.layers.get(i).defaultQuery(q).build(sys);
+				layerMap.put(al.name, al);
+			}
 			return sys;
 		}
 	}

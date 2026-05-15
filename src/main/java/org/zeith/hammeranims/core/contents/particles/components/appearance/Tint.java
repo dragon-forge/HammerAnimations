@@ -1,12 +1,12 @@
 package org.zeith.hammeranims.core.contents.particles.components.appearance;
 
 import com.google.gson.*;
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.jvm.LzFactory;
 import org.zeith.hammeranims.api.animation.interp.InterpolatedDouble;
-import org.zeith.hammeranims.api.particles.emitter.BedrockParticle;
-import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
-import org.zeith.hammeranims.joml.Math;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class Tint
 {
@@ -16,10 +16,10 @@ public abstract class Tint
 	 */
 	public static Tint.Solid parseColor(JsonElement element)
 	{
-		InterpolatedDouble<ParticleVariables> r = InterpolatedDouble.one();
-		InterpolatedDouble<ParticleVariables> g = InterpolatedDouble.one();
-		InterpolatedDouble<ParticleVariables> b = InterpolatedDouble.one();
-		InterpolatedDouble<ParticleVariables> a = InterpolatedDouble.one();
+		LzFactory r = InterpolatedDouble.one();
+		LzFactory g = InterpolatedDouble.one();
+		LzFactory b = InterpolatedDouble.one();
+		LzFactory a = InterpolatedDouble.one();
 		
 		if(element.isJsonPrimitive())
 		{
@@ -70,7 +70,7 @@ public abstract class Tint
 	{
 		JsonElement gradient = color.get("gradient");
 		
-		InterpolatedDouble<ParticleVariables> expression = InterpolatedDouble.zero();
+		LzFactory expression = InterpolatedDouble.zero();
 		List<Gradient.ColorStop> colorStops = new ArrayList<>();
 		boolean equal = true;
 		
@@ -114,7 +114,7 @@ public abstract class Tint
 		return new Tint.Gradient(colorStops, range, expression, equal);
 	}
 	
-	public abstract void compute(ParticleVariables vars, BedrockParticle particle);
+	public abstract TintInstance newInstance(LzVariableStore vars);
 	
 	/**
 	 * Solid color (not necessarily static)
@@ -122,12 +122,12 @@ public abstract class Tint
 	public static class Solid
 			extends Tint
 	{
-		public InterpolatedDouble<ParticleVariables> r;
-		public InterpolatedDouble<ParticleVariables> g;
-		public InterpolatedDouble<ParticleVariables> b;
-		public InterpolatedDouble<ParticleVariables> a;
+		public LzFactory r;
+		public LzFactory g;
+		public LzFactory b;
+		public LzFactory a;
 		
-		public Solid(InterpolatedDouble<ParticleVariables> r, InterpolatedDouble<ParticleVariables> g, InterpolatedDouble<ParticleVariables> b, InterpolatedDouble<ParticleVariables> a)
+		public Solid(LzFactory r, LzFactory g, LzFactory b, LzFactory a)
 		{
 			this.r = r;
 			this.g = g;
@@ -144,20 +144,14 @@ public abstract class Tint
 		}
 		
 		@Override
-		public void compute(ParticleVariables vars, BedrockParticle particle)
+		public TintInstance.SolidInstance newInstance(LzVariableStore vars)
 		{
-			particle.r = (float) this.r.get(vars);
-			particle.g = (float) this.g.get(vars);
-			particle.b = (float) this.b.get(vars);
-			particle.a = (float) this.a.get(vars);
-		}
-		
-		public void lerp(BedrockParticle particle, float factor, ParticleVariables vars)
-		{
-			particle.r = Math.lerp(particle.r, (float) this.r.get(vars), factor);
-			particle.g = Math.lerp(particle.g, (float) this.g.get(vars), factor);
-			particle.b = Math.lerp(particle.b, (float) this.b.get(vars), factor);
-			particle.a = Math.lerp(particle.a, (float) this.a.get(vars), factor);
+			return new TintInstance.SolidInstance(
+					r.instantiate(vars),
+					g.instantiate(vars),
+					b.instantiate(vars),
+					a.instantiate(vars)
+			);
 		}
 	}
 	
@@ -169,11 +163,11 @@ public abstract class Tint
 			extends Tint
 	{
 		public List<ColorStop> stops;
-		public InterpolatedDouble<ParticleVariables> interpolant;
+		public LzFactory interpolant;
 		public float range = 1;
 		public boolean equal;
 		
-		public Gradient(List<ColorStop> stops, float range, InterpolatedDouble<ParticleVariables> interpolant, boolean equal)
+		public Gradient(List<ColorStop> stops, float range, LzFactory interpolant, boolean equal)
 		{
 			this.stops = stops;
 			this.range = range;
@@ -196,51 +190,14 @@ public abstract class Tint
 		}
 		
 		@Override
-		public void compute(ParticleVariables vars, BedrockParticle particle)
+		public TintInstance newInstance(LzVariableStore vars)
 		{
-			int length = this.stops.size();
-			
-			if(length == 0)
-			{
-				particle.r = particle.g = particle.b = particle.a = 1;
-				
-				return;
-			} else if(length == 1)
-			{
-				this.stops.get(0).color.compute(vars, particle);
-				
-				return;
-			}
-			
-			double factor = this.interpolant.get(vars);
-			
-			factor = Math.clamp(0, 1, factor);
-			
-			ColorStop prev = this.stops.get(0);
-			
-			if(factor < prev.getStop(this.range))
-			{
-				prev.color.compute(vars, particle);
-				
-				return;
-			}
-			
-			for(int i = 1; i < length; i++)
-			{
-				ColorStop stop = this.stops.get(i);
-				
-				if(stop.getStop(this.range) > factor)
-				{
-					prev.color.compute(vars, particle);
-					stop.color.lerp(particle, (float) (factor - prev.getStop(this.range)) / (stop.getStop(this.range) - prev.getStop(this.range)), vars);
-					
-					return;
-				}
-				
-				prev = stop;
-			}
-			
-			prev.color.compute(vars, particle);
+			return new TintInstance.GradientInstance(
+					stops.stream().map(st -> st.newInstance(vars)).collect(Collectors.toList()),
+					interpolant.instantiate(vars),
+					range,
+					equal
+			);
 		}
 		
 		public static class ColorStop
@@ -254,9 +211,9 @@ public abstract class Tint
 				this.color = color;
 			}
 			
-			public float getStop(float range)
+			public TintInstance.GradientInstance.ColorStopInstance newInstance(LzVariableStore vars)
 			{
-				return this.stop * range;
+				return new TintInstance.GradientInstance.ColorStopInstance(stop, color.newInstance(vars));
 			}
 		}
 	}

@@ -16,7 +16,7 @@ buildscript {
 }
 
 plugins {
-    id "com.modrinth.minotaur" version "2.+"
+    id "com.modrinth.minotaur" version "2.8.7"
 //    id 'net.ltgt.apt' version '0.10'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
@@ -119,9 +119,8 @@ dependencies {
     }
 
     ////// UTILITY STUFF //////
-    // implementation 'java-oo:javac-oo-plugin:0.5'
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly "org.projectlombok:lombok:$lombok"
+    annotationProcessor "org.projectlombok:lombok:$lombok"
     compileOnly 'org.jetbrains:annotations:24.0.1'
     ///////////////////////////
 
@@ -207,7 +206,8 @@ jar {
     }
 }
 
-task signJar(type: SignJar, dependsOn: jar) {
+tasks.register('signJar', SignJar) {
+    dependsOn jar
     onlyIf {
         System.env.MC_KS_PASS != null
     }
@@ -222,7 +222,6 @@ task signJar(type: SignJar, dependsOn: jar) {
 jar.finalizedBy('reobfJar')
 assemble.finalizedBy('signJar')
 signJar.finalizedBy('cleanReplaces')
-
 
 task deobfJar(type: Jar) {
     from sourceSets.main.output
@@ -280,6 +279,7 @@ modrinth {
     versionType = config.release_type as String
     uploadFile = jar
     gameVersions = [minecraft_version as String]
+    additionalFiles = [deobfJar, srcJar]
     dependencies {
         def mods = (config.required_mods as String).split(";")
         if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
@@ -347,6 +347,12 @@ curseforge {
         addGameVersion "Java 8"
         mainArtifact(jar) {
             displayName = "[${minecraft_version}] ${config.mod_name} - ${config.mod_version}"
+        }
+        addArtifact(deobfJar) {
+            displayName = "[${minecraft_version}] ${config.mod_name} - ${config.mod_version} (Deobfuscated, for developers)"
+        }
+        addArtifact(srcJar) {
+            displayName = "[${minecraft_version}] ${config.mod_name} - ${config.mod_version} (Source Code)"
         }
         relations {
             def mods = (config.required_mods as String).split(";")

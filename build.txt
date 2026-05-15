@@ -1,6 +1,6 @@
 #Project info
 author=Zeitheron
-start_git_commit=7c27035d2be7bd36b67b1739551ef2ff99bf126a
+start_git_commit=a44835cbb142c755c9b96743d40ad70deac75070
 git_commit=https://github.com/dragon-forge/HammerAnimations/commit/{{hash}}
 
 #Runtime info
@@ -11,7 +11,7 @@ jei_version=4.16.1.302
 mod_id=hammeranims
 mod_id_fancy=HammerAnimations
 mod_name=HammerAnimations
-mod_version=12.2.39.4
+mod_version=12.2.47
 
 # Project ID on CurseForge
 modrinth_project=C7cTlgwS

@@ -17,6 +17,7 @@ import net.minecraftforge.client.resource.*;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.McUtil;
@@ -25,10 +26,10 @@ import org.zeith.hammeranims.api.geometry.model.IGeometricModel;
 import org.zeith.hammeranims.api.geometry.model.RenderData;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
+import org.zeith.hammeranims.api.texture.ITextureAccess;
 import org.zeith.hammeranims.api.utils.IExtendedResourceProvider;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
-import org.zeith.hammeranims.core.client.BuiltInResourcePack;
-import org.zeith.hammeranims.core.client.CommandReloadHA;
+import org.zeith.hammeranims.core.client.*;
 import org.zeith.hammeranims.core.client.model.GeometricModelImpl;
 import org.zeith.hammeranims.core.client.particle.ParticleWithEmitter;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
@@ -61,6 +62,32 @@ public class ClientProxy
 	public ExtraParticleEffects getExtraParticles()
 	{
 		return extraEffects;
+	}
+	
+	protected final Map<ResourceLocation, ITextureAccess> textureCache = new HashMap<>();
+	
+	@Override
+	public @NotNull ITextureAccess getTextureAccess(ResourceLocation texture)
+	{
+		return textureCache.computeIfAbsent(texture, this::createTextureAccess);
+	}
+	
+	@Override
+	public void purgeTextureAccessCache()
+	{
+		textureCache.clear();
+	}
+	
+	@Override
+	public @NotNull ITextureAccess createTextureAccess(ResourceLocation texture)
+	{
+		try
+		{
+			return McTextureAccess.getPixels(Minecraft.getMinecraft().getResourceManager(), texture);
+		} catch(Exception e)
+		{
+			return ITextureAccess.MISSING_TEXTURE;
+		}
 	}
 	
 	private boolean inWorld;
@@ -143,6 +170,12 @@ public class ClientProxy
 				return HammerAnimations.MOD_NAME;
 			}
 		});
+	}
+	
+	@Override
+	public boolean isGamePaused()
+	{
+		return Minecraft.getMinecraft().isGamePaused();
 	}
 	
 	@Override

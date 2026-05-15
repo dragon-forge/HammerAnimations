@@ -7,15 +7,12 @@ import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.zeith.hammeranims.core.contents.commands.CommandBedrock;
-import org.zeith.hammeranims.core.contents.commands.CommandParticle;
+import org.apache.logging.log4j.*;
+import org.zeith.hammeranims.core.contents.commands.*;
 import org.zeith.hammeranims.core.contents.entity.EntityBilly;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
 import org.zeith.hammeranims.core.impl.api.particles.ParticleDecoder;
-import org.zeith.hammeranims.core.js.JsFactory;
 import org.zeith.hammeranims.core.proxy.CommonProxy;
 
 import java.lang.annotation.Annotation;
@@ -30,8 +27,10 @@ public class HammerAnimations
 	
 	public static final Logger LOG = LogManager.getLogger(MOD_NAME);
 	
-	@SidedProxy(serverSide = ROOT_PACKAGE + ".core.proxy.ServerProxy",
-			clientSide = ROOT_PACKAGE + ".core.proxy.ClientProxy")
+	@SidedProxy(
+			serverSide = ROOT_PACKAGE + ".core.proxy.ServerProxy",
+			clientSide = ROOT_PACKAGE + ".core.proxy.ClientProxy"
+	)
 	public static CommonProxy PROXY;
 	
 	public HammerAnimations()
@@ -55,7 +54,6 @@ public class HammerAnimations
 	public void construct(FMLConstructionEvent e)
 	{
 		LOG.info("{} is constructing.", MOD_NAME);
-		JsFactory.init(true);
 		MinecraftForge.EVENT_BUS.register(PROXY);
 		PROXY.construct();
 	}
