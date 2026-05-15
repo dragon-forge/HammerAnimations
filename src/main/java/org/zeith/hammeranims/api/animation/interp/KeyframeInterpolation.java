@@ -61,7 +61,7 @@ public class KeyframeInterpolation
 	{
 		LzExpression[] exprs = new LzExpression[doubleCount];
 		
-		List<IKeyFrameInstance> kfInst = keyframes.stream().map(f -> f.newInstance(query)).toList();
+		IKeyFrameInstance[] kfInst = keyframes.stream().map(f -> f.newInstance(query)).toArray(IKeyFrameInstance[]::new);
 		
 		for(int i = 0; i < exprs.length; i++)
 			exprs[i] = new KeyframeInterpolationInstance(
@@ -78,11 +78,11 @@ public class KeyframeInterpolation
 			implements LzExpression
 	{
 		protected final KeyframeInterpolation owner;
-		protected final List<IKeyFrameInstance> keyframes;
+		protected final IKeyFrameInstance[] keyframes;
 		protected final LzVarOp anim_time, anim_duration;
 		protected final int component;
 		
-		public KeyframeInterpolationInstance(KeyframeInterpolation owner, LzVariableStore store, List<IKeyFrameInstance> keyframes, int component)
+		public KeyframeInterpolationInstance(KeyframeInterpolation owner, LzVariableStore store, IKeyFrameInstance[] keyframes, int component)
 		{
 			this.owner = owner;
 			this.keyframes = keyframes;
@@ -99,11 +99,11 @@ public class KeyframeInterpolation
 			int index = findInsertionIndex(owner.keyframeTimes, anim_time);
 			
 			int fromIdx = index - 1;
-			int toIdx = index % keyframes.size();
-			if(fromIdx < 0) fromIdx += keyframes.size();
+			int toIdx = index % keyframes.length;
+			if(fromIdx < 0) fromIdx += keyframes.length;
 			
-			IKeyFrameInstance prev = keyframes.get(fromIdx),
-					next = toIdx > fromIdx ? keyframes.get(toIdx) : null;
+			IKeyFrameInstance prev = keyframes[fromIdx],
+					next = toIdx > fromIdx ? keyframes[toIdx] : null;
 			
 			if(next == null)
 				return prev.getVec(IKeyFrame.KeyFrameState.PREV).get(component);
@@ -125,10 +125,10 @@ public class KeyframeInterpolation
 		private double interpolateSmoothly(IKeyFrameInstance prev, IKeyFrameInstance next, int prevIndex, int nextIndex, double anim_time, double anim_duration)
 		{
 			IKeyFrameInstance beforeMinus = null;
-			if(prevIndex > 0) beforeMinus = keyframes.get(prevIndex - 1);
+			if(prevIndex > 0) beforeMinus = keyframes[prevIndex - 1];
 			
 			IKeyFrameInstance afterPlus = null;
-			if(nextIndex < keyframes.size() - 1) afterPlus = keyframes.get(nextIndex + 1);
+			if(nextIndex < keyframes.length - 1) afterPlus = keyframes[nextIndex + 1];
 			
 			return catmullRom(beforeMinus, prev, next, afterPlus, anim_time, anim_duration, component);
 		}

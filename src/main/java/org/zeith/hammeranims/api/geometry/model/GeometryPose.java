@@ -56,7 +56,7 @@ public class GeometryPose
 		boneTransforms.clear();
 	}
 	
-	public void apply(ActiveAnimation animation, ILayerMask mask, BlendMode mode, float weight, Query query)
+	public void apply(ActiveAnimation animation, ILayerMask mask, BlendMode mode, float weight)
 	{
 		for(Map.Entry<String, BoneAnimationInstance> entry : animation.getBoneAnimations().entrySet())
 		{
@@ -66,7 +66,7 @@ public class GeometryPose
 		}
 	}
 	
-	public void apply(SerializableMask animationMask, ActiveAnimation animation, ILayerMask mask, BlendMode mode, float weight, Query query)
+	public void apply(SerializableMask animationMask, ActiveAnimation animation, ILayerMask mask, BlendMode mode, float weight)
 	{
 		Set<String> excludes = animationMask.getExcludes();
 		SerializableMask.WeightFunction weightFun = animationMask.getBoneWeight();

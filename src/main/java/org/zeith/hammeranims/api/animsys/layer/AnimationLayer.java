@@ -148,8 +148,8 @@ public class AnimationLayer
 			query.setTime(system, sysTime, partialTicks, lastAnimation);
 			
 			SerializableMask sm = la.config.mask;
-			if(sm != null) pose.apply(sm, lastAnimation, mask, mode, weight, query);
-			else pose.apply(lastAnimation, mask, mode, weight, query);
+			if(sm != null) pose.apply(sm, lastAnimation, mask, mode, weight);
+			else pose.apply(lastAnimation, mask, mode, weight);
 		}
 		
 		if(currentAnimation != null)
@@ -159,8 +159,8 @@ public class AnimationLayer
 			query.setTime(system, sysTime, partialTicks, currentAnimation);
 			
 			SerializableMask sm = currentAnimation.config.mask;
-			if(sm != null) pose.apply(sm, currentAnimation, mask, mode, weight, query);
-			else pose.apply(currentAnimation, mask, mode, weight, query);
+			if(sm != null) pose.apply(sm, currentAnimation, mask, mode, weight);
+			else pose.apply(currentAnimation, mask, mode, weight);
 		}
 	}
 	
@@ -184,11 +184,11 @@ public class AnimationLayer
 			int maxTicks = Math.min(100, ticks - prev);
 			for(int i = 0; i < maxTicks; i++)
 			{
-				val snds = sounds.get(i);
+				val snds = sounds.get(ticks+i);
 				if(snds != null)
 					snds.forEach(owner::playSound);
 				
-				val fx = particles.get(i);
+				val fx = particles.get(ticks+i);
 				if(fx != null) for(AnimatedParticleEffect effect : fx)
 				{
 					val pp = owner.playParticle(effect);

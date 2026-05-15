@@ -65,8 +65,6 @@ public class ParcomMotionDynamic
 		@Override
 		public void update(ParticleEmitter emitter, BedrockParticle particle)
 		{
-			ParticleVariables v = emitter.vars;
-			
 			particle.acceleration.x += (float) this.motionAcceleration[0].get();
 			particle.acceleration.y += (float) this.motionAcceleration[1].get();
 			particle.acceleration.z += (float) this.motionAcceleration[2].get();
