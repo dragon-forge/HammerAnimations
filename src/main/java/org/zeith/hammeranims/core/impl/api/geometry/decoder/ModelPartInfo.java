@@ -1,9 +1,7 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import lombok.Getter;
-import lombok.val;
+import lombok.*;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.*;
 import org.joml.Vector3f;
@@ -61,7 +59,7 @@ public class ModelPartInfo
 		
 		rotationRads.mul(-1, -1, 1);
 		
-		Object2ObjectArrayMap<String, PositionalBone> bakedChildren = new Object2ObjectArrayMap<>();
+		Map<String, PositionalBone> bakedChildren = new HashMap<>();
 		for(ModelPartInfo child : children)
 			bakedChildren.put(child.name, child.bakePositional(this));
 		
@@ -106,7 +104,7 @@ public class ModelPartInfo
 		
 		rotationRads.mul(-1, -1, 1);
 		
-		Map<String, ModelBoneF> bakedChildren = new Object2ObjectArrayMap<>();
+		Map<String, ModelBoneF> bakedChildren = new HashMap<>();
 		for(ModelPartInfo child : children)
 			bakedChildren.put(child.name, child.bake(this, textureWidth, textureHeight));
 		
