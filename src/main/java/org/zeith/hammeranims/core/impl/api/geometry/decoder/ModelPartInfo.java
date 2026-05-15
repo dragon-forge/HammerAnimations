@@ -57,7 +57,7 @@ public class ModelPartInfo
 		
 		rotationRads.mul(-1, -1, 1);
 		
-		Map<String, PositionalBone> bakedChildren = new LinkedHashMap<>();
+		Map<String, PositionalBone> bakedChildren = new HashMap<>();
 		for(ModelPartInfo child : children)
 			bakedChildren.put(child.name, child.bakePositional(this));
 		
@@ -101,7 +101,7 @@ public class ModelPartInfo
 		
 		rotationRads.mul(-1, -1, 1);
 		
-		Map<String, ModelBoneF> bakedChildren = new LinkedHashMap<>();
+		Map<String, ModelBoneF> bakedChildren = new HashMap<>();
 		for(ModelPartInfo child : children)
 			bakedChildren.put(child.name, child.bake(this, textureWidth, textureHeight));
 		
