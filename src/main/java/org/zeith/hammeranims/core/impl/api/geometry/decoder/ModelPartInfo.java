@@ -1,15 +1,12 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
-import org.joml.Vector3f;
-import org.zeith.hammeranims.standalone.utils.MathHelper;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import lombok.Getter;
-import lombok.val;
+import lombok.*;
 import org.jetbrains.annotations.Nullable;
-import org.zeith.hammeranims.core.client.model.ModelBoneF;
-import org.zeith.hammeranims.core.client.model.ModelCubeF;
+import org.joml.Vector3f;
+import org.zeith.hammeranims.core.client.model.*;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;
 import org.zeith.hammeranims.core.impl.api.geometry.PositionalModelImpl.PositionalBone;
+import org.zeith.hammeranims.standalone.utils.MathHelper;
 
 import java.util.*;
 
@@ -60,7 +57,7 @@ public class ModelPartInfo
 		
 		rotationRads.mul(-1, -1, 1);
 		
-		Object2ObjectArrayMap<String, PositionalBone> bakedChildren = new Object2ObjectArrayMap<>();
+		Map<String, PositionalBone> bakedChildren = new LinkedHashMap<>();
 		for(ModelPartInfo child : children)
 			bakedChildren.put(child.name, child.bakePositional(this));
 		
@@ -104,7 +101,7 @@ public class ModelPartInfo
 		
 		rotationRads.mul(-1, -1, 1);
 		
-		Map<String, ModelBoneF> bakedChildren = new Object2ObjectArrayMap<>();
+		Map<String, ModelBoneF> bakedChildren = new LinkedHashMap<>();
 		for(ModelPartInfo child : children)
 			bakedChildren.put(child.name, child.bake(this, textureWidth, textureHeight));
 		
