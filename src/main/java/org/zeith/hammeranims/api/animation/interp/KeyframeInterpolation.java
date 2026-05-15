@@ -12,6 +12,7 @@ import org.zeith.hammeranims.api.animation.interp.keyframes.*;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.DoubleStream;
 
 public class KeyframeInterpolation
 		extends BaseInterpolation
@@ -218,8 +219,7 @@ public class KeyframeInterpolation
 	
 	public static KeyframeInterpolation parse(int doubleCount, JSONObject json)
 	{
-		int keyFramePtr = 0;
-		double[] keyframeTimes = new double[json.length()];
+		DoubleStream.Builder keyframeTimes = DoubleStream.builder();
 		List<IKeyFrame> keyframes = new ArrayList<>(json.length());
 		
 		Iterator<Tuple2<String, Double>> itr = json
@@ -276,14 +276,14 @@ public class KeyframeInterpolation
 			if(keyframes.isEmpty() && time > 0)
 			{
 				keyframes.add(kf.withNewTime(0));
-				keyframeTimes[keyFramePtr++] = 0;
+				keyframeTimes.add(0);
 			}
 			
 			keyframes.add(kf);
-			keyframeTimes[keyFramePtr++] = time;
+			keyframeTimes.add(time);
 		}
 		
-		return new KeyframeInterpolation(doubleCount, keyframeTimes, keyframes);
+		return new KeyframeInterpolation(doubleCount, keyframeTimes.build().toArray(), keyframes);
 	}
 	
 	private static int findInsertionIndex(double[] list, double x)
