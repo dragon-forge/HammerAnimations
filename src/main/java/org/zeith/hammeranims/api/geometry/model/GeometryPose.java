@@ -56,6 +56,7 @@ public class GeometryPose
 		}
 	}
 	
+	@Override
 	public GeometryPose copy()
 	{
 		GeometryPose c = new GeometryPose(availableBones);

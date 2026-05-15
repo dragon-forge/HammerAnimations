@@ -2,6 +2,7 @@ package org.zeith.hammeranims.standalone.wasm.itfs.geom;
 
 import org.teavm.jso.*;
 import org.teavm.jso.typedarrays.Float32Array;
+import org.zeith.hammeranims.standalone.wasm.itfs.anim.HAAnimationPose;
 
 @JSClass(name = "GeometryState")
 public interface HAGeoState
@@ -34,7 +35,7 @@ public interface HAGeoState
 	void resetPose();
 	
 	@JSExport
-	void updatePose(Object pose);
+	void updatePose(HAAnimationPose pose);
 	
 	@JSExport
 	void flush();

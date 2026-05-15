@@ -9,4 +9,7 @@ public interface HAAnimationPose
 	@JSProperty
 	@JSExport
 	JSObject getBones();
+	
+	@JSExport
+	HAAnimationPose copy();
 }
