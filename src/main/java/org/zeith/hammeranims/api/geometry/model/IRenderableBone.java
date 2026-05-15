@@ -35,7 +35,6 @@ public interface IRenderableBone
 		applyBoneTransforms(pose);
 	}
 	
-	// Can be used to
 	boolean anyUVMatch(IFaceUVPredicate filter);
 	boolean allUVMatch(IFaceUVPredicate filter);
 	<STATE> STATE visitUVs(STATE state, BiFunction<STATE, FaceUV, STATE> walker, Predicate<STATE> isDone);
