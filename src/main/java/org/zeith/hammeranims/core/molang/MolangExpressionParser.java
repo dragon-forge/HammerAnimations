@@ -1,28 +1,29 @@
 package org.zeith.hammeranims.core.molang;
 
-import dev.zeith.lzvm.*;
+import dev.zeith.lzvm.LzVariableStore;
 import dev.zeith.lzvm.jvm.*;
 import dev.zeith.lzvm.molang.compiler.MoLangCompiler;
+import dev.zeith.lzvm.molang.compiler.jclass.*;
 import dev.zeith.lzvm.molang.compiler.libs.*;
 import dev.zeith.lzvm.molang.expression.MLExpression;
 import dev.zeith.lzvm.program.*;
-import org.zeith.hammeranims.core.molang.jvm.*;
-import org.zeith.hammeranims.standalone.jvm.JvmClass;
+import dev.zeith.lzvm.vm.*;
+import dev.zeith.lzvm.vm.jvm.opt.MathJClass;
 
 import java.util.*;
 import java.util.function.Function;
 
 public class MolangExpressionParser
 {
-	static final Map<String, JvmClass> JVM_CLASSES = new HashMap<>();
+	static final Map<String, JClass> JVM_CLASSES = new HashMap<>();
 	static final MoLangCompiler MOLANG_COMPILER = new MoLangCompiler();
 	static final LzVM VM = new LzVM(JVM_CLASSES::get);
 	
 	static
 	{
-		registerClass(Math.class.getName(), MathClass::new);
-		registerClass(MoMathLibrary.class.getName(), MoMathClass::new);
-		registerClass(MoLangEasing.class.getName(), MoEasingClass::new);
+		registerClass(Math.class.getName(), MathJClass::new);
+		registerClass(MoMathLibrary.class.getName(), MoMathJClass::new);
+		registerClass(MoLangEasing.class.getName(), MoEasingJClass::new);
 	}
 	
 	public static void disableOptimizations()
@@ -30,7 +31,7 @@ public class MolangExpressionParser
 		MOLANG_COMPILER.optimize = false;
 	}
 	
-	public static void registerClass(String name, Function<String, JvmClass> factory)
+	public static void registerClass(String name, Function<String, JClass> factory)
 	{
 		JVM_CLASSES.put(name, factory.apply(name));
 	}
