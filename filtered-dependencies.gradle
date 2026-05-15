@@ -1,0 +1,111 @@
+import java.util.jar.*
+
+tasks.register("filterJars") {
+}
+
+tasks.named("prepareKotlinBuildScriptModel") {
+    it.finalizedBy("filterJars")
+}
+
+ext.filteredImplementation = { Object notation, Closure spec ->
+    def dep = dependencies.create(notation)
+
+    def group = dep.group
+    def name = dep.name
+    def version = dep.version
+
+    def cfg = configurations.detachedConfiguration(dep).copyRecursive()
+    cfg.transitive = false
+
+    def rules = [
+            includes: [],
+            excludes: []
+    ]
+
+    def api = new Object() {
+        void include(String regex) {
+            rules.includes << regex
+        }
+
+        void exclude(String regex) {
+            rules.excludes << regex
+        }
+    }
+
+    spec.delegate = api
+    spec.resolveStrategy = Closure.DELEGATE_FIRST
+    spec()
+
+    def taskName = "filterJar_" + name.replaceAll("[^A-Za-z0-9]", "_")
+
+    def outputFile = layout.buildDirectory.file(
+            "filtered-libs/${name}-${version}.jar"
+    )
+
+    def filterTask = tasks.register(taskName) {
+        it.group = "filterJars"
+        inputs.files(cfg)
+        outputs.file(outputFile)
+
+        doLast {
+
+            def input = cfg.singleFile
+            def output = outputFile.get().asFile
+
+            output.parentFile.mkdirs()
+
+            def jarIn = new JarFile(input)
+            def jarOut = new JarOutputStream(
+                    new FileOutputStream(output)
+            )
+
+            try
+            {
+                jarIn.entries().each { entry ->
+
+                    if(entry.directory)
+                        return
+
+                    def path = entry.name
+
+                    boolean keep = true
+
+                    if(!rules.includes.isEmpty())
+                    {
+                        keep = rules.includes.any {
+                            path ==~ it
+                        }
+                    }
+
+                    if(rules.excludes.any {
+                        path ==~ it
+                    })
+                    {
+                        keep = false
+                    }
+
+                    if(!keep)
+                        return
+
+                    jarOut.putNextEntry(new JarEntry(path))
+
+                    jarIn.getInputStream(entry)
+                            .transferTo(jarOut)
+
+                    jarOut.closeEntry()
+                }
+            } finally
+            {
+                jarOut.close()
+                jarIn.close()
+            }
+        }
+    }
+
+    dependencies.add(
+            "implementation",
+            files(outputFile).builtBy(filterTask)
+    )
+
+    filterJars.finalizedBy(taskName)
+}

@@ -10,8 +10,7 @@ import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.BoneConstraintsImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.GsonGeometryDecoder;
-import shaded.tuples.Tuple2;
-import shaded.util.ResourceLocation;
+import org.zeith.hammeranims.standalone.mc.ResourceLocation;
 
 import java.util.*;
 

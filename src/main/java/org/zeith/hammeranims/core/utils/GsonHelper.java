@@ -1,9 +1,8 @@
 package org.zeith.hammeranims.core.utils;
 
 import org.jetbrains.annotations.Nullable;
-import shaded.joml.Vector2f;
-import shaded.joml.Vector3f;
-import shaded.json.*;
+import org.joml.*;
+import org.json.*;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -28,9 +27,9 @@ public class GsonHelper
 	
 	public static Vector3f toVec3f(JSONArray array, String name)
 	{
-		if(array.size() != 3)
+		if(array.length() != 3)
 		{
-			throw new JSONException("Expected 3 elements in '" + name + "' array, found: " + array.size());
+			throw new JSONException("Expected 3 elements in '" + name + "' array, found: " + array.length());
 		}
 		
 		return new Vector3f(convertToFloat(array.get(0), "member of '" + name + "'"),
@@ -57,9 +56,9 @@ public class GsonHelper
 	
 	public static Vector2f toVec2f(JSONArray array, String name)
 	{
-		if(array.size() != 2)
+		if(array.length() != 2)
 		{
-			throw new JSONException("Expected 2 elements in '" + name + "' array, found: " + array.size());
+			throw new JSONException("Expected 2 elements in '" + name + "' array, found: " + array.length());
 		}
 		
 		return new Vector2f(convertToFloat(array.get(0), "member of '" + name + "'"),
@@ -409,6 +408,6 @@ public class GsonHelper
 	
 	public static JSONObject parse(String pJson, boolean pLenient)
 	{
-		return (JSONObject) new JSONTokener(pJson).nextValue();
+		return new JSONObject(pJson);
 	}
 }

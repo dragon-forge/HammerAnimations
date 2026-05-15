@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.core.client.model;
 
+import org.joml.*;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
 import org.zeith.hammeranims.core.client.render.vertex.RenderVertex;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.utils.EnumFacing;
 import org.zeith.hammeranims.core.utils.IPoseEntry;
-import shaded.joml.*;
 
 import java.lang.Math;
 import java.util.ArrayList;

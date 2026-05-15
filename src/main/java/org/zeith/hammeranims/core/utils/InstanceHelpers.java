@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.utils;
 
-import shaded.util.ResourceLocation;
+import org.zeith.hammeranims.standalone.mc.ResourceLocation;
 
 public class InstanceHelpers
 {

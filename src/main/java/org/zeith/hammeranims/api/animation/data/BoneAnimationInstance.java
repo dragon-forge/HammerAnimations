@@ -2,11 +2,11 @@ package org.zeith.hammeranims.api.animation.data;
 
 import dev.zeith.lzvm.LzVariableStore;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3d;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.geometry.model.GeometryTransforms;
-import shaded.joml.Vector3d;
-import shaded.tuples.functions.Function3;
-import shaded.util.math.Vec3d;
+import org.zeith.libs.tuples.functions.Function3;
+import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 
 public class BoneAnimationInstance
 {

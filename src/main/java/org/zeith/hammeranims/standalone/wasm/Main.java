@@ -1,18 +1,14 @@
 package org.zeith.hammeranims.standalone.wasm;
 
-import org.teavm.jso.JSExport;
-import org.teavm.jso.JSObject;
+import org.teavm.jso.*;
 import org.teavm.jso.core.*;
 import org.teavm.jso.impl.JS;
 import org.teavm.jso.json.JSON;
 import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.animation.Animation;
-import org.zeith.hammeranims.api.animation.IAnimationContainer;
+import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
-import org.zeith.hammeranims.standalone.wasm.itfs.anim.AnimationState;
-import org.zeith.hammeranims.standalone.wasm.itfs.anim.HAAnimation;
-import org.zeith.hammeranims.standalone.wasm.itfs.geom.GeometryState;
-import org.zeith.hammeranims.standalone.wasm.itfs.geom.HAGeoState;
+import org.zeith.hammeranims.standalone.wasm.itfs.anim.*;
+import org.zeith.hammeranims.standalone.wasm.itfs.geom.*;
 
 import java.util.*;
 

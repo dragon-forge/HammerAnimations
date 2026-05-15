@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.standalone.hammeranims;
 
 import lombok.Getter;
-import shaded.joml.Vector3f;
+import org.joml.Vector3f;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
 import org.zeith.hammeranims.core.client.render.vertex.RenderVertex;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;

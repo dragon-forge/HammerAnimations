@@ -2,8 +2,7 @@ package org.zeith.hammeranims.api.geometry.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import shaded.joml.Matrix4d;
-import shaded.joml.Matrix4f;
+import org.joml.*;
 
 import java.util.*;
 

@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.jomljson;
 
-import shaded.json.JSONObject;
+import org.json.JSONObject;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.BoneConstraintsImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
 import org.zeith.hammeranims.core.utils.GsonHelper;

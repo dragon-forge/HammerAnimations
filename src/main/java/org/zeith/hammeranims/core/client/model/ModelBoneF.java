@@ -1,15 +1,12 @@
 package org.zeith.hammeranims.core.client.model;
 
-import org.zeith.hammeranims.api.geometry.model.IRenderableBone;
-import org.zeith.hammeranims.api.geometry.model.IRenderableHook;
+import org.joml.*;
+import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;
 import org.zeith.hammeranims.core.utils.PoseStack;
-import shaded.joml.Quaternionf;
-import shaded.joml.Vector3f;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ModelBoneF
 		implements IRenderableBone

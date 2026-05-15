@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
 import lombok.Getter;
-import shaded.util.math.Vec3d;
-import shaded.json.JSONObject;
+import org.json.JSONObject;
 import org.zeith.hammeranims.core.utils.GsonHelper;
+import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 
 @Getter
 public class ModelMaterialInfo

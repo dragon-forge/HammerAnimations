@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.core.utils;
 
 import lombok.Getter;
-import shaded.joml.Vector3i;
+import org.joml.Vector3i;
 
 import java.util.*;
 import java.util.function.Predicate;

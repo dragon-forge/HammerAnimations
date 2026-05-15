@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.core.client.model;
 
 import org.jetbrains.annotations.Nullable;
-import shaded.joml.Vector2i;
-import shaded.joml.Vector3f;
+import org.joml.*;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.UVDefinition;
 import org.zeith.hammeranims.core.utils.EnumFacing;
 
+import java.lang.Math;
 import java.util.Map;
 
 public interface CubeUVs

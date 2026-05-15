@@ -9,7 +9,7 @@ import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.standalone.ConfigureException;
 import org.zeith.hammeranims.standalone.utils.Cast;
 import org.zeith.hammeranims.standalone.wasm.HaJsHelper;
-import shaded.util.math.Vec3d;
+import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;

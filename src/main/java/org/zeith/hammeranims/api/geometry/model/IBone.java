@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.geometry.model;
 
 import org.jetbrains.annotations.Nullable;
-import shaded.joml.Vector3f;
+import org.joml.Vector3f;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;
 
 import java.util.Map;

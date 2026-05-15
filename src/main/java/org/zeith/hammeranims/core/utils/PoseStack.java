@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.utils;
 
-import shaded.joml.*;
+import org.joml.*;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayDeque;

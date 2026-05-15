@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
-import shaded.joml.Vector3f;
+import org.joml.Vector3f;
 import org.zeith.hammeranims.core.client.model.ModelCubeF;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 

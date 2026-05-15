@@ -1,11 +1,10 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
-import shaded.joml.Vector2i;
-import shaded.joml.Vector3f;
+import org.joml.*;
+import org.json.*;
 import org.zeith.hammeranims.core.client.model.CubeUVs;
 import org.zeith.hammeranims.core.jomljson.Vector2iGsonAdapter;
 import org.zeith.hammeranims.core.utils.EnumFacing;
-import shaded.json.*;
 
 import java.util.Collections;
 import java.util.EnumMap;

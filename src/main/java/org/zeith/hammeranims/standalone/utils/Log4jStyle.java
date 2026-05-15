@@ -1,7 +1,6 @@
 package org.zeith.hammeranims.standalone.utils;
 
-import shaded.tuples.Tuple2;
-import shaded.tuples.Tuples;
+import org.zeith.libs.tuples.*;
 
 import java.util.*;
 import java.util.function.Consumer;

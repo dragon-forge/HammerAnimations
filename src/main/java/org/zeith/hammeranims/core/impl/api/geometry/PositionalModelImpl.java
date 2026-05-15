@@ -1,8 +1,9 @@
 package org.zeith.hammeranims.core.impl.api.geometry;
 
+import org.joml.*;
 import org.zeith.hammeranims.standalone.utils.MathHelper;
 import lombok.val;
-import shaded.util.math.Vec3d;
+import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
@@ -10,7 +11,6 @@ import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
 import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.impl.api.geometry.decoder.ModelMeshInfo;
-import shaded.joml.*;
 
 import java.util.*;
 

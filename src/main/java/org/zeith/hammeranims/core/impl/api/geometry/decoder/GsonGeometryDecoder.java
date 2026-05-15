@@ -1,6 +1,8 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
 import lombok.val;
+import org.joml.Vector3f;
+import org.json.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
@@ -8,9 +10,7 @@ import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
 import org.zeith.hammeranims.core.jomljson.GeometryConstrainsImplAdapter;
 import org.zeith.hammeranims.core.utils.GsonHelper;
-import shaded.joml.Vector3f;
-import shaded.json.*;
-import shaded.util.ResourceLocation;
+import org.zeith.hammeranims.standalone.mc.ResourceLocation;
 
 import java.util.*;
 
@@ -46,14 +46,14 @@ public class GsonGeometryDecoder
 	
 	private static GeometryDataImpl readGeometryFile(IGeometryContainer container, ResourceLocation fileLocation, JSONObject object)
 	{
-		for(var entry : object.entrySet())
-			if(entry.getKey().equals("format_version"))
+		for(var key : object.keySet())
+			if(key.equals("format_version"))
 			{
-				String formatVersion = GsonHelper.convertToString(entry.getValue(), entry.getKey());
+				String formatVersion = GsonHelper.convertToString(object.get(key), key);
 				checkFormatVersion(fileLocation, formatVersion);
-			} else if(entry.getKey().equals("minecraft:geometry"))
+			} else if(key.equals("minecraft:geometry"))
 			{
-				return parseGeometry(container, fileLocation, GsonHelper.convertToJsonArray(entry.getValue(), entry.getKey()));
+				return parseGeometry(container, fileLocation, object.getJSONArray(key));
 			}
 		
 		return null;
@@ -157,18 +157,18 @@ public class GsonGeometryDecoder
 		{
 			int i = 0;
 			val locs = GsonHelper.getAsJsonObject(bone, "locators");
-			for(val locEntry : locs.entrySet())
+			for(val key : locs.keySet())
 			{
-				val theLoc = locEntry.getValue();
+				val theLoc = locs.get(key);
 				if(theLoc instanceof JSONObject obj)
 				{
 					Vector3f offset = GsonHelper.getAsVec3f(obj, "offset");
 					Vector3f innerRotation = GsonHelper.getAsVec3f(obj, "rotation", new Vector3f(0, 0, 0));
-					locators.add(new ModelLocatorInfo(offset, innerRotation, locEntry.getKey()));
+					locators.add(new ModelLocatorInfo(offset, innerRotation, key));
 				} else
 				{
-					Vector3f origin = GsonHelper.toVec3f(GsonHelper.convertToJsonArray(locEntry.getValue(), locEntry.getKey()), locEntry.getKey());
-					locators.add(new ModelLocatorInfo(origin, new Vector3f(), locEntry.getKey()));
+					Vector3f origin = GsonHelper.toVec3f(GsonHelper.convertToJsonArray(theLoc, key), key);
+					locators.add(new ModelLocatorInfo(origin, new Vector3f(), key));
 				}
 			}
 		}

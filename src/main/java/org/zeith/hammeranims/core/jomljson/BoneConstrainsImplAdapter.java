@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.core.jomljson;
 
-import shaded.joml.Vector3d;
-import shaded.json.JSONObject;
+import org.joml.Vector3d;
+import org.json.JSONObject;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.BoneConstraintsImpl;
 
 public class BoneConstrainsImplAdapter
@@ -11,10 +11,10 @@ public class BoneConstrainsImplAdapter
 		BoneConstraintsImpl c = new BoneConstraintsImpl();
 		if(object.has("position"))
 		{
-			JSONObject o = object.getAsJsonObject("position");
+			JSONObject o = object.getJSONObject("position");
 			
 			//noinspection AssignmentUsedAsCondition
-			if(c.hasTranslation = o.size() > 0)
+			if(c.hasTranslation = !o.isEmpty())
 			{
 				if(o.has("min"))
 					c.minTranslation = Vector3dGsonAdapter.parse(o.getJSONArray("min"));
@@ -27,9 +27,10 @@ public class BoneConstrainsImplAdapter
 		}
 		if(object.has("rotation"))
 		{
-			JSONObject o = object.getAsJsonObject("rotation");
+			JSONObject o = object.getJSONObject("rotation");
+			
 			//noinspection AssignmentUsedAsCondition
-			if(c.hasRotation = o.size() > 0)
+			if(c.hasRotation = !o.isEmpty())
 			{
 				if(o.has("min"))
 					c.minTranslation = Vector3dGsonAdapter.parse(o.getJSONArray("min"));
@@ -42,9 +43,10 @@ public class BoneConstrainsImplAdapter
 		}
 		if(object.has("scale"))
 		{
-			JSONObject o = object.getAsJsonObject("scale");
+			JSONObject o = object.getJSONObject("scale");
+			
 			//noinspection AssignmentUsedAsCondition
-			if(c.hasScale = o.size() > 0)
+			if(c.hasScale = !o.isEmpty())
 			{
 				if(o.has("min"))
 					c.minTranslation = Vector3dGsonAdapter.parse(o.getJSONArray("min"));

@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.api.animation.data;
 
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 import org.zeith.hammeranims.api.animation.AnimationLocation;
 import org.zeith.hammeranims.api.animation.interp.*;
-import shaded.json.JSONObject;
 
 public class BoneAnimation
 {

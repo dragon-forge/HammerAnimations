@@ -1,8 +1,7 @@
 package org.zeith.hammeranims.core.client.render.vertex;
 
 import lombok.ToString;
-import shaded.joml.Vector3f;
-import shaded.joml.Vector3fc;
+import org.joml.Vector3f;
 
 @ToString
 public class RenderVertex
@@ -54,7 +53,7 @@ public class RenderVertex
 		};
 	}
 	
-	public Vector3fc pos()
+	public Vector3f pos()
 	{
 		return new Vector3f(x, y, z);
 	}

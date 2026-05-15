@@ -1,8 +1,8 @@
 package org.zeith.hammeranims.api.animation.interp;
 
 import org.zeith.hammeranims.api.geometry.model.GeometryTransforms;
-import shaded.util.math.Vec3d;
-import shaded.tuples.functions.Function3;
+import org.zeith.libs.tuples.functions.Function3;
+import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 
 public enum BlendMode
 {

@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.animsys;
 
 import org.zeith.hammeranims.api.animation.interp.Query;
-import shaded.util.math.Vec3d;
+import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 
 public interface IAnimatedObject
 {

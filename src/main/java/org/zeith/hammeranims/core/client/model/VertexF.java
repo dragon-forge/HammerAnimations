@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.client.model;
 
-import shaded.joml.Vector3f;
+import org.joml.Vector3f;
 
 public class VertexF
 {

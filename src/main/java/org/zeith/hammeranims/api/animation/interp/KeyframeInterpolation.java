@@ -6,10 +6,10 @@ import dev.zeith.lzvm.molang.compiler.libs.MoMathLibrary;
 import dev.zeith.lzvm.op.LzVarOp;
 import it.unimi.dsi.fastutil.doubles.*;
 import org.jetbrains.annotations.Nullable;
+import org.json.*;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;
 import org.zeith.hammeranims.api.animation.interp.keyframes.*;
-import shaded.json.*;
-import shaded.tuples.*;
+import org.zeith.libs.tuples.*;
 
 import java.util.*;
 

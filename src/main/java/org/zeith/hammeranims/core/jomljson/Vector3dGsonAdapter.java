@@ -1,8 +1,7 @@
 package org.zeith.hammeranims.core.jomljson;
 
-import shaded.joml.Vector3d;
-import shaded.json.JSONArray;
-import shaded.json.JSONException;
+import org.joml.Vector3d;
+import org.json.*;
 
 import static java.lang.Double.*;
 
@@ -14,8 +13,8 @@ public class Vector3dGsonAdapter
 	
 	public static Vector3d parse(JSONArray array)
 	{
-		if(array.size() != 3)
-			throw new JSONException("Expected 3 elements in Vector3d array, found: " + array.size());
+		if(array.length() != 3)
+			throw new JSONException("Expected 3 elements in Vector3d array, found: " + array.length());
 		
 		var xE = array.getString(0);
 		var yE = array.getString(1);

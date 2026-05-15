@@ -2,7 +2,7 @@ package org.zeith.hammeranims.api.animation.interp;
 
 import dev.zeith.lzvm.LzVariableStore;
 import dev.zeith.lzvm.jvm.LzExpression;
-import shaded.joml.Vector3d;
+import org.joml.Vector3d;
 
 import java.util.function.*;
 
@@ -32,7 +32,7 @@ public class Vec3Animation
 		return byComponent.applyAsDouble(component);
 	}
 	
-	public shaded.joml.Vector3d get()
+	public Vector3d get()
 	{
 		return eval.get();
 	}

@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.standalone.contexts;
 
-import shaded.util.ResourceLocation;
+import org.zeith.hammeranims.standalone.mc.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;

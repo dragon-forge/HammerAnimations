@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
+import org.joml.Vector3f;
 import org.zeith.hammeranims.standalone.utils.MathHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.Getter;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
-import shaded.joml.Vector3f;
 import org.zeith.hammeranims.core.client.model.ModelBoneF;
 import org.zeith.hammeranims.core.client.model.ModelCubeF;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;

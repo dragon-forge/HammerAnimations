@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.impl.api.animation;
 
-import shaded.json.JSONObject;
+import org.json.JSONObject;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.BoneAnimation;
 import org.zeith.hammeranims.api.animation.data.IAnimationData;

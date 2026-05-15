@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.geometry;
 
-import shaded.util.ResourceLocation;
+import org.zeith.hammeranims.standalone.mc.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
 import org.zeith.hammeranims.api.geometry.data.IGeometryData;

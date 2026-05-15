@@ -1,7 +1,6 @@
 package org.zeith.hammeranims.core.utils;
 
-import shaded.joml.Matrix3f;
-import shaded.joml.Matrix4f;
+import org.joml.*;
 
 public interface IPoseEntry
 {

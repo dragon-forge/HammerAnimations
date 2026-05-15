@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.core.impl.api.geometry.constrains;
 
-import shaded.joml.Vector3d;
+import org.joml.Vector3d;
 import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
 
 import static java.lang.Double.*;

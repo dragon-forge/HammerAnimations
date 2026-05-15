@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.utils;
 
-import shaded.util.ResourceLocation;
+import org.zeith.hammeranims.standalone.mc.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
 
 import java.util.Objects;

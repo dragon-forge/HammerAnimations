@@ -2,8 +2,8 @@ package org.zeith.hammeranims.api.animation.interp;
 
 import dev.zeith.lzvm.LzVariableStore;
 import dev.zeith.lzvm.jvm.*;
+import org.json.*;
 import org.zeith.hammeranims.HammerAnimations;
-import shaded.json.*;
 
 public abstract class BaseInterpolation
 {

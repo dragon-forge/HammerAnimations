@@ -1,18 +1,16 @@
 package org.zeith.hammeranims.core.impl.api.animation;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.IReadAnimationHolder;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
 import org.zeith.hammeranims.core.init.DefaultsHA;
-import shaded.json.JSONObject;
-import shaded.json.JSONTokener;
-import shaded.util.ResourceLocation;
+import org.zeith.hammeranims.standalone.mc.ResourceLocation;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 public class AnimationContainerImpl
 		implements IAnimationContainer
@@ -52,8 +50,7 @@ public class AnimationContainerImpl
 	
 	public static Optional<IReadAnimationHolder> defaultReadAnimation(IAnimationContainer container, Optional<String> text)
 	{
-		return text.map(JSONTokener::new)
-				.map(v -> (JSONObject) v.nextValue())
+		return text.map(JSONObject::new)
 				.map(json ->
 				{
 					ResourceLocation key = container.getRegistryKey();

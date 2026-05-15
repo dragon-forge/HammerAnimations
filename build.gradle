@@ -5,6 +5,8 @@ plugins {
     id "org.teavm" version "0.14.0"
 }
 
+apply from: "filtered-dependencies.gradle"
+
 group = 'org.zeith'
 version = appVersion
 compileJava {
@@ -25,11 +27,18 @@ dependencies {
 
     implementation "dev.zeith.lzvm:LzVM:$lzvmVersion"
     implementation "dev.zeith.lzvm:MoLang:$lzvmVersion"
+    implementation "org.zeith.libs:TupleLib:$tupleVersion"
+    implementation "org.json:json:$jsonVersion"
 
-    compileOnly "org.projectlombok:lombok:${lombok}"
-    annotationProcessor "org.projectlombok:lombok:${lombok}"
-    testCompileOnly "org.projectlombok:lombok:${lombok}"
-    testAnnotationProcessor "org.projectlombok:lombok:${lombok}"
+    filteredImplementation("org.joml:joml:$jomlVersion") {
+        exclude '^org/joml/MemUtil.*$'
+        exclude '^org/joml/Math\\..*$'
+    }
+
+    compileOnly "org.projectlombok:lombok:$lombok"
+    annotationProcessor "org.projectlombok:lombok:$lombok"
+    testCompileOnly "org.projectlombok:lombok:$lombok"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombok"
 
     compileOnly "org.jetbrains:annotations:26.0.1"
     implementation "it.unimi.dsi:fastutil:8.5.15"

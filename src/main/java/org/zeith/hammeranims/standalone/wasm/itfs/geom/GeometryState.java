@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.standalone.wasm.itfs.geom;
 
+import org.joml.Vector3f;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.impl.JS;
 import org.teavm.jso.typedarrays.Float32Array;
@@ -8,7 +9,6 @@ import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
 import org.zeith.hammeranims.core.client.render.vertex.*;
 import org.zeith.hammeranims.standalone.hammeranims.CountingVertexOutput;
-import shaded.joml.Vector3f;
 
 public class GeometryState
 		implements HAGeoState, IVertexOutput
@@ -122,6 +122,7 @@ public class GeometryState
 			normals.set(n + 1, t.ny);
 			normals.set(n + 2, t.nz);
 		}
+		
 		currentVertex += vertex.length;
 	}
 }

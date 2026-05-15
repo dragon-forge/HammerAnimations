@@ -4,9 +4,9 @@ import org.teavm.jso.JSObject;
 import org.teavm.jso.core.*;
 import org.teavm.jso.impl.JS;
 import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
-import shaded.util.math.Vec3d;
+import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 
-import static shaded.util.math.Vec3d.ZERO;
+import static org.zeith.hammeranims.standalone.mc.math.Vec3d.ZERO;
 
 public class GeometryTransforms
 {

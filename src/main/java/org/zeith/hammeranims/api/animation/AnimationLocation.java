@@ -1,6 +1,6 @@
 package org.zeith.hammeranims.api.animation;
 
-import shaded.util.ResourceLocation;
+import org.zeith.hammeranims.standalone.mc.ResourceLocation;
 import org.zeith.hammeranims.api.utils.EmbeddedLocation;
 
 public final class AnimationLocation
