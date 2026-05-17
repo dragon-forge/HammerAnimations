@@ -9,7 +9,6 @@ import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
 import org.zeith.hammeranims.core.client.render.vertex.*;
 import org.zeith.hammeranims.standalone.hammeranims.CountingVertexOutput;
-import org.zeith.hammeranims.standalone.wasm.itfs.anim.HAAnimationPose;
 
 public class GeometryState
 		implements HAGeoState, IVertexOutput
@@ -85,7 +84,7 @@ public class GeometryState
 	}
 	
 	@Override
-	public void updatePose(HAAnimationPose pose)
+	public void updatePose(Object pose)
 	{
 		model.applyPose((GeometryPose) pose);
 	}

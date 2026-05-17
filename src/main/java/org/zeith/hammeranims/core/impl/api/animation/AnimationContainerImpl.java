@@ -58,9 +58,16 @@ public class AnimationContainerImpl
 					try
 					{
 						ReadAnimationHolderImpl holder = new ReadAnimationHolderImpl(key);
+						String fmt = json.optString("format_version", "1.8.0");
+						
+						if(json.has("bones") && !json.has("animations"))
+						{
+							// This is a single animation
+							holder.put("unnamed", AnimationDecoder.decodeAnimation(json, container, "unnamed", fmt));
+							return holder;
+						}
 						
 						JSONObject animations = json.getJSONObject("animations");
-						String fmt = json.getString("format_version");
 						
 						for(String animKey : animations.keySet())
 							holder.put(animKey, AnimationDecoder.decodeAnimation(animations.getJSONObject(animKey), container, animKey, fmt));
