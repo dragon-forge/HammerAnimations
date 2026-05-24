@@ -2,6 +2,7 @@ package org.zeith.hammeranims.api.animation.interp;
 
 import com.zeitheron.hammercore.lib.zlib.utils.Vec2D;
 import dev.zeith.lzvm.op.ReadonlyLzVarOp;
+import lombok.Getter;
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,19 +19,30 @@ import static dev.zeith.lzvm.op.ReadonlyLzVarOp.ofBool;
 public class QueryEntity
 		extends QueryWorld
 {
-	protected final Entity entity;
+	protected @Getter Entity entity;
+	
+	public QueryEntity()
+	{
+	}
 	
 	public QueryEntity(Entity entity)
 	{
-		super(entity.getEntityWorld());
-		this.entity = entity;
-		registerEntityVariables(this::setVariable);
+		super(entity != null ? entity.getEntityWorld() : null);
+		setEntity(entity);
 	}
 	
-	protected void registerEntityVariables(BiConsumer<String, ReadonlyLzVarOp> reg)
+	public void setEntity(Entity entity)
+	{
+		if(entity == null) return;
+		setWorld(entity.getEntityWorld());
+		this.entity = entity;
+		registerEntityVariables(this, entity, this::setVariable);
+	}
+	
+	public static void registerEntityVariables(Query q, Entity entity, BiConsumer<String, ReadonlyLzVarOp> reg)
 	{
 		if(entity instanceof IAnimatedEntity)
-			((IAnimatedEntity) entity).registerEntityProperties(reg);
+			((IAnimatedEntity) entity).registerEntityProperties(q, reg);
 		
 		reg.accept("query.cardinal_facing", () -> entity.getHorizontalFacing().getIndex());
 		reg.accept("query.cardinal_facing_2d", () ->
@@ -63,7 +75,7 @@ public class QueryEntity
 		reg.accept("query.ground_speed", () -> Vec2D.ZERO.distanceTo(entity.motionX, entity.motionZ));
 		reg.accept("query.vertical_speed", () -> entity.motionY);
 		reg.accept("query.yaw_speed", () -> entity.rotationYaw - entity.prevRotationYaw);
-		reg.accept("query.movement_direction", () -> Vec2D.ZERO.distanceTo(entity.motionX, entity.motionZ) > 0.001 ? getNearest(entity.motionX,entity.motionY,entity.motionZ).getIndex() : 6);
+		reg.accept("query.movement_direction", () -> Vec2D.ZERO.distanceTo(entity.motionX, entity.motionZ) > 0.001 ? getNearest(entity.motionX, entity.motionY, entity.motionZ).getIndex() : 6);
 //		reg.accept("query.rider_body_x_rotation", () ->
 //				!entity.isVehicle() || entity.getFirstPassenger() == null
 //				? 0
@@ -88,16 +100,16 @@ public class QueryEntity
 //			reg.accept("query.body_y_rotation", () -> MoMathLibrary.lerp(le.yBodyRotO, le.yBodyRot, partialTicks));
 //			reg.accept("query.blocking", ofBool(le::isBlocking));
 			reg.accept("query.health", le::getHealth);
-			reg.accept("query.death_ticks", () -> le.getHealth() <= 0.0F ? le.deathTime + partialTicks : 0);
-			reg.accept("query.hurt_time", () -> le.hurtTime == 0 ? le.hurtTime : (le.hurtTime - partialTicks));
+			reg.accept("query.death_ticks", () -> le.getHealth() <= 0.0F ? le.deathTime + q.partialTicks : 0);
+			reg.accept("query.hurt_time", () -> le.hurtTime == 0 ? le.hurtTime : (le.hurtTime - q.partialTicks));
 			reg.accept("query.max_health", le::getMaxHealth);
 			reg.accept("query.is_alive", ofBool(le::isEntityAlive));
 			reg.accept("query.is_baby", ofBool(le::isChild));
 			reg.accept("query.is_using_item", ofBool(le::isHandActive));
 			reg.accept("query.query.is_wall_climbing", ofBool(le::isOnLadder));
-			reg.accept("query.item_in_use_duration", () -> (le.getItemInUseCount() + partialTicks) / 20.0);
+			reg.accept("query.item_in_use_duration", () -> (le.getItemInUseCount() + q.partialTicks) / 20.0);
 //			reg.accept("query.scale", le::getScale);
-			reg.accept("query.item_remaining_use_duration", () -> Math.max(0, (le.getItemInUseMaxCount() - le.getItemInUseCount()) - partialTicks) / 20.0);
+			reg.accept("query.item_remaining_use_duration", () -> Math.max(0, (le.getItemInUseMaxCount() - le.getItemInUseCount()) - q.partialTicks) / 20.0);
 //			reg.accept("query.sleep_rotation", () -> le.getBedOrientation() != null ? (double) le.getBedOrientation().toYRot() : 0.0);
 //			reg.accept("query.head_x_rotation", () -> le.getViewXRot(partialTicks));
 //			reg.accept("query.head_y_rotation", () -> le.getViewYRot(partialTicks));

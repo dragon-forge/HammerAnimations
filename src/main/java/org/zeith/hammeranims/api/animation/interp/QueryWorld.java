@@ -1,54 +1,57 @@
 package org.zeith.hammeranims.api.animation.interp;
 
 import dev.zeith.lzvm.op.ReadonlyLzVarOp;
+import lombok.Getter;
 import net.minecraft.world.World;
 
 import java.util.function.BiConsumer;
 
+/**
+ * This is an extensible class (this gets passed to animation layers)
+ */
 public class QueryWorld
 		extends Query
 {
-	protected boolean registered = false;
-	protected World world;
+	private static final float[] MOON_BRIGHTNESS_PER_PHASE = new float[] {1.0F, 0.75F, 0.5F, 0.25F, 0.0F, 0.25F, 0.5F, 0.75F};
+	
+	protected @Getter World world;
+	
+	public QueryWorld()
+	{
+	}
 	
 	public QueryWorld(World world)
 	{
-		this.world = world;
-		if(world != null)
-			registerWorldVariables(this::setVariable);
+		setWorld(world);
 	}
 	
 	@Override
 	public void setWorld(World world)
 	{
+		if(world == null) return;
 		this.world = world;
-		if(!registered) // in case of BlockEntities, world may be provided later.
-			registerWorldVariables(this::setVariable);
+		registerWorldVariables(this, world, this::setVariable);
 	}
 	
-	protected void registerWorldVariables(BiConsumer<String, ReadonlyLzVarOp> reg)
+	public static void registerWorldVariables(Query q, World world, BiConsumer<String, ReadonlyLzVarOp> reg)
 	{
-		if(registered || world == null) return;
-		registered = true;
-		reg.accept("query.moon_brightness", this::getMoonBrightness);
-		reg.accept("query.moon_phase", this::getMoonPhase);
+		reg.accept("query.moon_brightness", () -> getMoonBrightness(world));
+		reg.accept("query.moon_phase", () -> getMoonPhase(world));
 		reg.accept("query.time_of_day", () -> timeOfDay(world.getWorldTime()));
-		reg.accept("query.time_stamp", () -> world.getTotalWorldTime());
+		reg.accept("query.time_stamp", world::getTotalWorldTime);
 	}
 	
-	public double timeOfDay(long pDayTime)
+	public static double timeOfDay(long pDayTime)
 	{
 		return (pDayTime % 24000L) / 20D;
 	}
 	
-	public static final float[] MOON_BRIGHTNESS_PER_PHASE = new float[] {1.0F, 0.75F, 0.5F, 0.25F, 0.0F, 0.25F, 0.5F, 0.75F};
-	
-	public float getMoonBrightness()
+	public static float getMoonBrightness(World world)
 	{
-		return MOON_BRIGHTNESS_PER_PHASE[getMoonPhase()];
+		return MOON_BRIGHTNESS_PER_PHASE[getMoonPhase(world)];
 	}
 	
-	public int getMoonPhase()
+	public static int getMoonPhase(World world)
 	{
 		return world.provider.getMoonPhase(world.getWorldTime());
 	}
