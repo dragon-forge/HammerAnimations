@@ -11,28 +11,28 @@ public class QueryWorld
 	protected boolean registered = false;
 	protected Level world;
 	
+	public QueryWorld()
+	{
+	}
+	
 	public QueryWorld(Level world)
 	{
-		this.world = world;
-		if(world != null)
-			registerWorldVariables(this::setVariable);
+		setWorld(world);
 	}
 	
 	@Override
 	public void setWorld(Level world)
 	{
+		if(world == null) return;
 		this.world = world;
-		if(!registered) // in case of BlockEntities, world may be provided later.
-			registerWorldVariables(this::setVariable);
+		registerWorldVariables(this, world, this::setVariable);
 	}
 	
-	protected void registerWorldVariables(BiConsumer<String, ReadonlyLzVarOp> reg)
+	public static void registerWorldVariables(Query q, Level world, BiConsumer<String, ReadonlyLzVarOp> reg)
 	{
-		if(registered || world == null) return;
-		registered = true;
 		reg.accept("query.moon_brightness", () -> world.getMoonBrightness());
 		reg.accept("query.moon_phase", () -> world.getMoonPhase());
-		reg.accept("query.time_of_day", () -> world.getTimeOfDay(partialTicks));
+		reg.accept("query.time_of_day", () -> world.getTimeOfDay(q.partialTicks));
 		reg.accept("query.time_stamp", () -> world.getGameTime());
 	}
 }

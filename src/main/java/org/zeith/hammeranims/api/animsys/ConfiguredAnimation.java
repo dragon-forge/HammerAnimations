@@ -3,6 +3,9 @@ package org.zeith.hammeranims.api.animsys;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import lombok.*;
+import net.minecraft.nbt.*;
+import net.minecraft.network.FriendlyByteBuf;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
@@ -20,6 +23,8 @@ import java.util.*;
 
 import static org.zeith.hammeranims.core.contents.time.LinearTimeFunction.FREEZE_SPEED;
 
+
+@ToString
 public class ConfiguredAnimation
 		implements ICompoundSerializable, IAnimationSource
 {
@@ -229,6 +234,7 @@ public class ConfiguredAnimation
 		tag.putString("Animation", animation.getLocation().toString());
 		tag.putFloat("Weight", weight);
 		tag.putBoolean("Reverse", reverse);
+		tag.putBoolean("Important", important);
 		tag.putFloat("Speed", speed);
 		tag.putFloat("StartTime", startTime);
 		tag.putFloat("TransitionTime", transitionTime);
@@ -256,6 +262,7 @@ public class ConfiguredAnimation
 		this.setAnimation(new AnimationLocation(tag.getString("Animation")).resolve().orElse(null));
 		this.weight = tag.getFloat("Weight");
 		this.reverse = tag.getBoolean("Reverse");
+		this.important = tag.getBoolean("Important");
 		this.speed = tag.getFloat("Speed");
 		this.startTime = tag.getFloat("StartTime");
 		this.transitionTime = tag.getFloat("TransitionTime");
@@ -271,5 +278,63 @@ public class ConfiguredAnimation
 			AnimationActionInstance a = AnimationActionInstance.of(provider, onFinish.getCompound(i));
 			if(a != null && !a.isEmpty()) this.onFinish.add(a);
 		}
+	}
+	
+	public final void write(FriendlyByteBuf out)
+	{
+		out.writeNbt(mask != null ? mask.serializeNBT() : null);
+		out.writeNbt(timeFunction.serializeNBT());
+		out.writeUtf(animation.getLocation().toString(), 2048);
+		out.writeFloat(weight);
+		out.writeBoolean(reverse);
+		out.writeBoolean(important);
+		out.writeFloat(speed);
+		out.writeFloat(startTime);
+		out.writeFloat(transitionTime);
+		out.writeByte(loopMode.ordinal());
+		
+		out.writeVarInt(onFinish.size());
+		for(AnimationActionInstance f : onFinish) out.writeNbt(f.serializeNBT());
+		
+		if(next != null)
+		{
+			out.writeBoolean(true);
+			next.write(out);
+		} else out.writeBoolean(false);
+	}
+	
+	private static final LoopMode[] LOOP_MODES = LoopMode.values();
+	
+	@SneakyThrows
+	public static ConfiguredAnimation read(FriendlyByteBuf in)
+	{
+		var maskTag = in.readNbt();
+		var mask = maskTag != null ? new SerializableMask(maskTag) : null;
+		var time = TimeFunctionInstance.of(Objects.requireNonNull(in.readNbt(), "network->ConfiguredAnimation.time"));
+		var anim = new AnimationLocation(in.readUtf(2048)).resolve().orElse(DefaultsHA.NULL_ANIMATION_SYNTETIC);
+		ConfiguredAnimation ca = new ConfiguredAnimation(anim);
+		ca.mask = mask;
+		ca.timeFunction = time;
+		
+		ca.weight = in.readFloat();
+		ca.reverse = in.readBoolean();
+		ca.important = in.readBoolean();
+		ca.speed = in.readFloat();
+		ca.startTime = in.readFloat();
+		ca.transitionTime = in.readFloat();
+		ca.loopMode = LOOP_MODES[in.readByte()];
+		
+		int finishActionCount = in.readVarInt();
+		for(int i = 0; i < finishActionCount; i++)
+		{
+			var tag = in.readNbt();
+			var act = tag != null ? AnimationActionInstance.of(tag) : null;
+			if(act != null && !act.isEmpty()) ca.onFinish.add(act);
+		}
+		
+		if(in.readBoolean())
+			ca.next = read(in);
+		
+		return ca;
 	}
 }

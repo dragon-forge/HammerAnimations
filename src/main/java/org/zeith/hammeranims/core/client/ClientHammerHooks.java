@@ -59,7 +59,7 @@ public class ClientHammerHooks
 		enqueueAction(source, timeout, (w, sys) -> sys.deserializeNBT(w.registryAccess(), tag));
 	}
 	
-	public static void startAnimation(IObjectSource<?> source, int timeout, String layer, CompoundTag cfgAnim)
+	public static void startAnimation(IObjectSource<?> source, int timeout, String layer, ConfiguredAnimation cfgAnim)
 	{
 		if(layer == null || cfgAnim == null)
 		{
@@ -70,7 +70,7 @@ public class ClientHammerHooks
 		enqueueAction(source, timeout, (w, sys) ->
 				{
 					var l = sys.getLayer(layer);
-					if(l != null) l.startAnimationSync(new ConfiguredAnimation(w.registryAccess(), cfgAnim), false);
+					if(l != null) l.startAnimationSync(cfgAnim, false);
 				}
 		);
 	}

@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 public interface IAnimatedEntity
 		extends IAnimatedObject
 {
-	default void registerEntityProperties(BiConsumer<String, ReadonlyLzVarOp> reg)
+	default void registerEntityProperties(Query q, BiConsumer<String, ReadonlyLzVarOp> reg)
 	{
 	}
 	

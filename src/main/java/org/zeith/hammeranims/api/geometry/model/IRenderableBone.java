@@ -40,6 +40,7 @@ public interface IRenderableBone
 	<STATE> STATE visitUVs(STATE state, BiFunction<STATE, FaceUV, STATE> walker, Predicate<STATE> isDone);
 	
 	void setDefaultVertexType(VertexType defaultVertexType);
+	void setForcedVertexType(VertexType forceVertexType);
 	
 	void renderCubes(boolean b);
 	
