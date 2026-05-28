@@ -2,7 +2,10 @@ package org.zeith.hammeranims.api.geometry.model;
 
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.utils.PoseStack;
+
+import java.util.function.Predicate;
 
 public interface IRenderableBone
 		extends IBone
@@ -24,6 +27,13 @@ public interface IRenderableBone
 		// Then apply current bone transforms
 		applyBoneTransforms(pose);
 	}
+	
+	boolean anyUVMatch(IFaceUVPredicate filter);
+	boolean allUVMatch(IFaceUVPredicate filter);
+	<STATE> STATE visitUVs(STATE state, BiFunction<STATE, FaceUV, STATE> walker, Predicate<STATE> isDone);
+	
+	void setDefaultVertexType(VertexType defaultVertexType);
+	void setForcedVertexType(VertexType forceVertexType);
 	
 	void renderCubes(boolean b);
 	

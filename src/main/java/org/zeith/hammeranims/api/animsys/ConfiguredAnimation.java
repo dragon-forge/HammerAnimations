@@ -1,5 +1,7 @@
 package org.zeith.hammeranims.api.animsys;
 
+import lombok.*;
+import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.standalone.utils.Cast;
 import org.zeith.hammeranims.api.animation.*;
@@ -14,6 +16,8 @@ import java.util.Objects;
 
 import static org.zeith.hammeranims.core.contents.time.LinearTimeFunction.FREEZE_SPEED;
 
+
+@ToString
 public class ConfiguredAnimation
 	implements IAnimationSource
 {
