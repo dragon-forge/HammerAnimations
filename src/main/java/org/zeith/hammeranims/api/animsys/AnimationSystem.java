@@ -232,8 +232,8 @@ public class AnimationSystem
 		@Nonnull
 		protected final IAnimatedObject owner;
 		protected boolean canSync = true;
-		protected boolean autoSync = false;
-		protected boolean syncTime = true;
+		protected boolean autoSync = true;
+		protected boolean syncTime = false;
 		protected boolean defaultUseNanoTime = true;
 		protected final List<AnimationLayer.Builder> layers = new ArrayList<>();
 		

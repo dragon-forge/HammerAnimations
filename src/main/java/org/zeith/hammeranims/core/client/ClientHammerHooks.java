@@ -3,7 +3,6 @@ package org.zeith.hammeranims.core.client;
 import com.zeitheron.hammercore.utils.base.Cast;
 import com.zeitheron.hammercore.utils.java.tuples.*;
 import lombok.var;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Mod;
@@ -63,7 +62,7 @@ public class ClientHammerHooks
 		enqueueAction(source, timeout, sys -> sys.deserializeNBT(tag));
 	}
 	
-	public static void startAnimation(IObjectSource<?> source, int timeout, String layer, NBTTagCompound cfgAnim)
+	public static void startAnimation(IObjectSource<?> source, int timeout, String layer, ConfiguredAnimation cfgAnim)
 	{
 		if(layer == null || cfgAnim == null)
 		{
@@ -74,7 +73,7 @@ public class ClientHammerHooks
 		enqueueAction(source, timeout, sys ->
 				{
 					var l = sys.getLayer(layer);
-					if(l != null) l.startAnimationSync(new ConfiguredAnimation(cfgAnim), false);
+					if(l != null) l.startAnimationSync(cfgAnim, false);
 				}
 		);
 	}

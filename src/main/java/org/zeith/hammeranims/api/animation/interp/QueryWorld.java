@@ -37,13 +37,13 @@ public class QueryWorld
 	{
 		reg.accept("query.moon_brightness", () -> getMoonBrightness(world));
 		reg.accept("query.moon_phase", () -> getMoonPhase(world));
-		reg.accept("query.time_of_day", () -> timeOfDay(world.getWorldTime()));
+		reg.accept("query.time_of_day", () -> timeOfDay(world.getWorldTime(), q.partialTicks));
 		reg.accept("query.time_stamp", world::getTotalWorldTime);
 	}
 	
-	public static double timeOfDay(long pDayTime)
+	public static double timeOfDay(long pDayTime, float partialTicks)
 	{
-		return (pDayTime % 24000L) / 20D;
+		return (pDayTime % 24000L + partialTicks) / 20D;
 	}
 	
 	public static float getMoonBrightness(World world)

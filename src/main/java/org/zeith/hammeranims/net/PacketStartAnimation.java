@@ -18,7 +18,7 @@ public class PacketStartAnimation
 		implements IPacket
 {
 	protected String layer;
-	protected NBTTagCompound animation;
+	protected ConfiguredAnimation animation;
 	protected IObjectSource<?> source;
 	
 	public PacketStartAnimation()
@@ -29,18 +29,15 @@ public class PacketStartAnimation
 	{
 		this.layer = layer.name;
 		this.source = layer.system.getAnimationSource();
-		this.animation = animation.serializeNBT();
+		this.animation = animation;
 	}
 	
 	@Override
 	public void write(PacketBuffer buf)
 	{
 		buf.writeString(layer);
-		
-		val tag = new NBTTagCompound();
-		tag.setTag("src", IObjectSource.writeSource(source));
-		tag.setTag("anim", animation);
-		buf.writeCompoundTag(tag);
+		buf.writeCompoundTag(IObjectSource.writeSource(source));
+		animation.write(buf);
 	}
 	
 	@Override
@@ -52,8 +49,8 @@ public class PacketStartAnimation
 		var tag = buf.readCompoundTag();
 		assert tag != null;
 		
-		source = IObjectSource.readSource(tag.getCompoundTag("src")).orElse(null);
-		animation = tag.getCompoundTag("anim");
+		source = IObjectSource.readSource(tag).orElse(null);
+		animation = ConfiguredAnimation.read(buf);
 	}
 	
 	@Override

@@ -1,8 +1,9 @@
 package org.zeith.hammeranims.api.animsys;
 
 import com.zeitheron.hammercore.utils.base.Cast;
-import lombok.var;
+import lombok.*;
 import net.minecraft.nbt.*;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
@@ -18,6 +19,7 @@ import java.util.*;
 
 import static org.zeith.hammeranims.core.contents.time.LinearTimeFunction.FREEZE_SPEED;
 
+@ToString
 public class ConfiguredAnimation
 		implements ICompoundSerializable, IAnimationSource
 {
@@ -76,14 +78,14 @@ public class ConfiguredAnimation
 	public boolean same(ConfiguredAnimation other)
 	{
 		return this.speed == other.speed
-			   && this.weight == other.weight
-			   && this.loopMode == other.loopMode
-			   && this.startTime == other.startTime
-			   && this.transitionTime == other.transitionTime
-			   && this.timeFunction.equals(other.timeFunction)
-			   && Objects.equals(this.mask, other.mask)
-			   && this.reverse == other.reverse
-			   && this.animation == other.animation;
+				&& this.weight == other.weight
+				&& this.loopMode == other.loopMode
+				&& this.startTime == other.startTime
+				&& this.transitionTime == other.transitionTime
+				&& this.timeFunction.equals(other.timeFunction)
+				&& Objects.equals(this.mask, other.mask)
+				&& this.reverse == other.reverse
+				&& this.animation == other.animation;
 	}
 	
 	public void setAnimation(Animation animation)
@@ -227,6 +229,7 @@ public class ConfiguredAnimation
 		tag.setString("Animation", animation.getLocation().toString());
 		tag.setFloat("Weight", weight);
 		tag.setBoolean("Reverse", reverse);
+		tag.setBoolean("Important", important);
 		tag.setFloat("Speed", speed);
 		tag.setFloat("StartTime", startTime);
 		tag.setFloat("TransitionTime", transitionTime);
@@ -254,6 +257,7 @@ public class ConfiguredAnimation
 		this.setAnimation(new AnimationLocation(tag.getString("Animation")).resolve().orElse(null));
 		this.weight = tag.getFloat("Weight");
 		this.reverse = tag.getBoolean("Reverse");
+		this.important = tag.getBoolean("Important");
 		this.speed = tag.getFloat("Speed");
 		this.startTime = tag.getFloat("StartTime");
 		this.transitionTime = tag.getFloat("TransitionTime");
@@ -269,5 +273,63 @@ public class ConfiguredAnimation
 			AnimationActionInstance a = AnimationActionInstance.of(onFinish.getCompoundTagAt(i));
 			if(a != null && !a.isEmpty()) this.onFinish.add(a);
 		}
+	}
+	
+	public final void write(PacketBuffer out)
+	{
+		out.writeCompoundTag(mask != null ? mask.serializeNBT() : null);
+		out.writeCompoundTag(timeFunction.serializeNBT());
+		out.writeString(animation.getLocation().toString());
+		out.writeFloat(weight);
+		out.writeBoolean(reverse);
+		out.writeBoolean(important);
+		out.writeFloat(speed);
+		out.writeFloat(startTime);
+		out.writeFloat(transitionTime);
+		out.writeByte(loopMode.ordinal());
+		
+		out.writeVarInt(onFinish.size());
+		for(AnimationActionInstance f : onFinish) out.writeCompoundTag(f.serializeNBT());
+		
+		if(next != null)
+		{
+			out.writeBoolean(true);
+			next.write(out);
+		} else out.writeBoolean(false);
+	}
+	
+	private static final LoopMode[] LOOP_MODES = LoopMode.values();
+	
+	@SneakyThrows
+	public static ConfiguredAnimation read(PacketBuffer in)
+	{
+		var maskTag = in.readCompoundTag();
+		var mask = maskTag != null ? new SerializableMask(maskTag) : null;
+		var time = TimeFunctionInstance.of(Objects.requireNonNull(in.readCompoundTag(), "network->ConfiguredAnimation.time"));
+		var anim = new AnimationLocation(in.readString(2048)).resolve().orElse(DefaultsHA.NULL_ANIMATION_SYNTETIC);
+		ConfiguredAnimation ca = new ConfiguredAnimation(anim);
+		ca.mask = mask;
+		ca.timeFunction = time;
+		
+		ca.weight = in.readFloat();
+		ca.reverse = in.readBoolean();
+		ca.important = in.readBoolean();
+		ca.speed = in.readFloat();
+		ca.startTime = in.readFloat();
+		ca.transitionTime = in.readFloat();
+		ca.loopMode = LOOP_MODES[in.readByte()];
+		
+		int finishActionCount = in.readVarInt();
+		for(int i = 0; i < finishActionCount; i++)
+		{
+			var tag = in.readCompoundTag();
+			var act = tag != null ? AnimationActionInstance.of(tag) : null;
+			if(act != null && !act.isEmpty()) ca.onFinish.add(act);
+		}
+		
+		if(in.readBoolean())
+			ca.next = read(in);
+		
+		return ca;
 	}
 }
