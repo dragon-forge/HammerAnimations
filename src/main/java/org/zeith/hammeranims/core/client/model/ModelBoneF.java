@@ -162,6 +162,12 @@ public class ModelBoneF
 		this.defaultVertexType = defaultVertexType;
 	}
 	
+	@Override
+	public void setForcedVertexType(VertexType forceVertexType)
+	{
+		this.forceVertexType = forceVertexType;
+	}
+	
 	public void renderCubes(PoseStack.Pose matrixEntryIn, IVertexRenderer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
 	{
 		if(renderCubes)
