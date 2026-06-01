@@ -347,7 +347,7 @@ public class AnimationLayer
 		protected boolean allowAutoSync = true;
 		protected boolean persistent = true;
 		protected Boolean useNanoTime;
-		protected Query query = new Query();
+		protected Query query;
 		protected ILayerMask mask = ILayerMask.TRUE;
 		protected BlendMode blendMode = BlendMode.ADD;
 		protected float defaultTransitionTime = 0.25F;
