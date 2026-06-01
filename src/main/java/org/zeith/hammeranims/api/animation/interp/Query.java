@@ -15,8 +15,7 @@ public class Query
 {
 	public double anim_time;
 	public double anim_length;
-	
-	protected float partialTicks;
+	public float partialTicks;
 	
 	public Query()
 	{

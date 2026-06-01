@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.api.animation.interp;
 
 import com.zeitheron.hammercore.lib.zlib.utils.Vec2D;
+import dev.zeith.lzvm.molang.compiler.libs.MoMathLibrary;
 import dev.zeith.lzvm.op.ReadonlyLzVarOp;
 import lombok.Getter;
 import net.minecraft.entity.*;
@@ -58,13 +59,12 @@ public class QueryEntity
 		reg.accept("query.is_in_lava", ofBool(entity::isInLava));
 		reg.accept("query.is_in_water", ofBool(entity::isInWater));
 		reg.accept("query.is_on_ground", ofBool(() -> entity.onGround));
-//		reg.accept("query.invulnerable_ticks", () -> entity.invulnerableTime == 0 ? 0 : entity.invulnerableTime - partialTicks);
 		reg.accept("query.is_onfire", ofBool(entity::isBurning));
 		reg.accept("query.has_gravity", ofBool(() -> !entity.hasNoGravity()));
-//		reg.accept("query.walk_distance", () -> MoMathLibrary.lerp(entity.walkDistO, entity.walkDist, partialTicks));
+		reg.accept("query.walk_distance", () -> MoMathLibrary.lerp(entity.prevDistanceWalkedModified, entity.distanceWalkedModified, q.partialTicks));
 		reg.accept("query.has_collision", ofBool(() -> !entity.noClip));
-//		reg.accept("query.has_rider", ofBool(entity::isVehicle));
-//		reg.accept("query.is_riding", ofBool(entity::isPassenger));
+		reg.accept("query.has_rider", ofBool(() -> !entity.getPassengers().isEmpty()));
+		reg.accept("query.is_riding", ofBool(entity::isRiding));
 		reg.accept("query.is_invisible", ofBool(entity::isInvisible));
 		reg.accept("query.is_silent", ofBool(entity::isSilent));
 		reg.accept("query.is_sneaking", ofBool(entity::isSneaking));
@@ -96,6 +96,7 @@ public class QueryEntity
 		if(entity instanceof EntityLivingBase)
 		{
 			EntityLivingBase le = (EntityLivingBase) entity;
+			reg.accept("query.invulnerable_ticks", () -> le.hurtTime == 0 ? 0 : le.hurtTime - q.partialTicks);
 			reg.accept("query.body_x_rotation", () -> 0);
 //			reg.accept("query.body_y_rotation", () -> MoMathLibrary.lerp(le.yBodyRotO, le.yBodyRot, partialTicks));
 //			reg.accept("query.blocking", ofBool(le::isBlocking));
