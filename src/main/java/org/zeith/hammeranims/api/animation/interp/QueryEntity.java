@@ -21,8 +21,7 @@ import static dev.zeith.lzvm.op.ReadonlyLzVarOp.ofBool;
 public class QueryEntity
 		extends QueryWorld
 {
-	@Getter
-	protected Entity entity;
+	protected @Getter Entity entity;
 	
 	public QueryEntity()
 	{

@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.api.animation.interp;
 
 import dev.zeith.lzvm.op.ReadonlyLzVarOp;
+import lombok.Getter;
 import net.minecraft.world.level.Level;
 
 import java.util.function.BiConsumer;
@@ -8,8 +9,7 @@ import java.util.function.BiConsumer;
 public class QueryWorld
 		extends Query
 {
-	protected boolean registered = false;
-	protected Level world;
+	protected @Getter Level world;
 	
 	public QueryWorld()
 	{
