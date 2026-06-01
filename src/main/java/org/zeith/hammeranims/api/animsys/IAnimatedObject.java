@@ -1,17 +1,14 @@
 package org.zeith.hammeranims.api.animsys;
 
 import com.zeitheron.hammercore.utils.math.MathHelper;
-import dev.zeith.lzvm.op.ReadonlyLzVarOp;
 import lombok.val;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.util.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
-import org.zeith.hammeranims.api.animation.data.effects.AnimatedSoundEffect;
+import org.zeith.hammeranims.api.animation.data.effects.*;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
@@ -19,8 +16,6 @@ import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.joml.*;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
-
-import java.util.function.BiConsumer;
 
 public interface IAnimatedObject
 {
@@ -65,10 +60,6 @@ public interface IAnimatedObject
 	World getAnimatedObjectWorld();
 	
 	Vec3d getAnimatedObjectPosition();
-	
-	default void registerQueryProperties(BiConsumer<String, ReadonlyLzVarOp> reg)
-	{
-	}
 	
 	default Query createQuery()
 	{
