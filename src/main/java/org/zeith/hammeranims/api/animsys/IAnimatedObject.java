@@ -8,15 +8,14 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.animation.data.effects.AnimatedParticleEffect;
-import org.zeith.hammeranims.api.animation.data.effects.AnimatedSoundEffect;
+import org.zeith.hammeranims.api.animation.data.effects.*;
 import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
-import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 
 public interface IAnimatedObject
@@ -70,24 +69,43 @@ public interface IAnimatedObject
 	
 	default IGeometryContainer getObjectModel()
 	{
-		return DefaultsHA.NULL_GEOMETRY;
+		return getAnimationSystem().getGeometry();
 	}
 	
-	default Matrix4d getAnimatedLocatorMatrix(String locator, float partialTicks)
+	default float getBaseAnimatedYRot(float partialTicks)
+	{
+		return 0F;
+	}
+	
+	@Nullable
+	default Matrix4d getBaseAnimatedMatrix(float partialTicks)
 	{
 		val pos = getAnimatedObjectPosition();
 		if(pos == null) return null;
-		val mat = new Matrix4d()
+		return new Matrix4d()
 				.identity()
 				.translate(pos.x + 0.5F, pos.y, pos.z + 0.5F)
-				.rotateY((float) (Mth.DEG_TO_RAD * 0));
-		if(locator == null || locator.isEmpty())
-			return mat;
+				.rotateY(Mth.DEG_TO_RAD * getBaseAnimatedYRot(partialTicks));
+	}
+	
+	@Nullable
+	default Matrix4d getAnimatedLocatorMatrix(String locator, float partialTicks)
+	{
+		val mat = getBaseAnimatedMatrix(partialTicks);
+		if(mat == null || locator == null || locator.isEmpty()) return mat;
 		IPositionalModel posMod = getObjectModel().getPositionalModel();
 		posMod.applySystem(partialTicks, getAnimationSystem());
-		if(posMod.applyLocatorTransforms(mat, locator))
-			return mat;
-		return null;
+		return posMod.applyLocatorTransforms(mat, locator) ? mat : null;
+	}
+	
+	@Nullable
+	default Matrix4d getAnimatedBoneMatrix(String bone, float partialTicks)
+	{
+		val mat = getBaseAnimatedMatrix(partialTicks);
+		if(mat == null || bone == null || bone.isEmpty()) return mat;
+		IPositionalModel posMod = getObjectModel().getPositionalModel();
+		posMod.applySystem(partialTicks, getAnimationSystem());
+		return posMod.applyBoneTransforms(mat, bone) ? mat : null;
 	}
 	
 	default Vec3 getAnimatedLocatorPosition(String locator, float partialTicks)

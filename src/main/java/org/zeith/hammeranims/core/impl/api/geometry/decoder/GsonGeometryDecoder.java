@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.*;
 import lombok.val;
@@ -127,8 +128,8 @@ public class GsonGeometryDecoder
 		Vector3f rotation = GsonHelper.getAsVec3f(bone, "rotation", new Vector3f(0, 0, 0));
 		boolean mirror = GsonHelper.getAsBoolean(bone, "mirror", false);
 		boolean neverRender = GsonHelper.getAsBoolean(bone, "neverRender", false);
-		String name = GsonHelper.getAsString(bone, "name");
-		String parentName = GsonHelper.getAsString(bone, "parent", "root");
+		String name = GsonHelper.getAsString(bone, "name").toLowerCase(Locale.ROOT);
+		String parentName = MoreObjects.firstNonNull(GsonHelper.getAsString(bone, "parent", "root"), "root").toLowerCase(Locale.ROOT);
 		VertexType boneVertexType = VertexType.byId(GsonHelper.getAsString(bone, "render_type", ""), VertexType.DEFAULT);
 		
 		List<ModelPartInfo> children = new ArrayList<>();

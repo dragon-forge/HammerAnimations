@@ -14,7 +14,6 @@ import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 import org.zeith.hammeranims.api.animsys.CommonLayerNames;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
-import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.init.ContainersHA;
 
@@ -71,16 +70,10 @@ public class EntityBilly
 	@Override
 	public void setupSystem(AnimationSystem.Builder builder)
 	{
-		builder.addLayers(
+		builder.autoSync().geometry(ContainersHA.BILLY_GEOM).addLayers(
 				AnimationLayer.builder(CommonLayerNames.AMBIENT),
 				AnimationLayer.builder(CommonLayerNames.LEGS)
 		);
-	}
-	
-	@Override
-	public IGeometryContainer getObjectModel()
-	{
-		return ContainersHA.BILLY_GEOM;
 	}
 	
 	@Override
