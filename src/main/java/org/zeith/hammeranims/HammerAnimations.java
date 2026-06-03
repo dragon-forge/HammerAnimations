@@ -1,6 +1,7 @@
 package org.zeith.hammeranims;
 
 import com.zeitheron.hammercore.HammerCore;
+import com.zeitheron.hammercore.utils.CommonMessages;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.*;
@@ -35,6 +36,9 @@ public class HammerAnimations
 	
 	public HammerAnimations()
 	{
+		CommonMessages.checkModSource(HammerAnimations.class,
+				LOG, "HammerAnimations", "https://www.curseforge.com/minecraft/mc-mods/hammer-animations"
+		);
 		AnimationDecoder.init();
 		GeometryDecoder.init();
 		ParticleDecoder.init();
@@ -45,9 +49,9 @@ public class HammerAnimations
 	{
 		LOG.warn("*****************************");
 		LOG.warn("WARNING: Somebody has been tampering with " + HammerAnimations.MOD_NAME + " jar!");
-		LOG.warn("It is highly recommended that you redownload mod from https://www.curseforge.com/projects/@CF_ID@ !");
+		LOG.warn("It is highly recommended that you redownload mod from https://www.curseforge.com/minecraft/mc-mods/hammer-animations !");
 		LOG.warn("*****************************");
-		HammerCore.invalidCertificates.put(HammerAnimations.MOD_ID, "https://www.curseforge.com/projects/@CF_ID@");
+		HammerCore.invalidCertificates.put(HammerAnimations.MOD_ID, "https://www.curseforge.com/minecraft/mc-mods/hammer-animations");
 	}
 	
 	@Mod.EventHandler

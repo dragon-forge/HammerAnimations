@@ -13,7 +13,7 @@ import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
 import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
 import org.zeith.hammeranims.api.geometry.model.*;
-import org.zeith.hammeranims.core.client.render.IVertexRenderer;
+import org.zeith.hammeranims.core.client.render.*;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.utils.PoseStack;
 
@@ -141,17 +141,6 @@ public class GeometricModelImpl
 		}
 	}
 	
-	public static final VertexFormat POSITION_TEX_LMAP_COLOR_NORMAL = new VertexFormat();
-	
-	static
-	{
-		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(POSITION_3F);
-		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(TEX_2F);
-		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(TEX_2S); // lightmap
-		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(COLOR_4UB);
-		POSITION_TEX_LMAP_COLOR_NORMAL.addElement(NORMAL_3B);
-	}
-	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void renderModel(RenderData data)
@@ -160,7 +149,7 @@ public class GeometricModelImpl
 		
 		IVertexRenderer renderer = data.renderer;
 		renderer.bind(data);
-		renderer.begin(GL11.GL_QUADS, POSITION_TEX_LMAP_COLOR);
+		renderer.begin(GL11.GL_QUADS, IVertexEmitter.FULL);
 		root.render(pose,
 				renderer,
 				data.combinedLightIn, data.combinedOverlayIn,

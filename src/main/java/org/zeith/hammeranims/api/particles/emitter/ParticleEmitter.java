@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
@@ -447,7 +446,7 @@ public class ParticleEmitter
 			
 			IVertexRenderer renderer = ClientProxy.SHARED_TESS_RENDERER.get();
 			
-			renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
+			renderer.begin(GL11.GL_QUADS, IVertexEmitter.POSITION_TEX_LMAP_COLOR);
 			UtilsFX.bindTexture(this.effect.texture);
 			this.renderParticles(renderer, renders, false, partialTicks);
 			renderer.upload();
@@ -457,7 +456,7 @@ public class ParticleEmitter
 			/* rendering the collided particles with an extra component */
 			if(collisionAppearance != null && collisionAppearance.texture != null)
 			{
-				renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
+				renderer.begin(GL11.GL_QUADS, IVertexEmitter.POSITION_TEX_LMAP_COLOR);
 				UtilsFX.bindTexture(collisionAppearance.texture);
 				this.renderParticles(renderer, renders, true, partialTicks);
 				renderer.upload();

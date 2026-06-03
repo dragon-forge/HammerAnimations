@@ -113,6 +113,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     tcImplementation "org.zeith.HammerLib:HammerLib-${minecraft_version}:${hl_version}:deobf"
+    tcImplementation "org.zeith.ColoredLux:ColoredLux-${minecraft_version}:${lux_version}:deobf"
 
     if (hasConfig("viveapi_version")) {
         compileOnly "org.zeith.viveapi:VivecraftAPI-${minecraft_version}:${config.viveapi_version}:deobf"
@@ -243,6 +244,19 @@ task deobfJar(type: Jar) {
                 "Implementation-Timestamp"   : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+}
+
+tasks.register('signDeobfJar', SignJar) {
+    dependsOn deobfJar
+    onlyIf {
+        System.env.MC_KS_PASS != null
+    }
+    keyStore = System.env.MC_KS_PATH
+    alias = System.env.MC_KS_ALIAS
+    storePass = System.env.MC_KS_PASS
+    keyPass = System.env.MC_KS_PASS
+    inputFile = deobfJar.archivePath
+    outputFile = deobfJar.archivePath
 }
 
 task srcJar(type: Jar, dependsOn: classes) {
@@ -410,8 +424,6 @@ curseforge {
     }
 }
 
-build.dependsOn signJar
-
 tasks.register('copyDepsToRuntime') {
     doLast {
         def directories = []
@@ -436,16 +448,17 @@ tasks.register('copyDepsToRuntime') {
 
 tasks.register('buildAndUploadMod') {
     group = "upload"
-    dependsOn "curseforge${config.cf_project}", 'modrinth'
+    dependsOn "curseforge${config.cf_project}", 'modrinth', 'publish'
 
     doLast {
         println "Upload complete."
     }
 }
 
+tasks.jar.finalizedBy(signJar)
+tasks.deobfJar.finalizedBy(signDeobfJar)
+
 afterEvaluate {
-    tasks["curseforge${config.cf_project}"].dependsOn.add(signJar)
-    
     tasks['downloadAssets'].dependsOn.add('copyDepsToRuntime')
 
     tasks['downloadAssets'].dependsOn.add('fixupForgeJars')
@@ -457,17 +470,28 @@ afterEvaluate {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId = config.maven_group
-            artifactId = config.mod_id_fancy + "-" + minecraft_version
+            artifact(deobfJar) {
+                classifier null
+            }
 
-            artifact jar
             artifact srcJar
             artifact deobfJar
+
+            groupId = 'org.zeith.hammeranims'
+            artifactId = config.mod_id_fancy + "-" + minecraft_version
+
+            pom.withXml {
+                def root = asNode()
+
+                root.dependencies?.each {
+                    root.remove(it)
+                }
+            }
         }
     }
     repositories {
         maven {
-            url config.maven_url
+            url System.env.MAVEN_URL
         }
     }
 }

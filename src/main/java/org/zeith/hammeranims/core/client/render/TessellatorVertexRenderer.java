@@ -2,7 +2,6 @@ package org.zeith.hammeranims.core.client.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.Entity;
 import org.zeith.hammeranims.core.client.render.vertex.*;
 
@@ -12,6 +11,7 @@ public class TessellatorVertexRenderer
 	protected final Tessellator tess;
 	protected final BufferBuilder buffer;
 	protected final BufferBuilder translucencyBuffer;
+	protected IVertexEmitter emitter;
 	
 	protected boolean hasTranslucency;
 	
@@ -23,9 +23,10 @@ public class TessellatorVertexRenderer
 	}
 	
 	@Override
-	public void begin(int glMode, VertexFormat format)
+	public void begin(int glMode, IVertexEmitter format)
 	{
-		buffer.begin(glMode, format);
+		buffer.begin(glMode, format.getFormat());
+		this.emitter = format;
 		hasTranslucency = false;
 	}
 	
@@ -42,7 +43,7 @@ public class TessellatorVertexRenderer
 		
 		BufferBuilder bb = hasTranslucency ? translucencyBuffer : buffer;
 		for(RenderVertex v : vertex)
-			drawVertex(bb, v);
+			emitter.emit(bb, v);
 	}
 	
 	@Override
@@ -69,18 +70,5 @@ public class TessellatorVertexRenderer
 		buffer.begin(glMode, translucencyState.getVertexFormat());
 		buffer.setVertexState(translucencyState);
 		tess.draw();
-	}
-	
-	public static void drawVertex(BufferBuilder bb, RenderVertex rv)
-	{
-		int packedLight = rv.packedLight;
-		int k3 = packedLight >> 16 & 65535;
-		int l3 = packedLight & 65535;
-		bb.pos(rv.x, rv.y, rv.z)
-//				.normal(rv.nx, rv.ny, rv.nz)
-		  .tex(rv.u, rv.v)
-		  .lightmap(k3, l3)
-		  .color(rv.red, rv.green, rv.blue, rv.alpha)
-		  .endVertex();
 	}
 }
