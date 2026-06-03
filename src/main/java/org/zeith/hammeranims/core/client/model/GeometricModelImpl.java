@@ -58,12 +58,13 @@ public class GeometricModelImpl
 	@Override
 	public IRenderableBone getBone(String bone)
 	{
-		return bones.get(bone);
+		return bones.get(bone.toLowerCase(Locale.ROOT));
 	}
 	
+	@Override
 	public boolean hasBone(String bone)
 	{
-		return bones.containsKey(bone);
+		return bones.containsKey(bone.toLowerCase(Locale.ROOT));
 	}
 	
 	@Override

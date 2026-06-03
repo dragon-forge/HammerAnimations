@@ -1,7 +1,6 @@
 package org.zeith.hammeranims.core.contents.entity;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -14,7 +13,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
-import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.init.ContainersHA;
 
@@ -71,16 +69,10 @@ public class EntityBilly
 	@Override
 	public void setupSystem(AnimationSystem.Builder builder)
 	{
-		builder.addLayers(
+		builder.autoSync().geometry(ContainersHA.BILLY_GEOM).addLayers(
 				AnimationLayer.builder(CommonLayerNames.AMBIENT),
 				AnimationLayer.builder(CommonLayerNames.LEGS)
 		);
-	}
-	
-	@Override
-	public IGeometryContainer getObjectModel()
-	{
-		return ContainersHA.BILLY_GEOM;
 	}
 	
 	@Override
