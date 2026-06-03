@@ -8,6 +8,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.MathHelper;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 
 import java.util.function.BiConsumer;
@@ -93,6 +94,8 @@ public class QueryEntity
 //		reg.accept("query.rider_head_x_rotation", () -> entity.getFirstPassenger() instanceof LivingEntity le ? le.getViewXRot(partialTicks) : 0);
 //		reg.accept("query.rider_head_y_rotation", () -> entity.getFirstPassenger() instanceof LivingEntity le ? le.getViewXRot(partialTicks) : 0);
 		
+		reg.accept("query.head_x_rotation", () -> entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * q.partialTicks);
+		
 		if(entity instanceof EntityLivingBase)
 		{
 			EntityLivingBase le = (EntityLivingBase) entity;
@@ -112,8 +115,7 @@ public class QueryEntity
 //			reg.accept("query.scale", le::getScale);
 			reg.accept("query.item_remaining_use_duration", () -> Math.max(0, (le.getItemInUseMaxCount() - le.getItemInUseCount()) - q.partialTicks) / 20.0);
 //			reg.accept("query.sleep_rotation", () -> le.getBedOrientation() != null ? (double) le.getBedOrientation().toYRot() : 0.0);
-//			reg.accept("query.head_x_rotation", () -> le.getViewXRot(partialTicks));
-//			reg.accept("query.head_y_rotation", () -> le.getViewYRot(partialTicks));
+			reg.accept("query.head_y_rotation", () -> getNetHeadYaw(le, q.partialTicks));
 		} else
 		{
 //			reg.accept("query.body_x_rotation", () -> entity.getViewXRot(partialTicks));
@@ -142,6 +144,37 @@ public class QueryEntity
 			EntityWolf n = (EntityWolf) entity;
 			reg.accept("query.is_angry", ofBool(n::isAngry));
 		}
+	}
+	
+	private static float getNetHeadYaw(EntityLivingBase entity, float partialTicks)
+	{
+		boolean shouldSit = entity.isRiding() && (entity.getRidingEntity() != null && entity.getRidingEntity().shouldRiderSit());
+		float f = interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks);
+		float f1 = interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
+		float netHeadYaw = f1 - f;
+		if(shouldSit && entity.getRidingEntity() instanceof EntityLivingBase)
+		{
+			EntityLivingBase entitylivingbase = (EntityLivingBase) entity.getRidingEntity();
+			f = interpolateRotation(entitylivingbase.prevRenderYawOffset, entitylivingbase.renderYawOffset, partialTicks);
+			netHeadYaw = f1 - f;
+			float f3 = MathHelper.wrapDegrees(netHeadYaw);
+			if(f3 < -85.0F) f3 = -85.0F;
+			if(f3 >= 85.0F) f3 = 85.0F;
+			f = f1 - f3;
+			if(f3 * f3 > 2500.0F) f += f3 * 0.2F;
+			netHeadYaw = f1 - f;
+		}
+		if(!entity.isRiding())
+			netHeadYaw = f1 - f; // Forge: Fix MC-1207
+		return netHeadYaw;
+	}
+	
+	public static float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks)
+	{
+		float f;
+		for(f = yawOffset - prevYawOffset; f < -180.0F; f += 360.0F) ;
+		while(f >= 180.0F) f -= 360.0F;
+		return prevYawOffset + partialTicks * f;
 	}
 	
 	private static EnumFacing getNearest(double x, double y, double z)

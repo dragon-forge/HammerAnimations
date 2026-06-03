@@ -5,14 +5,17 @@ import net.minecraft.entity.ai.*;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import org.zeith.hammeranims.core.init.ContainersHA;
+import org.zeith.hammeranims.joml.*;
 
 import javax.annotation.Nullable;
+import java.lang.Math;
 
 public class EntityBilly
 		extends EntityAnimal
@@ -85,9 +88,10 @@ public class EntityBilly
 	@Override
 	public void setupSystem(AnimationSystem.Builder builder)
 	{
-		builder.autoSync().addLayers(
-				new AnimationLayer.Builder(CommonLayerNames.AMBIENT),
-				new AnimationLayer.Builder(CommonLayerNames.LEGS)
+		builder.autoSync().geometry(ContainersHA.BILLY_GEOM).addLayers(
+				AnimationLayer.builder(CommonLayerNames.HEAD_LOOK),
+				AnimationLayer.builder(CommonLayerNames.AMBIENT),
+				AnimationLayer.builder(CommonLayerNames.LEGS)
 		);
 	}
 	

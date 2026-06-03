@@ -1,9 +1,9 @@
 package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.*;
-import com.zeitheron.hammercore.utils.java.tuples.Tuple2;
-import com.zeitheron.hammercore.utils.java.tuples.Tuples;
+import com.zeitheron.hammercore.utils.java.tuples.*;
 import lombok.val;
 import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.HammerAnimations;
@@ -11,8 +11,7 @@ import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.utils.EmbeddedLocation;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
-import org.zeith.hammeranims.core.impl.api.geometry.constrains.BoneConstraintsImpl;
-import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
+import org.zeith.hammeranims.core.impl.api.geometry.constrains.*;
 import org.zeith.hammeranims.core.jomljson.*;
 import org.zeith.hammeranims.core.utils.GsonHelper;
 import org.zeith.hammeranims.joml.*;
@@ -105,8 +104,8 @@ public class GsonGeometryDecoder
 				} else
 				{
 					throw new JsonSyntaxException("Can't find parent '"
-												  + value.getParentName() + "' for bone '"
-												  + value.getName() + "'"
+							+ value.getParentName() + "' for bone '"
+							+ value.getName() + "'"
 					);
 				}
 			} else
@@ -132,8 +131,8 @@ public class GsonGeometryDecoder
 		Vector3f rotation = GsonHelper.getAsVec3f(bone, "rotation", new Vector3f(0, 0, 0));
 		boolean mirror = GsonHelper.getAsBoolean(bone, "mirror", false);
 		boolean neverRender = GsonHelper.getAsBoolean(bone, "neverRender", false);
-		String name = GsonHelper.getAsString(bone, "name");
-		String parentName = GsonHelper.getAsString(bone, "parent", "root");
+		String name = GsonHelper.getAsString(bone, "name").toLowerCase(Locale.ROOT);
+		String parentName = MoreObjects.firstNonNull(GsonHelper.getAsString(bone, "parent", "root"), "root").toLowerCase(Locale.ROOT);
 		VertexType boneVertexType = VertexType.byId(GsonHelper.getAsString(bone, "render_type", ""));
 		
 		List<ModelPartInfo> children = new ArrayList<>();

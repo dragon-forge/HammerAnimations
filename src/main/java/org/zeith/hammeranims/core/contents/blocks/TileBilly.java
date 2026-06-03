@@ -11,7 +11,6 @@ import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.annotation.ExposedToAnimAction;
-import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.tile.IAnimatedTile;
 import org.zeith.hammeranims.core.contents.actions.MethodAnimAction;
@@ -29,13 +28,13 @@ public class TileBilly
 	@Override
 	public void setupSystem(AnimationSystem.Builder builder)
 	{
-		builder.addLayers(AnimationLayer.builder(CommonLayerNames.LEGS)
-						.mask(
-								ContainersHA.BILLY_GEOM.getPositionalModel()
-										.maskAnyOfOrChildren("body")
-						)
+		builder.geometry(ContainersHA.BILLY_GEOM).addLayers(AnimationLayer
+				.builder(CommonLayerNames.LEGS)
+				.mask(ContainersHA.BILLY_GEOM
+						.getPositionalModel()
+						.maskAnyOfOrChildren("body")
 				)
-				.addLayers(AnimationLayer.builder(CommonLayerNames.AMBIENT));
+		).addLayers(AnimationLayer.builder(CommonLayerNames.AMBIENT));
 	}
 	
 	protected final Matrix4f mat = new Matrix4f();
@@ -74,12 +73,11 @@ public class TileBilly
 //			animations.startAnimationAt(CommonLayerNames.LEGS, ConfiguredAnimation.noAnimation()
 //					.transitionTime(1F));
 		
-		animations.startAnimationAt(CommonLayerNames.AMBIENT, ContainersHA.BILLY_BREATHE.configure()
-				.speed(0.5F));
+		animations.startAnimationAt(CommonLayerNames.AMBIENT, ContainersHA.BILLY_BREATHE.configure().speed(0.5F));
 		
 		mat.identity()
-				.translate(pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F)
-				.rotateY((float) (MathHelper.torad * 0));
+		   .translate(pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F)
+		   .rotateY((float) (MathHelper.torad * 0));
 		IPositionalModel posMod = ContainersHA.BILLY_GEOM.getPositionalModel();
 		posMod.applySystem(1F, animations);
 		if(posMod.applyLocatorTransforms(mat, "particle"))
@@ -94,12 +92,6 @@ public class TileBilly
 			if(atTickRate(5))
 				world.spawnParticle(EnumParticleTypes.END_ROD, pos.x, pos.y, pos.z, move.x, move.y, move.z);
 		}
-	}
-	
-	@Override
-	public IGeometryContainer getObjectModel()
-	{
-		return ContainersHA.BILLY_GEOM;
 	}
 	
 	@Override

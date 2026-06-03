@@ -6,16 +6,17 @@ import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import org.jetbrains.annotations.*;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.net.*;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 
-import javax.annotation.*;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
@@ -26,7 +27,7 @@ import static org.zeith.hammeranims.core.utils.InstanceHelpers.*;
 public class AnimationSystem
 		implements ICompoundSerializable
 {
-	@Nonnull
+	@NotNull
 	public final IAnimatedObject owner;
 	
 	protected boolean hasTicked = false;
@@ -42,7 +43,12 @@ public class AnimationSystem
 	protected final AnimationLayer[] layers;
 	protected final Map<String, AnimationLayer> layerMap;
 	
-	public AnimationSystem(@Nonnull IAnimatedObject owner, AnimationLayer[] layers, Map<String, AnimationLayer> layerMap)
+	@Setter
+	@Getter
+	@Nullable
+	protected IGeometryContainer geometry;
+	
+	public AnimationSystem(@NotNull IAnimatedObject owner, AnimationLayer[] layers, Map<String, AnimationLayer> layerMap)
 	{
 		this.owner = owner;
 		this.layers = layers;
@@ -222,22 +228,23 @@ public class AnimationSystem
 		return builder.build();
 	}
 	
-	public static Builder builder(@Nonnull IAnimatedObject owner)
+	public static Builder builder(@NotNull IAnimatedObject owner)
 	{
 		return new Builder(Objects.requireNonNull(owner));
 	}
 	
 	public static class Builder
 	{
-		@Nonnull
+		@NotNull
 		protected final IAnimatedObject owner;
 		protected boolean canSync = true;
 		protected boolean autoSync = true;
 		protected boolean syncTime = false;
 		protected boolean defaultUseNanoTime = true;
 		protected final List<AnimationLayer.Builder> layers = new ArrayList<>();
+		protected IGeometryContainer geometry = DefaultsHA.NULL_GEOMETRY;
 		
-		public Builder(@Nonnull IAnimatedObject owner)
+		public Builder(@NotNull IAnimatedObject owner)
 		{
 			this.owner = owner;
 		}
@@ -257,12 +264,19 @@ public class AnimationSystem
 		public Builder disableSync()
 		{
 			canSync = false;
+			autoSync = false;
 			return this;
 		}
 		
 		public Builder autoSync()
 		{
 			autoSync = true;
+			return this;
+		}
+		
+		public Builder canSync(boolean canSync)
+		{
+			this.canSync = canSync;
 			return this;
 		}
 		
@@ -285,6 +299,12 @@ public class AnimationSystem
 			return this;
 		}
 		
+		public Builder geometry(IGeometryContainer geometry)
+		{
+			this.geometry = geometry;
+			return this;
+		}
+		
 		public AnimationSystem build()
 		{
 			Query q = owner.createQuery();
@@ -296,6 +316,7 @@ public class AnimationSystem
 			sys.autoSync = autoSync;
 			sys.syncTime = syncTime;
 			sys.defaultUseNanoTime = defaultUseNanoTime;
+			sys.geometry = geometry;
 			
 			for(int i = 0; i < layers.length; i++)
 			{

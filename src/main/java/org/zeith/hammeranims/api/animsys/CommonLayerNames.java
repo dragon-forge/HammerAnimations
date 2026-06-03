@@ -5,6 +5,7 @@ public class CommonLayerNames
 	public static final String LEGS = "legs";
 	public static final String HANDS = "hands";
 	public static final String HEAD = "head";
+	public static final String HEAD_LOOK = "head_look";
 	public static final String AMBIENT = "ambient";
 	public static final String ACTION = "action";
 	public static final String EMOTION = "emotion";
