@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 import org.zeith.hammeranims.api.animation.AnimationLocation;
 import org.zeith.hammeranims.api.animation.IAnimationSource;
 import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.GeometryPose;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 
@@ -19,6 +21,7 @@ import java.util.stream.Stream;
 
 public class AnimationSystem
 {
+	@NotNull
 	public final IAnimatedObject owner;
 	
 	protected boolean hasTicked = false;
@@ -32,6 +35,11 @@ public class AnimationSystem
 	@Getter
 	protected final AnimationLayer[] layers;
 	protected final Map<String, AnimationLayer> layerMap;
+	
+	@Setter
+	@Getter
+	@Nullable
+	protected IGeometryContainer geometry;
 	
 	public AnimationSystem(@NotNull IAnimatedObject owner, AnimationLayer[] layers, Map<String, AnimationLayer> layerMap)
 	{
@@ -150,6 +158,7 @@ public class AnimationSystem
 		protected boolean autoSync = false;
 		protected boolean syncTime = true;
 		protected final List<AnimationLayer.Builder> layers = new ArrayList<>();
+		protected IGeometryContainer geometry = DefaultsHA.NULL_GEOMETRY;
 		
 		public Builder(@NotNull IAnimatedObject owner)
 		{
@@ -171,12 +180,19 @@ public class AnimationSystem
 		public Builder disableSync()
 		{
 			canSync = false;
+			autoSync = false;
 			return this;
 		}
 		
 		public Builder autoSync()
 		{
 			autoSync = true;
+			return this;
+		}
+		
+		public Builder canSync(boolean canSync)
+		{
+			this.canSync = canSync;
 			return this;
 		}
 		
@@ -189,6 +205,12 @@ public class AnimationSystem
 		public Builder autoSync(boolean autoSync)
 		{
 			this.autoSync = autoSync;
+			return this;
+		}
+		
+		public Builder geometry(IGeometryContainer geometry)
+		{
+			this.geometry = geometry;
 			return this;
 		}
 		
