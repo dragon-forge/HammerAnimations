@@ -83,7 +83,7 @@ public interface IAnimatedObject
 		val pos = getAnimatedObjectPosition();
 		if(pos == null) return null;
 		return new Matrix4d()
-				.translate(pos.x + 0.5F, pos.y, pos.z + 0.5F)
+				.translate(pos.x, pos.y, pos.z)
 				.rotateY(getBaseAnimatedYRot(partialTicks) * (float) MathHelper.torad);
 	}
 	

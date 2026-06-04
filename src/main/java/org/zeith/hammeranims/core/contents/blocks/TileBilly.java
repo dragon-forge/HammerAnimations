@@ -1,7 +1,6 @@
 package org.zeith.hammeranims.core.contents.blocks;
 
 import com.zeitheron.hammercore.tile.TileSyncableTickable;
-import com.zeitheron.hammercore.utils.math.MathHelper;
 import lombok.val;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
@@ -11,7 +10,6 @@ import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.annotation.ExposedToAnimAction;
-import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.tile.IAnimatedTile;
 import org.zeith.hammeranims.core.contents.actions.MethodAnimAction;
 import org.zeith.hammeranims.core.init.*;
@@ -75,19 +73,16 @@ public class TileBilly
 		
 		animations.startAnimationAt(CommonLayerNames.AMBIENT, ContainersHA.BILLY_BREATHE.configure().speed(0.5F));
 		
-		mat.identity()
-		   .translate(pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F)
-		   .rotateY((float) (MathHelper.torad * 0));
-		IPositionalModel posMod = ContainersHA.BILLY_GEOM.getPositionalModel();
-		posMod.applySystem(1F, animations);
-		if(posMod.applyLocatorTransforms(mat, "particle"))
+		val mat = getAnimatedBoneMatrix("bob", 1F);
+		if(mat != null)
 		{
-			Vector3f pos = new Vector3f(0, 0, 0);
+			Vector3d pos = new Vector3d(-2 / 16F, 2 / 16F, 1 / 16F);
 			mat.transformPosition(pos);
 			
-			Vector3f move = new Vector3f(0, 1F / 16F, 0);
+			Vector3d move = new Vector3d(-2 / 16F, 2 / 16F, 2 / 16F);
 			mat.transformPosition(move);
-			move.sub(pos);
+			
+			move.sub(pos).normalize(0.1f);
 			
 			if(atTickRate(5))
 				world.spawnParticle(EnumParticleTypes.END_ROD, pos.x, pos.y, pos.z, move.x, move.y, move.z);

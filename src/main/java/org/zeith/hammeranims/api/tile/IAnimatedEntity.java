@@ -2,7 +2,7 @@ package org.zeith.hammeranims.api.tile;
 
 import com.zeitheron.hammercore.utils.base.Cast;
 import dev.zeith.lzvm.op.ReadonlyLzVarOp;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animation.interp.*;
@@ -58,5 +58,17 @@ public interface IAnimatedEntity
 	{
 		Entity tile = Cast.cast(this);
 		return new Vec3d(tile.posX, tile.posY, tile.posZ);
+	}
+	
+	@Override
+	default float getBaseAnimatedYRot(float partialTicks)
+	{
+		Entity entity = Cast.cast(this);
+		if(entity instanceof EntityLivingBase)
+		{
+			EntityLivingBase living = (EntityLivingBase) entity;
+			return 180F - QueryEntity.getBodyYaw(living, partialTicks);
+		}
+		return 180F - (entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks);
 	}
 }

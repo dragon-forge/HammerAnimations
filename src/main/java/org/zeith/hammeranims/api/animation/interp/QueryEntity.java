@@ -95,13 +95,13 @@ public class QueryEntity
 //		reg.accept("query.rider_head_y_rotation", () -> entity.getFirstPassenger() instanceof LivingEntity le ? le.getViewXRot(partialTicks) : 0);
 		
 		reg.accept("query.head_x_rotation", () -> entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * q.partialTicks);
+		reg.accept("query.body_x_rotation", () -> entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * q.partialTicks);
 		
 		if(entity instanceof EntityLivingBase)
 		{
 			EntityLivingBase le = (EntityLivingBase) entity;
 			reg.accept("query.invulnerable_ticks", () -> le.hurtTime == 0 ? 0 : le.hurtTime - q.partialTicks);
-			reg.accept("query.body_x_rotation", () -> 0);
-//			reg.accept("query.body_y_rotation", () -> MoMathLibrary.lerp(le.yBodyRotO, le.yBodyRot, partialTicks));
+			reg.accept("query.body_y_rotation", () -> getBodyYaw(le, q.partialTicks));
 //			reg.accept("query.blocking", ofBool(le::isBlocking));
 			reg.accept("query.health", le::getHealth);
 			reg.accept("query.death_ticks", () -> le.getHealth() <= 0.0F ? le.deathTime + q.partialTicks : 0);
@@ -115,7 +115,7 @@ public class QueryEntity
 //			reg.accept("query.scale", le::getScale);
 			reg.accept("query.item_remaining_use_duration", () -> Math.max(0, (le.getItemInUseMaxCount() - le.getItemInUseCount()) - q.partialTicks) / 20.0);
 //			reg.accept("query.sleep_rotation", () -> le.getBedOrientation() != null ? (double) le.getBedOrientation().toYRot() : 0.0);
-			reg.accept("query.head_y_rotation", () -> getNetHeadYaw(le, q.partialTicks));
+			reg.accept("query.head_y_rotation", () -> getHeadYaw(le, q.partialTicks));
 		} else
 		{
 //			reg.accept("query.body_x_rotation", () -> entity.getViewXRot(partialTicks));
@@ -146,27 +146,27 @@ public class QueryEntity
 		}
 	}
 	
-	private static float getNetHeadYaw(EntityLivingBase entity, float partialTicks)
+	public static float getHeadYaw(EntityLivingBase entity, float partialTicks)
+	{
+		return interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
+	}
+	
+	public static float getBodyYaw(EntityLivingBase entity, float partialTicks)
 	{
 		boolean shouldSit = entity.isRiding() && (entity.getRidingEntity() != null && entity.getRidingEntity().shouldRiderSit());
 		float f = interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks);
 		float f1 = interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
-		float netHeadYaw = f1 - f;
 		if(shouldSit && entity.getRidingEntity() instanceof EntityLivingBase)
 		{
 			EntityLivingBase entitylivingbase = (EntityLivingBase) entity.getRidingEntity();
 			f = interpolateRotation(entitylivingbase.prevRenderYawOffset, entitylivingbase.renderYawOffset, partialTicks);
-			netHeadYaw = f1 - f;
-			float f3 = MathHelper.wrapDegrees(netHeadYaw);
+			float f3 = MathHelper.wrapDegrees(f1 - f);
 			if(f3 < -85.0F) f3 = -85.0F;
 			if(f3 >= 85.0F) f3 = 85.0F;
 			f = f1 - f3;
 			if(f3 * f3 > 2500.0F) f += f3 * 0.2F;
-			netHeadYaw = f1 - f;
 		}
-		if(!entity.isRiding())
-			netHeadYaw = f1 - f; // Forge: Fix MC-1207
-		return netHeadYaw;
+		return f;
 	}
 	
 	public static float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks)

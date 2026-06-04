@@ -2,7 +2,7 @@ package org.zeith.hammeranims.api.tile;
 
 import com.zeitheron.hammercore.utils.base.Cast;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
 import org.zeith.hammerlib.abstractions.sources.*;
@@ -28,6 +28,7 @@ public interface IAnimatedTile
 	default Vec3d getAnimatedObjectPosition()
 	{
 		TileEntity tile = Cast.cast(this);
-		return new Vec3d(tile.getPos());
+		BlockPos bp = tile.getPos();
+		return new Vec3d(bp.getX() + 0.5,  bp.getY(), bp.getZ() + 0.5);
 	}
 }

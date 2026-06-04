@@ -5,7 +5,7 @@
 			"loop": true,
 			"bones": {
 				"Head": {
-					"rotation": ["-query.head_x_rotation", "-query.head_y_rotation", 0]
+					"rotation": ["q.head_x_rotation", "q.head_y_rotation - q.body_y_rotation", 0]
 				}
 			}
 		}

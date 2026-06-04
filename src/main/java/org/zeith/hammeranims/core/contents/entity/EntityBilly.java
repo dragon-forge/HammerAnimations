@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.contents.entity;
 
+import lombok.val;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -11,11 +12,10 @@ import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
-import org.zeith.hammeranims.core.init.ContainersHA;
-import org.zeith.hammeranims.joml.*;
+import org.zeith.hammeranims.core.init.*;
+import org.zeith.hammeranims.joml.Vector3d;
 
 import javax.annotation.Nullable;
-import java.lang.Math;
 
 public class EntityBilly
 		extends EntityAnimal
@@ -64,6 +64,21 @@ public class EntityBilly
 		double prevPosZ = this.prevPosZ;
 		super.onEntityUpdate();
 		
+		val mat = getAnimatedBoneMatrix("bob", 1F);
+		if(mat != null)
+		{
+			Vector3d pos = new Vector3d(-2 / 16F, 2 / 16F, 1 / 16F);
+			mat.transformPosition(pos);
+			
+			Vector3d move = new Vector3d(-2 / 16F, 2 / 16F, 2 / 16F);
+			mat.transformPosition(move);
+			
+			move.sub(pos).normalize(0.1f);
+			
+			if(ticksExisted%5==0)
+				world.spawnParticle(EnumParticleTypes.END_ROD, pos.x, pos.y, pos.z, move.x, move.y, move.z);
+		}
+		
 		if(world.isRemote) return;
 		
 		setAlwaysRenderNameTag(false);
@@ -88,8 +103,7 @@ public class EntityBilly
 	@Override
 	public void setupSystem(AnimationSystem.Builder builder)
 	{
-		builder.autoSync().geometry(ContainersHA.BILLY_GEOM).addLayers(
-				AnimationLayer.builder(CommonLayerNames.HEAD_LOOK),
+		builder.autoSync().geometry(ContainersHA.BILLY_GEOM).addHeadLookLayer().addLayers(
 				AnimationLayer.builder(CommonLayerNames.AMBIENT),
 				AnimationLayer.builder(CommonLayerNames.LEGS)
 		);

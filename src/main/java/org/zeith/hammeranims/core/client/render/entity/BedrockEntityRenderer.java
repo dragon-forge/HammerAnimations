@@ -49,6 +49,6 @@ public abstract class BedrockEntityRenderer<T extends EntityLivingBase & IAnimat
 	
 	protected void addProcessors(BedrockModelWrapper<T> model)
 	{
-		model.addProcessor(new HeadLookProcessor<>("head"));
+//		model.addProcessor(new HeadLookProcessor<>("head"));
 	}
 }
