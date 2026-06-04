@@ -14,7 +14,6 @@ import org.zeith.hammeranims.api.animation.interp.*;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.particles.emitter.IParticleRotationUpdater;
-import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.joml.*;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 
@@ -107,6 +106,7 @@ public interface IAnimatedObject
 		return posMod.applyBoneTransforms(mat, bone) ? mat : null;
 	}
 	
+	@Nullable
 	default Vec3d getAnimatedLocatorPosition(String locator, float partialTicks)
 	{
 		val mat = getAnimatedLocatorMatrix(locator, partialTicks);
