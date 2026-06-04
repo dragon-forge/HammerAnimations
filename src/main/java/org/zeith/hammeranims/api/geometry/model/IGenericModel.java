@@ -14,7 +14,8 @@ public interface IGenericModel
 	 */
 	default ILayerMask maskAnyOfOrChildren(String... rootBones)
 	{
-		List<String> expanded = new ArrayList<>(Arrays.asList(rootBones));
+		List<String> expanded = new ArrayList<>(rootBones.length);
+		for(String rb : rootBones) expanded.add(rb.toLowerCase(Locale.ROOT));
 		for(int i = 0; i < expanded.size(); i++)
 		{
 			IBone b = getBone(expanded.get(i));

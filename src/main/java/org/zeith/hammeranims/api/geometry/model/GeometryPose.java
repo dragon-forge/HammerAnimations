@@ -101,6 +101,7 @@ public class GeometryPose
 	
 	public GeometryTransforms getTransform(String bone)
 	{
+		bone = bone.toLowerCase(Locale.ROOT);
 		if(!availableBones.test(bone)) return null;
 		return boneTransforms.computeIfAbsent(bone, TRANSFORM_FACTORY);
 	}
