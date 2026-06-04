@@ -143,7 +143,7 @@ public class PositionalModelImpl
 	@Override
 	public boolean applyBoneTransforms(@Nonnull Matrix4f base, String bone)
 	{
-		List<PositionalBone> tree = parentTree.get(bone);
+		List<PositionalBone> tree = parentTree.get(bone.toLowerCase(Locale.ROOT));
 		if(tree == null || tree.isEmpty()) return false;
 		
 		for(PositionalBone f : tree)
@@ -157,7 +157,7 @@ public class PositionalModelImpl
 	@Override
 	public boolean applyBoneTransforms(@Nonnull Matrix4d base, String bone)
 	{
-		List<PositionalBone> tree = parentTree.get(bone);
+		List<PositionalBone> tree = parentTree.get(bone.toLowerCase(Locale.ROOT));
 		if(tree == null || tree.isEmpty()) return false;
 		
 		for(PositionalBone f : tree)
@@ -171,6 +171,7 @@ public class PositionalModelImpl
 	@Override
 	public boolean applyLocatorTransforms(@NotNull Matrix4f base, String locator)
 	{
+		locator = locator.toLowerCase(Locale.ROOT);
 		val bone = locatorSources.get(locator);
 		if(bone == null) return false;
 		GeometryLocator loc = bone.getLocators().get(locator);
@@ -190,6 +191,7 @@ public class PositionalModelImpl
 	@Override
 	public boolean applyLocatorTransforms(@NotNull Matrix4d base, String locator)
 	{
+		locator = locator.toLowerCase(Locale.ROOT);
 		val bone = locatorSources.get(locator);
 		if(bone == null) return false;
 		GeometryLocator loc = bone.getLocators().get(locator);
