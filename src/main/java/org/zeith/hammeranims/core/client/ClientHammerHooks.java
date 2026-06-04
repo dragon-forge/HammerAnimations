@@ -21,6 +21,7 @@ public class ClientHammerHooks
 {
 	private static final List<Tuple3.Mutable3<IObjectSource<?>, Consumer<AnimationSystem>, Integer>> QUEUED_ACTIONS = new ArrayList<>();
 	
+	public static boolean LOG_TIMEOUTS = false;
 	public static int DEFAULT_TIMEOUT = 100;
 	
 	@SubscribeEvent
@@ -41,7 +42,7 @@ public class ClientHammerHooks
 			src.setC(ticksAwaiting - 1);
 			if(ticksAwaiting <= 0)
 			{
-				HammerAnimations.LOG.warn("Animation action for {} has timed out.", src.a());
+				if(LOG_TIMEOUTS) HammerAnimations.LOG.warn("Animation action for {} has timed out.", src.a());
 				return true;
 			}
 			return applyAnimationSystem(w, src.a(), src.b());

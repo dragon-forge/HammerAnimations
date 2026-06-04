@@ -135,6 +135,8 @@ public class PositionalModelImpl
 					(float) scale.y,
 					(float) scale.z
 			);
+			
+			bone.renderCubes = !add.skipGeometry;
 		}
 	}
 	
@@ -221,6 +223,8 @@ public class PositionalModelImpl
 		public float offsetX;
 		public float offsetY;
 		public float offsetZ;
+		
+		public boolean renderCubes = true;
 		
 		public PositionalBone(String name, Vector3f startRotRadians, Map<String, PositionalBone> children, Map<String, GeometryLocator> locators)
 		{

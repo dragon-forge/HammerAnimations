@@ -138,6 +138,9 @@ public class GeometricModelImpl
 					(float) scale.y,
 					(float) scale.z
 			);
+			
+			if(add.forceVertexType != null) bone.forceVertexType = add.forceVertexType;
+			bone.renderCubes = !add.skipGeometry;
 		}
 	}
 	

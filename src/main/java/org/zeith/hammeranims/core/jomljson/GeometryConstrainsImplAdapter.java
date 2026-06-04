@@ -5,7 +5,7 @@ import com.google.gson.*;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.*;
 
 import java.lang.reflect.Type;
-import java.util.Map;
+import java.util.*;
 
 public class GeometryConstrainsImplAdapter
 		implements JsonDeserializer<GeometryConstrainsImpl>, JsonSerializer<GeometryConstrainsImpl>
@@ -17,7 +17,7 @@ public class GeometryConstrainsImplAdapter
 		JsonObject object = json.getAsJsonObject();
 		ImmutableMap.Builder<String, BoneConstraintsImpl> builder = ImmutableMap.builder();
 		for(Map.Entry<String, JsonElement> e : object.entrySet())
-			builder.put(e.getKey(), context.deserialize(e.getValue(), BoneConstraintsImpl.class));
+			builder.put(e.getKey().toLowerCase(Locale.ROOT), context.deserialize(e.getValue(), BoneConstraintsImpl.class));
 		return new GeometryConstrainsImpl(builder.build());
 	}
 	

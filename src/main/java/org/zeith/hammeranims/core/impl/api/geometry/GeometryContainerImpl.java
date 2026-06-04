@@ -58,7 +58,7 @@ public class GeometryContainerImpl
 				return evt.getDecoded();
 			} catch(Exception e)
 			{
-				HammerAnimations.LOG.error("Failed to load geometry " + key + ", skipping.", e);
+				HammerAnimations.LOG.error("Failed to load geometry {}, skipping.", key, e);
 				return null;
 			}
 		});
@@ -90,7 +90,7 @@ public class GeometryContainerImpl
 		{
 			ImmutableMap.Builder<String, BoneConstraintsImpl> bones = ImmutableMap.builder();
 			for(String bone : geometry.getBones())
-				bones.put(bone, new BoneConstraintsImpl());
+				bones.put(bone.toLowerCase(Locale.ROOT), new BoneConstraintsImpl());
 			constraints = new GeometryConstrainsImpl(bones.build());
 		}
 		

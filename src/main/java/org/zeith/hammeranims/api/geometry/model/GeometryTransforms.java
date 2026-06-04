@@ -1,10 +1,14 @@
 package org.zeith.hammeranims.api.geometry.model;
 
+import lombok.*;
 import net.minecraft.util.math.Vec3d;
 import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 
 import static net.minecraft.util.math.Vec3d.ZERO;
 
+@With
+@AllArgsConstructor
 public class GeometryTransforms
 {
 	public static final Vec3d ONE = new Vec3d(1, 1, 1);
@@ -12,6 +16,8 @@ public class GeometryTransforms
 	public Vec3d translation;
 	public Vec3d rotation; // (in degrees)
 	public Vec3d scale;
+	public boolean skipGeometry;
+	public VertexType forceVertexType;
 	
 	public GeometryTransforms(Vec3d translation, Vec3d rotation, Vec3d scale)
 	{
@@ -50,14 +56,14 @@ public class GeometryTransforms
 			double z = Math.max(constraints.getMinScaleZ(), Math.min(constraints.getMaxScaleZ(), scale.z));
 			scale = new Vec3d(x, y, z);
 		}
+		
+		// If the scale is zero or so, we don't need to render it
+		if(!skipGeometry)
+			skipGeometry = scale.length() < 1.0E-10;
 	}
 	
 	public GeometryTransforms copy()
 	{
-		return new GeometryTransforms(
-				translation,
-				rotation,
-				scale
-		);
+		return withTranslation(translation.add(ZERO));
 	}
 }
