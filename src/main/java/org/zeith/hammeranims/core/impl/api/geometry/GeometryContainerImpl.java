@@ -92,7 +92,7 @@ public class GeometryContainerImpl
 		{
 			ImmutableMap.Builder<String, BoneConstraintsImpl> bones = ImmutableMap.builder();
 			for(String bone : geometry.getBones())
-				bones.put(bone, new BoneConstraintsImpl());
+				bones.put(bone.toLowerCase(Locale.ROOT), new BoneConstraintsImpl());
 			constraints = new GeometryConstrainsImpl(bones.build());
 		}
 		
