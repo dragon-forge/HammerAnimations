@@ -87,6 +87,7 @@ public interface IAnimatedObject
 		return posMod.applyBoneTransforms(mat, bone) ? mat : null;
 	}
 	
+	@Nullable
 	default Vec3d getAnimatedLocatorPosition(String locator, float partialTicks)
 	{
 		val mat = getAnimatedLocatorMatrix(locator, partialTicks);
