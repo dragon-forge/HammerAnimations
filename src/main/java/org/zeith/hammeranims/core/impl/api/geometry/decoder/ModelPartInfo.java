@@ -17,6 +17,7 @@ import java.util.*;
 
 public class ModelPartInfo
 {
+	public static final String ROOT_BONE_NAME = "__model_root__";
 	private final List<ModelCubeInfo> cubes;
 	private final @Getter List<ModelLocatorInfo> locators;
 	private final @Getter List<ModelPartInfo> children = new ArrayList<>();
@@ -39,7 +40,7 @@ public class ModelPartInfo
 	
 	public static ModelPartInfo makeRoot()
 	{
-		return new ModelPartInfo(ImmutableList.of(), ImmutableList.of(), new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), false, "root", null);
+		return new ModelPartInfo(ImmutableList.of(), ImmutableList.of(), new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), false, ROOT_BONE_NAME, null);
 	}
 	
 	public void addChild(ModelPartInfo child)
