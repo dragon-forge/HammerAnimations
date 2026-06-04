@@ -84,8 +84,8 @@ public interface IAnimatedObject
 		if(pos == null) return null;
 		return new Matrix4d()
 				.identity()
-				.translate(pos.x + 0.5F, pos.y, pos.z + 0.5F)
-				.rotateY(Mth.DEG_TO_RAD * getBaseAnimatedYRot(partialTicks));
+				.translate(pos.x, pos.y, pos.z)
+				.rotateY(getBaseAnimatedYRot(partialTicks) * Mth.DEG_TO_RAD);
 	}
 	
 	@Nullable

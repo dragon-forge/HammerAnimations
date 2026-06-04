@@ -93,6 +93,6 @@ public abstract class BedrockEntityRenderer<T extends LivingEntity & IAnimatedEn
 	
 	protected void addProcessors(BedrockModelWrapper<T> model)
 	{
-		model.addProcessor(new HeadLookProcessor<>("head"));
+//		model.addProcessor(new HeadLookProcessor<>("head"));
 	}
 }

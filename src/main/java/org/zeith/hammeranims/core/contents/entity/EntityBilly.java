@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.core.contents.entity;
 
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -11,11 +12,12 @@ import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import org.joml.Vector3d;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 import org.zeith.hammeranims.api.animsys.CommonLayerNames;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
-import org.zeith.hammeranims.core.init.ContainersHA;
+import org.zeith.hammeranims.core.init.*;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class EntityBilly
@@ -46,6 +48,21 @@ public class EntityBilly
 		animations.tick();
 		super.tick();
 		
+		var mat = getAnimatedBoneMatrix("bob", 1F);
+		if(mat != null)
+		{
+			Vector3d pos = new Vector3d(-2 / 16F, 2 / 16F, 1 / 16F);
+			mat.transformPosition(pos);
+			
+			Vector3d move = new Vector3d(-2 / 16F, 2 / 16F, 2 / 16F);
+			mat.transformPosition(move);
+			
+			move.sub(pos).normalize(0.1f);
+			
+			if(tickCount % 5 == 0)
+				level().addParticle(ParticleTypes.END_ROD, pos.x, pos.y, pos.z, move.x, move.y, move.z);
+		}
+		
 		if(level().isClientSide) return;
 		
 		setCustomNameVisible(false);
@@ -70,7 +87,7 @@ public class EntityBilly
 	@Override
 	public void setupSystem(AnimationSystem.Builder builder)
 	{
-		builder.autoSync().geometry(ContainersHA.BILLY_GEOM).addLayers(
+		builder.autoSync().geometry(ContainersHA.BILLY_GEOM).addHeadLookLayer().addLayers(
 				AnimationLayer.builder(CommonLayerNames.AMBIENT),
 				AnimationLayer.builder(CommonLayerNames.LEGS)
 		);

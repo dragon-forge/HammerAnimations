@@ -4,6 +4,7 @@ import dev.zeith.lzvm.molang.compiler.libs.MoMathLibrary;
 import dev.zeith.lzvm.op.ReadonlyLzVarOp;
 import lombok.Getter;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.navigation.*;
 import net.minecraft.world.entity.animal.Animal;
@@ -14,6 +15,7 @@ import org.zeith.hammeranims.api.tile.IAnimatedEntity;
 import java.util.function.BiConsumer;
 
 import static dev.zeith.lzvm.op.ReadonlyLzVarOp.ofBool;
+import static net.minecraft.client.renderer.entity.LivingEntityRenderer.isEntityUpsideDown;
 
 /**
  * This is an extensible class (this gets passed to animation layers)
@@ -98,8 +100,8 @@ public class QueryEntity
 		if(entity instanceof LivingEntity)
 		{
 			LivingEntity le = (LivingEntity) entity;
-			reg.accept("query.body_x_rotation", () -> 0);
-			reg.accept("query.body_y_rotation", () -> MoMathLibrary.lerp(le.yBodyRotO, le.yBodyRot, q.partialTicks));
+			reg.accept("query.body_x_rotation", () -> entity.getViewXRot(q.partialTicks));
+			reg.accept("query.body_y_rotation", () -> getBodyYaw(le, q.partialTicks));
 			reg.accept("query.blocking", ofBool(le::isBlocking));
 			reg.accept("query.health", le::getHealth);
 			reg.accept("query.death_ticks", () -> le.isDeadOrDying() ? (le.deathTime + q.partialTicks) : 0);
@@ -113,8 +115,8 @@ public class QueryEntity
 			reg.accept("query.scale", le::getScale);
 			reg.accept("query.item_remaining_use_duration", () -> (le.getUseItemRemainingTicks() + q.partialTicks) / 20.0);
 			reg.accept("query.sleep_rotation", () -> le.getBedOrientation() != null ? (double) le.getBedOrientation().toYRot() : 0.0);
-			reg.accept("query.head_x_rotation", () -> le.getViewXRot(q.partialTicks));
-			reg.accept("query.head_y_rotation", () -> le.getViewYRot(q.partialTicks));
+			reg.accept("query.head_x_rotation", () -> Mth.lerp(q.partialTicks, le.xRotO, le.getXRot()) * (isEntityUpsideDown(le) ? -1F : 1F));
+			reg.accept("query.head_y_rotation", () -> getHeadYaw(le, q.partialTicks));
 		} else
 		{
 			reg.accept("query.body_x_rotation", () -> entity.getViewXRot(q.partialTicks));
@@ -143,6 +145,29 @@ public class QueryEntity
 			NeutralMob n = (NeutralMob) entity;
 			reg.accept("query.is_angry", ofBool(n::isAngry));
 		}
+	}
+	
+	public static float getHeadYaw(LivingEntity pEntity, float pPartialTicks)
+	{
+		return Mth.rotLerp(pPartialTicks, pEntity.yHeadRotO, pEntity.yHeadRot);
+	}
+	
+	public static float getBodyYaw(LivingEntity pEntity, float pPartialTicks)
+	{
+		boolean shouldSit = pEntity.isPassenger() && (pEntity.getVehicle() != null && pEntity.getVehicle().shouldRiderSit());
+		float f = Mth.rotLerp(pPartialTicks, pEntity.yBodyRotO, pEntity.yBodyRot);
+		float f1 = Mth.rotLerp(pPartialTicks, pEntity.yHeadRotO, pEntity.yHeadRot);
+		if(shouldSit && pEntity.getVehicle() instanceof LivingEntity le)
+		{
+			f = Mth.rotLerp(pPartialTicks, le.yBodyRotO, le.yBodyRot);
+			float f3 = Mth.wrapDegrees(f1 - f);
+			if(f3 < -85.0F) f3 = -85.0F;
+			if(f3 >= 85.0F) f3 = 85.0F;
+			f = f1 - f3;
+			if(f3 * f3 > 2500.0F)
+				f += f3 * 0.2F;
+		}
+		return f;
 	}
 	
 	private static Direction getNearest(Vec3 v)
