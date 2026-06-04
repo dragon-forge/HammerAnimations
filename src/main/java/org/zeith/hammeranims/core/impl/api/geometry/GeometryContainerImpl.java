@@ -78,7 +78,7 @@ public class GeometryContainerImpl
 		{
 			Map<String, BoneConstraintsImpl> bones = new HashMap<>();
 			for(String bone : geometry.getBones())
-				bones.put(bone, new BoneConstraintsImpl());
+				bones.put(bone.toLowerCase(Locale.ROOT), new BoneConstraintsImpl());
 			constraints = new GeometryConstrainsImpl(Collections.unmodifiableMap(bones));
 		}
 		

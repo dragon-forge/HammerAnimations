@@ -53,7 +53,8 @@ public interface ILayerMask
 	
 	static ILayerMask anyOf(String... bones)
 	{
-		List<String> boneList = Arrays.asList(bones);
+		for(int i = 0; i < bones.length; i++) bones[i] = bones[i].toLowerCase(Locale.ROOT);
+		Set<String> boneList = new HashSet<>(Arrays.asList(bones));
 		return boneList::contains;
 	}
 	

@@ -3,7 +3,7 @@ package org.zeith.hammeranims.core.impl.api.geometry.constrains;
 import org.zeith.hammeranims.standalone.utils.Cast;
 import org.zeith.hammeranims.api.geometry.constrains.*;
 
-import java.util.Map;
+import java.util.*;
 
 public class GeometryConstrainsImpl
 		implements IGeometryConstraints
@@ -18,7 +18,7 @@ public class GeometryConstrainsImpl
 	@Override
 	public IBoneConstraints getConstraints(String bone)
 	{
-		return Cast.or(bones.get(bone), IBoneConstraints.NONE);
+		return Cast.or(bones.get(bone.toLowerCase(Locale.ROOT)), IBoneConstraints.NONE);
 	}
 	
 	public Map<String, BoneConstraintsImpl> getBones()
