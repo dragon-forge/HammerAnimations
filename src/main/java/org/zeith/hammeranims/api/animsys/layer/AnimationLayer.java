@@ -350,10 +350,22 @@ public class AnimationLayer
 		protected ILayerMask mask = ILayerMask.TRUE;
 		protected BlendMode blendMode = BlendMode.ADD;
 		protected float defaultTransitionTime = 0.25F;
+		protected ConfiguredAnimation initialAnimation;
 		
 		public Builder(String name)
 		{
 			this.name = name;
+		}
+		
+		public Builder initialAnimation(IAnimationSource initialAnimation)
+		{
+			return initialAnimation(initialAnimation.configure());
+		}
+		
+		public Builder initialAnimation(ConfiguredAnimation initialAnimation)
+		{
+			this.initialAnimation = new ConfiguredAnimation(initialAnimation).transitionTime(0F);
+			return this;
 		}
 		
 		public Builder defaultQuery(Query query)
@@ -430,6 +442,7 @@ public class AnimationLayer
 			layer.weight = weight;
 			layer.defaultTransitionTime = defaultTransitionTime;
 			layer.useNanoTime = useNanoTime != null ? useNanoTime : sys.isDefaultUseNanoTime();
+			if(initialAnimation != null) layer.currentAnimation = new ActiveAnimation(initialAnimation, query);
 			return layer;
 		}
 	}

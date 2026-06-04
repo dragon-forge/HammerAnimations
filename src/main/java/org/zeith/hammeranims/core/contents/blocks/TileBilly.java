@@ -3,7 +3,6 @@ package org.zeith.hammeranims.core.contents.blocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,7 +12,6 @@ import org.zeith.hammeranims.api.animation.LoopMode;
 import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.annotation.ExposedToAnimAction;
-import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.api.tile.IAnimatedTile;
 import org.zeith.hammeranims.core.contents.actions.MethodAnimAction;
 import org.zeith.hammeranims.core.init.*;
@@ -85,23 +83,19 @@ public class TileBilly
 		
 		animations.startAnimationAt(CommonLayerNames.AMBIENT, ContainersHA.BILLY_BREATHE.configure().speed(0.5F));
 		
-		mat.identity()
-		   .translate(worldPosition.getX() + 0.5F, worldPosition.getY(), worldPosition.getZ() + 0.5F)
-		   .rotateY((float) (Mth.DEG_TO_RAD * 0));
-		IPositionalModel posMod = ContainersHA.BILLY_GEOM.getPositionalModel();
-		posMod.applySystem(1F, animations);
-		if(posMod.applyBoneTransforms(mat, "bob"))
+		var mat = getAnimatedBoneMatrix("bob", 1F);
+		if(mat != null)
 		{
-			Vector3f relativePos = new Vector3f(-2 / 16F, 2 / 16F, 1 / 16F);
-			mat.transformPosition(relativePos);
+			Vector3d pos = new Vector3d(-2 / 16F, 2 / 16F, 1 / 16F);
+			mat.transformPosition(pos);
 			
-			Vector3f relativePosUp = new Vector3f(-2 / 16F, 2 / 16F, 2 / 16F);
-			mat.transformPosition(relativePosUp);
+			Vector3d move = new Vector3d(-2 / 16F, 2 / 16F, 2 / 16F);
+			mat.transformPosition(move);
 			
-			relativePosUp.sub(relativePos).normalize(0.1f);
+			move.sub(pos).normalize(0.1f);
 			
 			if(atTickRate(5))
-				level.addParticle(ParticleTypes.END_ROD, relativePos.x, relativePos.y, relativePos.z, relativePosUp.x, relativePosUp.y, relativePosUp.z);
+				level.addParticle(ParticleTypes.END_ROD, pos.x, pos.y, pos.z, move.x, move.y, move.z);
 		}
 	}
 	

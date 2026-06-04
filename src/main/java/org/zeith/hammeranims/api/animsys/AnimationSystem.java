@@ -254,6 +254,11 @@ public class AnimationSystem
 			this.owner = owner;
 		}
 		
+		public Builder addHeadLookLayer()
+		{
+			return addLayers(AnimationLayer.builder(CommonLayerNames.HEAD_LOOK).initialAnimation(DefaultsHA.HEAD_LOOK));
+		}
+		
 		public Builder addLayers(AnimationLayer.Builder... layers)
 		{
 			this.layers.addAll(Arrays.asList(layers));

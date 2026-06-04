@@ -18,6 +18,9 @@ public interface DefaultsHA
 	@RegistryName("null")
 	IGeometryContainer NULL_GEOMETRY = IGeometryContainer.create();
 	
+	@RegistryName("head_look")
+	IAnimationContainer HEAD_LOOK = IAnimationContainer.create();
+	
 	@RegistryName("linear")
 	TimeFunction LINEAR_TIME = new LinearTimeFunction();
 	

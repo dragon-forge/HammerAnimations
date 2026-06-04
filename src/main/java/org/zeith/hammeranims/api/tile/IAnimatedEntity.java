@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.tile;
 
 import dev.zeith.lzvm.op.ReadonlyLzVarOp;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.zeith.hammeranims.api.animation.interp.*;
@@ -58,5 +58,14 @@ public interface IAnimatedEntity
 	{
 		Entity tile = Cast.cast(this);
 		return tile.position();
+	}
+	
+	@Override
+	default float getBaseAnimatedYRot(float partialTicks)
+	{
+		Entity entity = Cast.cast(this);
+		if(entity instanceof LivingEntity le)
+			return 180F - QueryEntity.getBodyYaw(le, partialTicks);
+		return 180F - entity.getViewYRot(partialTicks);
 	}
 }
