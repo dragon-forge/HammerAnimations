@@ -1,0 +1,13 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"head": {
+			"loop": true,
+			"bones": {
+				"Head": {
+					"rotation": ["q.head_x_rotation", "q.head_y_rotation - q.body_y_rotation", 0]
+				}
+			}
+		}
+	}
+}

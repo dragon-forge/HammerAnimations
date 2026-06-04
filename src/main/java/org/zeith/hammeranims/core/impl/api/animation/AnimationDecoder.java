@@ -61,7 +61,7 @@ public class AnimationDecoder
 				loc.warn("Unable to parse bone {}, skipping.", boneKey);
 				continue;
 			}
-			bones.put(boneKey, parse);
+			bones.put(boneKey.toLowerCase(Locale.ROOT), parse);
 		}
 		
 		final LoopMode mode = modeRaw;

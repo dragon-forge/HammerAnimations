@@ -63,9 +63,8 @@ public interface IAnimatedObject
 		val pos = getAnimatedObjectPosition();
 		if(pos == null) return null;
 		return new Matrix4d()
-				.identity()
-				.translate(pos.x + 0.5F, pos.y, pos.z + 0.5F)
-				.rotateY(MathHelper.TO_RAD_F * getBaseAnimatedYRot(partialTicks));
+				.translate(pos.x, pos.y, pos.z)
+				.rotateY(getBaseAnimatedYRot(partialTicks) * MathHelper.TO_RAD_F);
 	}
 	
 	@Nullable
