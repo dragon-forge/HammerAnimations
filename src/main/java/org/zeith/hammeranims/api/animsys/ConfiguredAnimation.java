@@ -196,7 +196,7 @@ public class ConfiguredAnimation
 	public ConfiguredAnimation next(ConfiguredAnimation next)
 	{
 		this.next = next;
-		return this;
+		return loopMode(LoopMode.ONCE);
 	}
 	
 	@Override
