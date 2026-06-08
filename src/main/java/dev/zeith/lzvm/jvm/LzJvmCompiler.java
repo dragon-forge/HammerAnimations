@@ -1,8 +1,10 @@
 package dev.zeith.lzvm.jvm;
 
+import dev.zeith.lzvm.api.JzRuntimeProvider;
 import dev.zeith.lzvm.exception.*;
 import dev.zeith.lzvm.op.LzOpcodes;
 import dev.zeith.lzvm.program.*;
+import lombok.*;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.*;
 
@@ -13,6 +15,7 @@ import java.util.function.*;
 import static org.objectweb.asm.Opcodes.*;
 
 public class LzJvmCompiler
+		implements JzRuntimeProvider<LzJvmCompiler>
 {
 	public static final String LzExpression = dev.zeith.lzvm.jvm.LzExpression.class.getName().replace('.', '/');
 	public static final String LzVariableStore = dev.zeith.lzvm.LzVariableStore.class.getName().replace('.', '/');
@@ -28,18 +31,27 @@ public class LzJvmCompiler
 	public static final String L_LzCallOp = "L" + LzCallOp + ";";
 	public static final String L_LzGenerated = "L" + LzGenerated + ";";
 	
-	private LzJCallShutter jcallShutter = LzJCallShutter.ALLOW_EVERYTHING;
-	public boolean generatedAnnotation = false;
+	@Getter
+	@Setter
+	protected LzJCallShutter jCallShutter = LzJCallShutter.ALLOW_EVERYTHING;
 	
-	public LzJvmCompiler addJCallShutter(LzJCallShutter shutter)
+	@Getter
+	@Setter
+	protected boolean generatedAnnotation = false;
+	
+	@Getter
+	@Setter
+	protected boolean useSineLookupTable = true;
+	
+	@Getter
+	@Setter
+	protected IClassDefiner classDefiner;
+	
+	@Override
+	public LzFactory expression(LzProgramBody body)
 	{
-		if(jcallShutter == LzJCallShutter.ALLOW_EVERYTHING)
-		{
-			jcallShutter = shutter;
-			return this;
-		}
-		jcallShutter = jcallShutter.or(shutter);
-		return this;
+		if(classDefiner == null) classDefiner = new LzJVM.LzClassLoader();
+		return LzJVM.compile(this, body, 0, classDefiner);
 	}
 	
 	public byte[] compile(String name, LzProgramBody body, int argCount)
@@ -246,7 +258,7 @@ public class LzJvmCompiler
 					String owner = body.sConstTable[code[++i]];
 					LzCallInsn call = body.callTable[code[++i]];
 					
-					if(jcallShutter != LzJCallShutter.ALLOW_EVERYTHING && !jcallShutter.permits(owner.replace('/', '.'), call))
+					if(jCallShutter != LzJCallShutter.ALLOW_EVERYTHING && !jCallShutter.permits(owner.replace('/', '.'), call))
 						throw new LzVMCallNotFoundException(LzOpcodes.opNameIndexed(i, op) + ": jcall to " + owner + " was not allowed by the compilers jcall shutter.");
 					
 					insn.add(mCall(
@@ -380,14 +392,20 @@ public class LzJvmCompiler
 				case LzOpcodes.FSIN:
 				{
 					tryPop(i, op, stack, ArgType.DOUBLE);
-					insn.add(mCall(INVOKESTATIC, LzFMath, "sind", "(D)D"));
+					if(useSineLookupTable)
+						insn.add(mCall(INVOKESTATIC, LzFMath, "sind", "(D)D"));
+					else
+						insn.add(mCall(INVOKESTATIC, Math, "sin", "(D)D"));
 					stack.push(ArgType.DOUBLE);
 					break;
 				}
 				case LzOpcodes.FCOS:
 				{
 					tryPop(i, op, stack, ArgType.DOUBLE);
-					insn.add(mCall(INVOKESTATIC, LzFMath, "cosd", "(D)D"));
+					if(useSineLookupTable)
+						insn.add(mCall(INVOKESTATIC, LzFMath, "cosd", "(D)D"));
+					else
+						insn.add(mCall(INVOKESTATIC, Math, "cos", "(D)D"));
 					stack.push(ArgType.DOUBLE);
 					break;
 				}
@@ -493,7 +511,7 @@ public class LzJvmCompiler
 					insn.add(new FieldInsnNode(GETFIELD, cn.name, varHolder.name, varHolder.desc));
 					insn.add(mCall(
 							INVOKESTATIC,
-							LzFMath,
+							LzVarOp,
 							"get",
 							"(D" + L_LzVarOp + ")D"
 					));

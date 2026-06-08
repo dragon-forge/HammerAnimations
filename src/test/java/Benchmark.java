@@ -4,7 +4,7 @@ import dev.zeith.lzvm.molang.compiler.MoLangCompiler;
 import dev.zeith.lzvm.op.*;
 import net.minecraft.util.Mth;
 import org.openjdk.nashorn.api.scripting.*;
-import org.zeith.hammeranims.api.animation.interp.BaseQuery;
+import org.zeith.hammeranims.api.animation.interp.*;
 
 import javax.script.ScriptException;
 import java.time.*;
@@ -128,7 +128,7 @@ public class Benchmark
 		@Override
 		public LzVarOp findVar(String name)
 		{
-			return vars.computeIfAbsent(name, l -> new BaseQuery.ReadWriteVariable());
+			return vars.computeIfAbsent(name, l -> new ReadWriteVariable());
 		}
 		
 		@Override

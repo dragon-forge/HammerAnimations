@@ -1,5 +1,6 @@
 package dev.zeith.lzvm.molang.compiler;
 
+import dev.zeith.lzvm.api.LzCompiler;
 import dev.zeith.lzvm.jvm.*;
 import dev.zeith.lzvm.molang.compiler.libs.*;
 import dev.zeith.lzvm.molang.expression.*;
@@ -7,11 +8,12 @@ import dev.zeith.lzvm.molang.parser.MoParser;
 import dev.zeith.lzvm.molang.tokenizer.Tokenizer;
 import dev.zeith.lzvm.op.LzOpcodes;
 import dev.zeith.lzvm.program.*;
+import org.jetbrains.annotations.*;
 
 import java.util.*;
 import java.util.function.Function;
 
-public class MoLangCompiler
+public class MoLangCompiler implements LzCompiler
 {
 	protected final Map<String, Function<NameExpression, MLExpression>> nameTransformers = new HashMap<>();
 	protected final Map<LzCallInsn, IMoFunctionCallTransformer> callTransformers = new HashMap<>();
@@ -44,6 +46,7 @@ public class MoLangCompiler
 		return LzCallInsn.ofDbl(name, ArgType.DOUBLE, ArgType.DOUBLE, ArgType.DOUBLE);
 	}
 	
+	@Override
 	public void includeRequiredClasses(Set<String> intoSet)
 	{
 		intoSet.addAll(this.requiredClasses);
@@ -91,6 +94,7 @@ public class MoLangCompiler
 		return nex;
 	}
 	
+	@Override
 	public LzFactory parseFactory(LzJvmCompiler compiler, String expression, IClassDefiner definer)
 	{
 		ArrayList<MLExpression> parsed = parse(expression);
@@ -103,6 +107,7 @@ public class MoLangCompiler
 		return LzJVM.compile(compiler, compile(parsed), 0, definer);
 	}
 	
+	@Override
 	public LzProgramBody parseAndCompile(String expression)
 	{
 		return compile(parse(expression));
@@ -132,5 +137,34 @@ public class MoLangCompiler
 			}
 		
 		return exprs;
+	}
+	
+	@Override
+	public void setOptimize(boolean optimize)
+	{
+		this.optimize = optimize;
+	}
+	
+	@Override
+	public @NotNull Set<String> getKnownOptions()
+	{
+		return Collections.emptySet();
+	}
+	
+	@Override
+	public @Nullable Set<String> getValidOptions(String optionName)
+	{
+		return null;
+	}
+	
+	@Override
+	public void setOption(String optionName, @Nullable String value)
+	{
+	}
+	
+	@Override
+	public @Nullable String getOption(String optionName)
+	{
+		return "";
 	}
 }

@@ -12,6 +12,12 @@ public interface ReadonlyLzVarOp
 		return () -> bool.getAsBoolean() ? 1 : 0;
 	}
 	
+	static ReadonlyLzVarOp ofBool(boolean bool)
+	{
+		final int i = bool ? 1 : 0;
+		return () -> i;
+	}
+	
 	@Override
 	default void set(double value)
 			throws LzVMOperationNotSupportedException

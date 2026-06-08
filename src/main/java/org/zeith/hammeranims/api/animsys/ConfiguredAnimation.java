@@ -23,7 +23,6 @@ import java.util.*;
 
 import static org.zeith.hammeranims.core.contents.time.LinearTimeFunction.FREEZE_SPEED;
 
-
 @ToString
 public class ConfiguredAnimation
 		implements ICompoundSerializable, IAnimationSource
@@ -83,14 +82,14 @@ public class ConfiguredAnimation
 	public boolean same(ConfiguredAnimation other)
 	{
 		return this.speed == other.speed
-			   && this.weight == other.weight
-			   && this.loopMode == other.loopMode
-			   && this.startTime == other.startTime
-			   && this.transitionTime == other.transitionTime
-			   && this.timeFunction.equals(other.timeFunction)
-			   && Objects.equals(this.mask, other.mask)
-			   && this.reverse == other.reverse
-			   && this.animation == other.animation;
+		       && this.weight == other.weight
+		       && this.loopMode == other.loopMode
+		       && this.startTime == other.startTime
+		       && this.transitionTime == other.transitionTime
+		       && this.timeFunction.equals(other.timeFunction)
+		       && Objects.equals(this.mask, other.mask)
+		       && this.reverse == other.reverse
+		       && this.animation == other.animation;
 	}
 	
 	public void setAnimation(Animation animation)
@@ -171,8 +170,7 @@ public class ConfiguredAnimation
 	
 	public ConfiguredAnimation timeFunction(TimeFunction timeFunction)
 	{
-		this.timeFunction = timeFunction.defaultInstance();
-		return this;
+		return timeFunction(timeFunction.defaultInstance());
 	}
 	
 	public ConfiguredAnimation timeFunction(TimeFunctionInstance timeFunction)
@@ -205,6 +203,7 @@ public class ConfiguredAnimation
 		return loopMode(LoopMode.ONCE);
 	}
 	
+	@Override
 	public AnimationLocation getLocation()
 	{
 		return animation != null ? animation.getLocation() : null;
@@ -218,7 +217,7 @@ public class ConfiguredAnimation
 	
 	public ActiveAnimation activate(AnimationLayer layer, Query query)
 	{
-		ActiveAnimation aa = new ActiveAnimation(this, query);
+		ActiveAnimation aa = new ActiveAnimation(layer, this, query);
 		aa.activationTime = layer.startTime;
 		return aa;
 	}
@@ -276,7 +275,7 @@ public class ConfiguredAnimation
 		for(int i = 0; i < onFinish.size(); i++)
 		{
 			AnimationActionInstance a = AnimationActionInstance.of(provider, onFinish.getCompound(i));
-			if(a != null && !a.isEmpty()) this.onFinish.add(a);
+			if(!a.isEmpty()) this.onFinish.add(a);
 		}
 	}
 	
@@ -285,7 +284,7 @@ public class ConfiguredAnimation
 		RegistryAccess reg = out.registryAccess();
 		out.writeNbt(mask != null ? mask.serializeNBT(reg) : null);
 		out.writeNbt(timeFunction.serializeNBT(reg));
-		out.writeUtf(animation.getLocation().toString(), 2048);
+		out.writeUtf(animation.getLocation().toString());
 		out.writeFloat(weight);
 		out.writeBoolean(reverse);
 		out.writeBoolean(important);

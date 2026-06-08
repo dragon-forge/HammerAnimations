@@ -17,9 +17,7 @@ import static org.zeith.hammeranims.api.HammerAnimationsApi.APPROX_ZERO;
 public class SerializableMask
 		implements ICompoundSerializable
 {
-	@Singular
 	protected Set<String> excludes = new HashSet<>();
-	
 	protected Object2FloatMap<String> boneWeights = null;
 	
 	@Builder
@@ -59,14 +57,13 @@ public class SerializableMask
 	{
 		excludes.clear();
 		var excludeNBT = nbt.getList("Excludes", Tag.TAG_STRING);
-		for(int i = 0; i < excludeNBT.size(); i++) excludes.add(excludeNBT.getString(i));
+		for(int i = 0; i < excludeNBT.size(); i++) excludes.add(excludeNBT.getString(i).toLowerCase(Locale.ROOT));
 		
 		if(nbt.contains("Weights", Tag.TAG_COMPOUND))
 		{
 			var weightNBT = nbt.getCompound("Weights");
 			boneWeights = new Object2FloatOpenHashMap<>();
-			for(String key : weightNBT.getAllKeys())
-				boneWeights.put(key, weightNBT.getFloat(key));
+			for(String key : weightNBT.getAllKeys()) boneWeights.put(key.toLowerCase(Locale.ROOT), weightNBT.getFloat(key));
 		}
 	}
 	
@@ -111,7 +108,25 @@ public class SerializableMask
 		public SerializableMaskBuilder boneWeight(String bone, float weight)
 		{
 			if(Math.abs(weight) < APPROX_ZERO) return exclude(bone);
-			boneWeights().put(bone, weight);
+			boneWeights().put(bone.toLowerCase(Locale.ROOT), weight);
+			return this;
+		}
+		
+		public SerializableMaskBuilder boneWeights(Object2FloatMap<String> weightMap)
+		{
+			if(weightMap == null || weightMap.isEmpty()) return this;
+			Object2FloatMap<String> bw = boneWeights();
+			for(Object2FloatMap.Entry<String> e : weightMap.object2FloatEntrySet())
+			{
+				String bone = e.getKey().toLowerCase(Locale.ROOT);
+				float weight = e.getFloatValue();
+				if(Math.abs(weight) < APPROX_ZERO)
+				{
+					exclude(bone);
+					continue;
+				}
+				bw.put(bone, weight);
+			}
 			return this;
 		}
 		
@@ -119,6 +134,11 @@ public class SerializableMask
 		{
 			if(this.boneWeights != null) return this.boneWeights;
 			return this.boneWeights = new Object2FloatOpenHashMap<>();
+		}
+		
+		private SerializableMaskBuilder excludes(Set<String> excludes)
+		{
+			return this;
 		}
 	}
 }

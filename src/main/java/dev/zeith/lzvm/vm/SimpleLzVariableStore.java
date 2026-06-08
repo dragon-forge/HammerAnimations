@@ -1,23 +1,30 @@
-package dev.zeith.lzvm;
+package dev.zeith.lzvm.vm;
 
+import dev.zeith.lzvm.LzVariableStore;
 import dev.zeith.lzvm.op.*;
 import dev.zeith.lzvm.program.LzCallInsn;
 
 import java.util.*;
 
-public class LzVMVariableStore
+public class SimpleLzVariableStore
 		implements LzVariableStore
 {
 	protected final Map<String, LzCallOp> callRegister = new HashMap<>();
 	protected final Map<String, LzVarOp> varRegister = new HashMap<>();
 	
-	public LzVMVariableStore registerCall(LzCallInsn name, LzCallOp op)
+	public SimpleLzVariableStore registerCall(LzCallInsn name, LzCallOp op)
 	{
 		callRegister.put(name.name + name.descriptor, op);
 		return this;
 	}
 	
-	public LzVMVariableStore registerVar(String name, LzVarOp op)
+	public SimpleLzVariableStore registerVar(String name, LzVarOp op)
+	{
+		varRegister.put(name, op);
+		return this;
+	}
+	
+	public SimpleLzVariableStore registerReadVar(String name, ReadonlyLzVarOp op)
 	{
 		varRegister.put(name, op);
 		return this;

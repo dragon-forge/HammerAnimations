@@ -37,8 +37,7 @@ public class ParticleEmitter
 	public boolean isRenderingGUI = false;
 	
 	public IAnimatedObject target;
-	@Setter
-	public Level world;
+	public @Setter Level world;
 	public boolean lit;
 	
 	public long lastWorldTick;
@@ -174,7 +173,8 @@ public class ParticleEmitter
 		
 		vars.update(particle, this, partialTicks);
 		
-		for(Map.Entry<String, LzExpression> e : variables.entrySet()) vars.putUpdate(e.getKey(), e.getValue());
+		for(Map.Entry<String, LzExpression> e : variables.entrySet())
+			vars.putUpdate(e.getKey(), e.getValue());
 	}
 	
 	public void setEmitterVariables(float partialTicks)
@@ -432,7 +432,7 @@ public class ParticleEmitter
 			var renderer = buffers.getBuffer(type.apply(effect.texture));
 			this.renderParticles(renderer, pose, renders, false, partialTicks);
 			
-			ParcomCollisionAppearance.ParcomCollisionAppearanceInstance collisionAppearance = this.effect.get(ParcomCollisionAppearance.ParcomCollisionAppearanceInstance.class, ParticleComponentsHA.PARTICLE_COLLISION_APPEARANCE);
+			var collisionAppearance = this.effect.get(ParcomCollisionAppearance.ParcomCollisionAppearanceInstance.class, ParticleComponentsHA.PARTICLE_COLLISION_APPEARANCE);
 			
 			/* rendering the collided particles with an extra component */
 			if(collisionAppearance != null && collisionAppearance.texture != null)
@@ -534,10 +534,12 @@ public class ParticleEmitter
 	{
 		if(this.world == null) return;
 		
-		var camera = Minecraft.getInstance().getCameraEntity();
+		Minecraft mc = Minecraft.getInstance();
+		
+		var camera = mc.getCameraEntity();
 		if(camera == null) return;
 		
-		this.perspective = Minecraft.getInstance().options.getCameraType();
+		this.perspective = mc.options.getCameraType();
 		this.cYaw = 180 - info.getYRot();
 		this.cPitch = 180 - info.getXRot();
 		

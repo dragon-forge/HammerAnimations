@@ -5,6 +5,7 @@ import dev.zeith.lzvm.jvm.LzMath;
 import dev.zeith.lzvm.molang.compiler.*;
 import dev.zeith.lzvm.molang.expression.*;
 import dev.zeith.lzvm.program.LzCallInsn;
+import dev.zeith.lzvm.util.DoubleTernaryOperator;
 
 import java.util.*;
 import java.util.function.*;
@@ -45,8 +46,8 @@ public enum MoMathLibrary
 		nt.put("e", e -> new NumberExpression(Math.E));
 		
 		// Standard Java Math functions:
-		c.put(dUnaryOperator("sin"), argsAndExtraPure(duOpt(val -> LzMath.sind(val * DEG_TO_RAD)), b -> b.addConstD(DEG_TO_RAD).addInsn(MUL).addInsn(FSIN)));
-		c.put(dUnaryOperator("cos"), argsAndExtraPure(duOpt(val -> LzMath.cosd(val * DEG_TO_RAD)), b -> b.addConstD(DEG_TO_RAD).addInsn(MUL).addInsn(FCOS)));
+		c.put(dUnaryOperator("sin"), argsAndExtraPure(duOpt(val -> Math.sin(val * DEG_TO_RAD)), b -> b.addConstD(DEG_TO_RAD).addInsn(MUL).addInsn(FSIN)));
+		c.put(dUnaryOperator("cos"), argsAndExtraPure(duOpt(val -> Math.cos(val * DEG_TO_RAD)), b -> b.addConstD(DEG_TO_RAD).addInsn(MUL).addInsn(FCOS)));
 		c.put(dBinaryOperator("mod"), argsAndExtraPure(dbOpt((left, right) -> left % right), b -> b.addInsn(MOD)));
 		c.put(dUnaryOperator("acos"), argsAndExtraPure(duOpt(val -> Math.acos(val) * RAD_TO_DEG), b -> b.addJCall(JMath, dUnaryOperator("acos")).addConstD(RAD_TO_DEG).addInsn(MUL)));
 		c.put(dUnaryOperator("asin"), argsAndExtraPure(duOpt(val -> Math.asin(val) * RAD_TO_DEG), b -> b.addJCall(JMath, dUnaryOperator("asin")).addConstD(RAD_TO_DEG).addInsn(MUL)));
@@ -224,12 +225,6 @@ public enum MoMathLibrary
 			if(opt1.isPresent() && opt2.isPresent() && opt3.isPresent()) return new NumberExpression(operator.applyAsDouble(opt1.getAsDouble(), opt2.getAsDouble(), opt3.getAsDouble()));
 			return null;
 		};
-	}
-	
-	@FunctionalInterface
-	public interface DoubleTernaryOperator
-	{
-		double applyAsDouble(double a, double b, double c);
 	}
 	
 	public static double signum(double t)

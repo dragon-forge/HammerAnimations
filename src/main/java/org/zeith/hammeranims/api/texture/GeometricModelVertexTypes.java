@@ -30,7 +30,7 @@ public class GeometricModelVertexTypes
 	
 	public boolean isInvisible(String bone)
 	{
-		return bones.getOrDefault(bone, DEF).isEmpty();
+		return !bones.getOrDefault(bone, DEF).isPresent();
 	}
 	
 	@Override

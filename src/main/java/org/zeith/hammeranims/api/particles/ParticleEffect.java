@@ -3,12 +3,12 @@ package org.zeith.hammeranims.api.particles;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonNull;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.particles.components.*;
 import org.zeith.hammeranims.api.particles.curve.ParticleCurve;
 import org.zeith.hammeranims.api.particles.event.CreateParticleEffectEvent;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
+import org.zeith.hammerlib.util.mcf.Resources;
 
 import java.util.*;
 
@@ -42,12 +42,13 @@ public class ParticleEffect
 		return new Builder();
 	}
 	
+	public static final ResourceLocation LOCATION_BLOCKS_TEXTURE = Resources.location("textures/atlas/blocks.png");
 	public static class Builder
 	{
 		protected final Map<IParticleComponentType, IParticleComponent> components = new HashMap<>();
 		protected final List<ParticleCurve> curves = new ArrayList<>();
 		protected ParticleMaterial material = ParticleMaterial.OPAQUE;
-		protected ResourceLocation texture = InventoryMenu.BLOCK_ATLAS;
+		protected ResourceLocation texture = LOCATION_BLOCKS_TEXTURE;
 		
 		public Builder material(ParticleMaterial material)
 		{

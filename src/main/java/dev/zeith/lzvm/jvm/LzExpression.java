@@ -1,7 +1,5 @@
 package dev.zeith.lzvm.jvm;
 
-import org.zeith.hammeranims.HammerAnimations;
-
 public interface LzExpression
 		extends LzFactory
 {
@@ -10,14 +8,7 @@ public interface LzExpression
 	
 	default double get()
 	{
-		try
-		{
-			return get(EMPTY_DOUBLE_ARRAY);
-		} catch(IncompatibleClassChangeError e)
-		{
-			HammerAnimations.LOG.error("Failed to call get() on {}", this);
-			throw e;
-		}
+		return get(EMPTY_DOUBLE_ARRAY);
 	}
 	
 	double get(double... args);
