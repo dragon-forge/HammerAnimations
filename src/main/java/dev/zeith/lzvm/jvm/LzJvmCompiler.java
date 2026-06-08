@@ -511,7 +511,7 @@ public class LzJvmCompiler
 					insn.add(new FieldInsnNode(GETFIELD, cn.name, varHolder.name, varHolder.desc));
 					insn.add(mCall(
 							INVOKESTATIC,
-							LzVarOp,
+							LzFMath,
 							"get",
 							"(D" + L_LzVarOp + ")D"
 					));

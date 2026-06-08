@@ -121,4 +121,9 @@ public class LzMath
 	{
 		var.set(index, v);
 	}
+	
+	public static double get(double index, LzVarOp var)
+	{
+		return var.get(index);
+	}
 }
