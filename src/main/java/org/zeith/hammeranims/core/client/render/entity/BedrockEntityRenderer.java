@@ -2,14 +2,12 @@ package org.zeith.hammeranims.core.client.render.entity;
 
 import com.zeitheron.hammercore.utils.base.Cast;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.model.RenderData;
 import org.zeith.hammeranims.api.tile.IAnimatedEntity;
-import org.zeith.hammeranims.core.client.render.entity.proc.HeadLookProcessor;
 
 public abstract class BedrockEntityRenderer<T extends EntityLivingBase & IAnimatedEntity>
 		extends RenderLivingBase<T>
@@ -40,7 +38,7 @@ public abstract class BedrockEntityRenderer<T extends EntityLivingBase & IAnimat
 		RenderData data = model.renderData;
 		data.prepare();
 		data.texture = getRenderType(getEntityTexture(entity));
-		data.combinedLightIn = entity.getBrightnessForRender();
+		data.lighting = entity.getBrightnessForRender();
 		
 		model.entity = entity;
 		model.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);

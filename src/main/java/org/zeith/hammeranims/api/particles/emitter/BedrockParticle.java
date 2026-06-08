@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.particles.emitter;
 
+import dev.zeith.lzvm.jvm.LzMath;
 import lombok.var;
 import net.minecraft.entity.Entity;
 import org.zeith.hammeranims.core.contents.particles.components.appearance.*;
@@ -110,13 +111,13 @@ public class BedrockParticle
 	public boolean isCollisionTexture(ParticleEmitter emitter)
 	{
 		var a = emitter.effect.get(ParcomCollisionAppearance.ParcomCollisionAppearanceInstance.class, ParticleComponentsHA.PARTICLE_COLLISION_APPEARANCE);
-		return a != null && a.enabled.get() >= 1 && this.intersected;
+		return a != null && LzMath.isNotZero(a.enabled.get()) && this.intersected;
 	}
 	
 	public boolean isCollisionTinting(ParticleEmitter emitter)
 	{
-		ParcomCollisionTinting.ParcomCollisionTintingInstance a = emitter.effect.get(ParcomCollisionTinting.ParcomCollisionTintingInstance.class, ParticleComponentsHA.PARTICLE_COLLISION_TINTING);
-		return a != null && a.enabled.get() >= 1 && this.intersected;
+		var a = emitter.effect.get(ParcomCollisionTinting.ParcomCollisionTintingInstance.class, ParticleComponentsHA.PARTICLE_COLLISION_TINTING);
+		return a != null && LzMath.isNotZero(a.enabled.get()) && this.intersected;
 	}
 	
 	public int getExpireAge()

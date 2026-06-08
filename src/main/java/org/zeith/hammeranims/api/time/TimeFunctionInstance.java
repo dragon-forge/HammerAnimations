@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.time;
 
+import lombok.var;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
@@ -53,7 +54,7 @@ public class TimeFunctionInstance
 	
 	public NBTTagCompound getExtra()
 	{
-		NBTTagCompound i = InstanceHelpers.newNBTCompound();
+		var i = InstanceHelpers.newNBTCompound();
 		if(extra == null && !isEmpty()) extra = i;
 		return i;
 	}
@@ -61,7 +62,7 @@ public class TimeFunctionInstance
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		NBTTagCompound tag = InstanceHelpers.newNBTCompound();
+		var tag = InstanceHelpers.newNBTCompound();
 		if(extra != null) tag.setTag("Extra", extra);
 		tag.setString("Id", function.getRegistryKey().toString());
 		return tag;

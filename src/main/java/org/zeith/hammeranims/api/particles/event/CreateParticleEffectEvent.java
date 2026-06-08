@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.api.particles.event;
 
+import lombok.Getter;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.api.particles.ParticleEffect;
@@ -9,6 +10,7 @@ import org.zeith.hammeranims.api.particles.components.IParticleComponentType;
 import java.util.Map;
 import java.util.function.Function;
 
+@Getter
 public class CreateParticleEffectEvent
 		extends Event
 {
@@ -21,21 +23,6 @@ public class CreateParticleEffectEvent
 		this.container = container;
 		this.components = components;
 		this.builder = builder;
-	}
-	
-	public IParticleContainer getContainer()
-	{
-		return container;
-	}
-	
-	public Map<IParticleComponentType, IParticleComponent> getComponents()
-	{
-		return components;
-	}
-	
-	public ParticleEffect.Builder getBuilder()
-	{
-		return builder;
 	}
 	
 	public IParticleComponent get(IParticleComponentType type)

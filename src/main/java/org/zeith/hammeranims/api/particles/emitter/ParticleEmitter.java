@@ -2,12 +2,14 @@ package org.zeith.hammeranims.api.particles.emitter;
 
 import com.zeitheron.hammercore.client.utils.UtilsFX;
 import dev.zeith.lzvm.jvm.*;
+import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 import org.zeith.hammeranims.HammerAnimations;
@@ -16,6 +18,7 @@ import org.zeith.hammeranims.api.particles.*;
 import org.zeith.hammeranims.api.particles.components.itf.*;
 import org.zeith.hammeranims.api.particles.curve.ParticleCurve;
 import org.zeith.hammeranims.api.particles.variables.ParticleVariables;
+import org.zeith.hammeranims.api.utils.LightTexture;
 import org.zeith.hammeranims.core.client.render.*;
 import org.zeith.hammeranims.core.contents.particles.components.appearance.ParcomCollisionAppearance;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
@@ -91,9 +94,9 @@ public class ParticleEmitter
 	public float random3 = (float) Math.random();
 	public float random4 = (float) Math.random();
 	
-	private MutableBlockPos blockPos = new MutableBlockPos();
+	private BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 	
-	public double[] scale = { 1, 1, 1 };
+	public double[] scale = {1, 1, 1};
 	
 	/* Camera properties */
 	public int perspective;
@@ -109,17 +112,6 @@ public class ParticleEmitter
 	public boolean isFinished()
 	{
 		return !this.running && this.particles.isEmpty();
-	}
-	
-	public double getDistanceSq()
-	{
-		this.setupCameraProperties(0F);
-		
-		double dx = this.cX - this.lastGlobal.x;
-		double dy = this.cY - this.lastGlobal.y;
-		double dz = this.cZ - this.lastGlobal.z;
-		
-		return dx * dx + dy * dy + dz * dz;
 	}
 	
 	public double getAge()
@@ -184,6 +176,8 @@ public class ParticleEmitter
 		vars.particle_pos.set(relativePos);
 		vars.particle_speed.set(particle.speed);
 		vars.particle_bounces = particle.bounces;
+		
+		vars.update(particle, this, partialTicks);
 		
 		for(Map.Entry<String, LzExpression> e : variables.entrySet())
 			vars.putUpdate(e.getKey(), e.getValue());
@@ -274,6 +268,7 @@ public class ParticleEmitter
 		
 		this.setEmitterVariables(0);
 		this.updateParticles();
+		this.brightnessCache.clear(); // Reset lighting cache
 		
 		this.age += 1;
 		this.sanityTicks += 1;
@@ -556,16 +551,21 @@ public class ParticleEmitter
 	{
 		if(this.world == null) return;
 		
-		Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
+		Minecraft mc = Minecraft.getMinecraft();
+		
+		var camera = mc.getRenderViewEntity();
 		if(camera == null) return;
 		
-		this.perspective = Minecraft.getMinecraft().gameSettings.thirdPersonView;
-		this.cYaw = (float) (180 - ParticleCurve.lerp(camera.prevRotationYaw, camera.rotationYaw, partialTicks));
-		this.cPitch = (float) (180 - ParticleCurve.lerp(camera.prevRotationPitch, camera.rotationPitch, partialTicks));
+		this.perspective = mc.gameSettings.thirdPersonView;
+		this.cYaw = 180 - (float) ParticleCurve.lerp(camera.prevRotationYaw, camera.rotationYaw, partialTicks);
+		this.cPitch = 180 - (float) ParticleCurve.lerp(camera.prevRotationPitch, camera.rotationPitch, partialTicks);
+		
 		this.cX = ParticleCurve.lerp(camera.prevPosX, camera.posX, partialTicks);
 		this.cY = ParticleCurve.lerp(camera.prevPosY, camera.posY, partialTicks) + camera.getEyeHeight();
 		this.cZ = ParticleCurve.lerp(camera.prevPosZ, camera.posZ, partialTicks);
 	}
+	
+	Long2IntMap brightnessCache = new Long2IntOpenHashMap();
 	
 	/**
 	 * Get brightness for the block
@@ -573,13 +573,28 @@ public class ParticleEmitter
 	public int getBrightnessForRender(float partialTicks, double x, double y, double z)
 	{
 		if(this.lit || this.world == null)
-		{
-			return 15728880;
-		}
-		
+			return 0xf000f0; // full-brightness
 		this.blockPos.setPos(x, y, z);
-		
-		return this.world.isBlockLoaded(this.blockPos) ? this.world.getCombinedLight(this.blockPos, 0) : 0;
+		return this.world.isBlockLoaded(this.blockPos) ? getBrightnessCached(this.blockPos) : 0;
+	}
+	
+	private int getBrightnessCached(BlockPos pos)
+	{
+		return brightnessCache.computeIfAbsent(pos.toLong(), l ->
+				{
+					BlockPos ipos = pos.toImmutable();
+					int max = this.world.getCombinedLight(ipos, 0);
+					for(var dir : EnumFacing.VALUES)
+					{
+						int cur = this.world.getCombinedLight(ipos.offset(dir), 0);
+						max = LightTexture.pack(
+								Math.max(LightTexture.block(max), LightTexture.block(cur)),
+								Math.max(LightTexture.sky(max), LightTexture.sky(cur))
+						);
+					}
+					return max;
+				}
+		);
 	}
 	
 	@Override

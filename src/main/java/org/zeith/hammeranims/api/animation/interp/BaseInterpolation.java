@@ -4,6 +4,7 @@ import com.zeitheron.hammercore.lib.zlib.json.*;
 import dev.zeith.lzvm.LzVariableStore;
 import dev.zeith.lzvm.jvm.*;
 import org.zeith.hammeranims.HammerAnimations;
+
 public abstract class BaseInterpolation
 {
 	public abstract int getDoubleCount();

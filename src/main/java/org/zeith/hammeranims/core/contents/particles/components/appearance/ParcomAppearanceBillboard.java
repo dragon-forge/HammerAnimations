@@ -294,7 +294,7 @@ public class ParcomAppearanceBillboard
 			float v2 = this.v2 / (float) this.textureHeight;
 			
 			VertexType vt = emitter.effect.material == ParticleMaterial.OPAQUE
-			                ? VertexType.DIRECT
+			                ? VertexType.DEFAULT
 			                : VertexType.TRANSLUCENT;
 			
 			builder.vertex(

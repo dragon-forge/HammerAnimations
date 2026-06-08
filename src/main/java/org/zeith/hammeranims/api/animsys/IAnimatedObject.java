@@ -7,7 +7,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.data.effects.*;
 import org.zeith.hammeranims.api.animation.interp.*;
@@ -61,7 +61,7 @@ public interface IAnimatedObject
 	
 	Vec3d getAnimatedObjectPosition();
 	
-	default Query createQuery()
+	default @NotNull Query createQuery()
 	{
 		return new QueryWorld(getAnimatedObjectWorld());
 	}

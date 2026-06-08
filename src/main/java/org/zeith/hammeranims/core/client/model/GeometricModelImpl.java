@@ -3,7 +3,6 @@ package org.zeith.hammeranims.core.client.model;
 import com.zeitheron.hammercore.utils.math.MathHelper;
 import lombok.val;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
@@ -19,8 +18,6 @@ import org.zeith.hammeranims.core.utils.PoseStack;
 
 import javax.annotation.Nullable;
 import java.util.*;
-
-import static net.minecraft.client.renderer.vertex.DefaultVertexFormats.*;
 
 public class GeometricModelImpl
 		implements IGeometricModel
@@ -155,7 +152,7 @@ public class GeometricModelImpl
 		renderer.begin(GL11.GL_QUADS, IVertexEmitter.FULL);
 		root.render(pose,
 				renderer,
-				data.combinedLightIn, data.combinedOverlayIn,
+				data.lighting, data.overlay,
 				data.red, data.green, data.blue, data.alpha
 		);
 		renderer.upload();

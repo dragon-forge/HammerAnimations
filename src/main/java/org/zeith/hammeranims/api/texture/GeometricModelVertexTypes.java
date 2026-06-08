@@ -16,7 +16,7 @@ import java.util.function.Function;
 public class GeometricModelVertexTypes
 		implements Function<String, @Nullable VertexType>
 {
-	private static final Optional<VertexType> DEF = Optional.of(VertexType.DIRECT);
+	private static final Optional<VertexType> DEF = Optional.of(VertexType.DEFAULT);
 	public final Map<String, Optional<VertexType>> bones;
 	
 	public static GeometricModelVertexTypes forModelAndTexture(IGeometricModel model, ResourceLocation texture)

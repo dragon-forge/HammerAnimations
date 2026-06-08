@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 public enum VertexType
 {
-	DIRECT(""),
+	DEFAULT(""),
 	SOLID("solid"),
 	CUTOUT("cutout"),
 	TRANSLUCENT("translucent");
@@ -33,7 +33,7 @@ public enum VertexType
 	
 	public static VertexType byId(String id)
 	{
-		return TYPE_MAP.get().getOrDefault(id, DIRECT);
+		return TYPE_MAP.get().getOrDefault(id, DEFAULT);
 	}
 	
 	public static VertexType byId(String id, VertexType orDefault)

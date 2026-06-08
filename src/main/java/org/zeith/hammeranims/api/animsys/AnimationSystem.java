@@ -2,7 +2,7 @@ package org.zeith.hammeranims.api.animsys;
 
 import com.zeitheron.hammercore.net.*;
 import lombok.*;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
@@ -30,11 +30,14 @@ public class AnimationSystem
 	@NotNull
 	public final IAnimatedObject owner;
 	
-	protected boolean hasTicked = false;
-	protected boolean hasReceivedTime = false;
+	@NotNull
+	public final Query query;
 	
 	@Setter
 	protected double time;
+	
+	protected boolean hasTicked = false;
+	protected boolean hasReceivedTime = false;
 	
 	public boolean canSync = true, autoSync = false, syncTime = true;
 	protected @Getter boolean defaultUseNanoTime = false;
@@ -53,6 +56,13 @@ public class AnimationSystem
 		this.owner = owner;
 		this.layers = layers;
 		this.layerMap = Collections.unmodifiableMap(layerMap);
+		this.query = Objects.requireNonNull(owner.createQuery(), "owner.createQuery()");
+	}
+	
+	public void setWorld(World world)
+	{
+		for(AnimationLayer layer : layers)
+			layer.query.setWorld(world);
 	}
 	
 	public IPacket createSyncPacket()
@@ -62,12 +72,11 @@ public class AnimationSystem
 	
 	public void sync()
 	{
-		World world = owner.getAnimatedObjectWorld();
+		var world = owner.getAnimatedObjectWorld();
 		if(world.isRemote || !canSync) // if on server
 			return;
-		BlockPos pos = new BlockPos(owner.getAnimatedObjectPosition());
-		if(!world.isBlockLoaded(pos))
-			return;
+		var pos = new BlockPos(owner.getAnimatedObjectPosition());
+		if(!world.isBlockLoaded(pos)) return;
 		sendPacketToTracking(createSyncPacket());
 	}
 	
@@ -82,11 +91,7 @@ public class AnimationSystem
 		if(world.isRemote) return;
 		HCNet.INSTANCE.sendToAllAroundTracking(
 				packet,
-				HCNet.point(
-						world,
-						owner.getAnimatedObjectPosition(),
-						256
-				)
+				HCNet.point(world, owner.getAnimatedObjectPosition(), 256)
 		);
 	}
 	
@@ -151,8 +156,10 @@ public class AnimationSystem
 		if(!hasTicked)
 		{
 			hasTicked = true;
-			if(canSync && owner.getAnimatedObjectWorld().isRemote) // Request animations from server on load
+			val world = owner.getAnimatedObjectWorld();
+			if(canSync && world.isRemote) // Request animations from server on load
 				HCNet.INSTANCE.sendToServer(new PacketRequestAnimationSystemSync(this));
+			setWorld(world);
 		}
 		
 		time += 0.05; // add a tick
@@ -190,11 +197,12 @@ public class AnimationSystem
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		val comp = newNBTCompound();
+		var comp = newNBTCompound();
 		
-		comp.setDouble("Time", time);
+		if(syncTime)
+			comp.setDouble("Time", time);
 		
-		NBTTagList layers = newNBTList();
+		var layers = newNBTList();
 		for(AnimationLayer layer : this.layers)
 			if(layer.persistent) // save only persistent layers
 				layers.appendTag(layer.serializeNBT());
@@ -208,14 +216,17 @@ public class AnimationSystem
 	{
 		if(syncTime || !hasReceivedTime)
 		{
-			time = nbt.getDouble("Time");
-			hasReceivedTime = true;
+			if(nbt.hasKey("Time") || !hasReceivedTime)
+			{
+				time = nbt.getDouble("Time");
+				hasReceivedTime = true;
+			}
 		}
 		
-		val layers = nbt.getTagList("Layers", Constants.NBT.TAG_COMPOUND);
+		var layers = nbt.getTagList("Layers", Constants.NBT.TAG_COMPOUND);
 		for(int i = 0; i < layers.tagCount(); i++)
 		{
-			val tag = layers.getCompoundTagAt(i);
+			var tag = layers.getCompoundTagAt(i);
 			AnimationLayer l = layerMap.get(tag.getString("Name"));
 			if(l != null && l.persistent) l.deserializeNBT(tag);
 		}
@@ -312,7 +323,6 @@ public class AnimationSystem
 		
 		public AnimationSystem build()
 		{
-			Query q = owner.createQuery();
 			AnimationLayer[] layers = new AnimationLayer[this.layers.size()];
 			
 			Map<String, AnimationLayer> layerMap = new HashMap<>();
@@ -325,7 +335,7 @@ public class AnimationSystem
 			
 			for(int i = 0; i < layers.length; i++)
 			{
-				AnimationLayer al = layers[i] = this.layers.get(i).defaultQuery(q).build(sys);
+				AnimationLayer al = layers[i] = this.layers.get(i).build(sys);
 				layerMap.put(al.name, al);
 			}
 			return sys;

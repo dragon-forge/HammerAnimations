@@ -37,7 +37,7 @@ public class RenderTileBilly
 	{
 		model.applySystem(partialTicks, te.getAnimationSystem());
 		
-		data.combinedLightIn = getBrightnessForRB(te, RenderBlocks.getInstance());
+		data.lighting = getBrightnessForRB(te, RenderBlocks.getInstance());
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.disableLighting();

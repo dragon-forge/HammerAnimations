@@ -45,7 +45,7 @@ public class AnimationLayer
 	public float defaultTransitionTime = 0.25F;
 	
 	protected boolean useNanoTime;
-	public boolean frozen;
+	protected boolean frozen;
 	
 	public AnimationLayer(AnimationSystem sys, ILayerMask mask, Query query, String name, BlendMode mode, boolean allowAutoSync, boolean persistent)
 	{
@@ -81,7 +81,7 @@ public class AnimationLayer
 	
 	public boolean startAnimation(@Nonnull ConfiguredAnimation animation)
 	{
-		return startAnimationSync(animation, true);
+		return startAnimationSync(animation, system.canSync);
 	}
 	
 	public boolean startAnimationSync(@Nonnull ConfiguredAnimation animation, boolean doSync)
@@ -106,8 +106,6 @@ public class AnimationLayer
 		lastAnimation = currentAnimation;
 		startTime = system.getTime(0);
 		currentAnimation = animation.activate(this, query);
-		
-		currentAnimation.useNanoTime = useNanoTime;
 		
 		if(doSync && system.autoSync && allowAutoSync)
 		{
@@ -213,35 +211,12 @@ public class AnimationLayer
 		{
 			startTime += 0.05;
 			
-			long nt = System.nanoTime();
-			
-			if(currentAnimation != null)
-			{
-				currentAnimation.useNanoTime = useNanoTime;
-				currentAnimation.activationTime += 0.05;
-				if(currentAnimation.freezeRelativeNanoTime <= 0L) currentAnimation.freezeRelativeNanoTime = nt - currentAnimation.activationTimeNanos;
-			}
-			
-			if(lastAnimation != null)
-			{
-				lastAnimation.useNanoTime = useNanoTime;
-				lastAnimation.activationTime += 0.05;
-				if(lastAnimation.freezeRelativeNanoTime <= 0L) lastAnimation.freezeRelativeNanoTime = nt - lastAnimation.activationTimeNanos;
-			}
+			if(currentAnimation != null) currentAnimation.activationTime += 0.05;
+			if(lastAnimation != null) lastAnimation.activationTime += 0.05;
 		} else
 		{
-			if(currentAnimation != null)
-			{
-				currentAnimation.useNanoTime = useNanoTime;
-				currentAnimation.freezeRelativeNanoTime = -1L;
-				processEffects(sysTime, currentAnimation);
-			}
-			if(lastAnimation != null)
-			{
-				lastAnimation.useNanoTime = useNanoTime;
-				lastAnimation.freezeRelativeNanoTime = -1L;
-				processEffects(sysTime, lastAnimation);
-			}
+			if(currentAnimation != null) processEffects(sysTime, currentAnimation);
+			if(lastAnimation != null) processEffects(sysTime, lastAnimation);
 		}
 		
 		if(lastAnimation != null)
@@ -284,7 +259,7 @@ public class AnimationLayer
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		NBTTagCompound tag = InstanceHelpers.newNBTCompound();
+		var tag = InstanceHelpers.newNBTCompound();
 		tag.setFloat("Weight", weight);
 		tag.setString("Name", name);
 		tag.setDouble("StartTime", startTime);
@@ -299,14 +274,14 @@ public class AnimationLayer
 	{
 		weight = tag.getFloat("Weight");
 		startTime = tag.getDouble("StartTime");
-		frozen = tag.getBoolean("Frozen");
+		setFrozen(tag.getBoolean("Frozen"));
 		
 		if(tag.hasKey("Last", Constants.NBT.TAG_COMPOUND))
-			lastAnimation = new ActiveAnimation(tag.getCompoundTag("Last"), query);
+			lastAnimation = new ActiveAnimation(this, tag.getCompoundTag("Last"), query);
 		else lastAnimation = null;
 		
 		if(tag.hasKey("Current", Constants.NBT.TAG_COMPOUND))
-			currentAnimation = new ActiveAnimation(tag.getCompoundTag("Current"), query);
+			currentAnimation = new ActiveAnimation(this, tag.getCompoundTag("Current"), query);
 		else currentAnimation = null;
 	}
 	
@@ -320,23 +295,13 @@ public class AnimationLayer
 		if(frozen != shouldFreeze)
 		{
 			setFrozen(shouldFreeze);
-			system.sync();
+			if(system.autoSync && allowAutoSync) system.sync();
 		}
 	}
 	
 	protected void setFrozen(boolean shouldFreeze)
 	{
 		frozen = shouldFreeze;
-		if(frozen)
-		{
-			long nt = System.nanoTime();
-			if(lastAnimation != null) lastAnimation.freezeRelativeNanoTime = nt - lastAnimation.activationTimeNanos;
-			if(currentAnimation != null) currentAnimation.freezeRelativeNanoTime = nt - currentAnimation.activationTimeNanos;
-		} else
-		{
-			if(lastAnimation != null) lastAnimation.freezeRelativeNanoTime = -1L;
-			if(currentAnimation != null) currentAnimation.freezeRelativeNanoTime = -1L;
-		}
 	}
 	
 	public static class Builder
@@ -438,12 +403,13 @@ public class AnimationLayer
 		
 		public AnimationLayer build(AnimationSystem sys)
 		{
-			if(query == null) query = new Query();
-			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync, persistent);
+			var q = query;
+			if(q == null) q = sys.query;
+			AnimationLayer layer = new AnimationLayer(sys, mask, q, name, blendMode, allowAutoSync, persistent);
 			layer.weight = weight;
 			layer.defaultTransitionTime = defaultTransitionTime;
 			layer.useNanoTime = useNanoTime != null ? useNanoTime : sys.isDefaultUseNanoTime();
-			if(initialAnimation != null) layer.currentAnimation = new ActiveAnimation(initialAnimation, query);
+			if(initialAnimation != null) layer.currentAnimation = new ActiveAnimation(layer, new ConfiguredAnimation(initialAnimation), q);
 			return layer;
 		}
 	}

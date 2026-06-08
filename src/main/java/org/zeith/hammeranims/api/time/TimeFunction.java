@@ -5,7 +5,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animation.LoopMode;
-import org.zeith.hammeranims.api.animsys.AnimationSystem;
+import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
 
 import javax.annotation.Nonnull;
@@ -45,13 +45,15 @@ public abstract class TimeFunction
 	{
 		double time = computeTime(system, sysTime, partialTicks, animation, instance);
 		
-		if(animation.config.animation != null)
+		ConfiguredAnimation config = animation.config;
+		
+		if(config.animation != null)
 		{
-			LoopMode mode = animation.config.loopMode;
+			LoopMode mode = config.loopMode;
 			
 			double duration = getLengthSeconds(animation, instance);
 			
-			if(animation.config.reverse)
+			if(config.reverse)
 			{
 				switch(mode)
 				{

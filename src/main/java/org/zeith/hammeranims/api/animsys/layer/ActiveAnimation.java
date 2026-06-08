@@ -2,10 +2,12 @@ package org.zeith.hammeranims.api.animsys.layer;
 
 import com.google.common.collect.ImmutableMap;
 import dev.zeith.lzvm.LzVariableStore;
+import lombok.var;
 import net.minecraft.nbt.NBTTagCompound;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.*;
+import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
@@ -16,11 +18,12 @@ import java.util.concurrent.TimeUnit;
 public class ActiveAnimation
 		implements ICompoundSerializable
 {
+	public final AnimationLayer layer;
+	public final Query query;
+	
 	public double activationTime;
 	
 	// Nano time implementation
-	public boolean useNanoTime;
-	public long freezeRelativeNanoTime = -1L;
 	public long gameFreezeNanos = -1L;
 	public long activationTimeNanos = System.nanoTime();
 	
@@ -36,27 +39,31 @@ public class ActiveAnimation
 	
 	public final Map<String, BoneAnimationInstance> bones;
 	
-	public ActiveAnimation(NBTTagCompound tag, LzVariableStore vars)
+	public ActiveAnimation(AnimationLayer layer, NBTTagCompound tag, Query query)
 	{
+		this.layer = layer;
+		this.query = query;
 		deserializeNBT(tag);
-		this.bones = instantiateBones(this.config, vars);
+		this.bones = instantiateBones(this.config, query);
 	}
 	
-	public ActiveAnimation(ConfiguredAnimation config, LzVariableStore vars)
+	public ActiveAnimation(AnimationLayer layer, ConfiguredAnimation config, Query query)
 	{
+		this.layer = layer;
+		this.query = query;
 		this.config = config;
-		this.bones = instantiateBones(config, vars);
+		this.bones = instantiateBones(config, query);
 	}
 	
 	public double elapsedSeconds(double sysTime)
 	{
-		if(!useNanoTime)
+		if(!layer.useNanoTime)
 			return sysTime - activationTime;
 		
 		long now = System.nanoTime();
 		
 		// Add support for game pausing
-		if(HammerAnimations.PROXY.isGamePaused())
+		if(isFrozen())
 		{
 			if(gameFreezeNanos <= 0L)
 				gameFreezeNanos = now;
@@ -70,9 +77,12 @@ public class ActiveAnimation
 		
 		long nt = now - this.activationTimeNanos;
 		
-		if(freezeRelativeNanoTime > 0) nt = freezeRelativeNanoTime;
-		
 		return TimeUnit.NANOSECONDS.toMicros(nt) / 1_000_000D;
+	}
+	
+	public boolean isFrozen()
+	{
+		return HammerAnimations.PROXY.isGamePaused() || layer.frozen;
 	}
 	
 	public Map<String, BoneAnimationInstance> getBoneAnimations()
@@ -82,11 +92,9 @@ public class ActiveAnimation
 	
 	public boolean isDone(double sysTime)
 	{
-		IAnimationData data;
-		return config.animation == null
-				|| (config.loopMode == LoopMode.ONCE && (
-				(data = config.animation.getData()) == null
-						|| (sysTime - activationTime) * config.speed >= getLengthSeconds()
+		return config.animation == null || (config.loopMode == LoopMode.ONCE && (
+				config.animation.getData() == null
+				|| elapsedSeconds(sysTime) * config.speed >= getLengthSeconds()
 		));
 	}
 	
@@ -98,33 +106,36 @@ public class ActiveAnimation
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		NBTTagCompound tag = config.serializeNBT();
+		var tag = config.serializeNBT();
 		tag.setDouble("ActivationTime", activationTime);
 		tag.setBoolean("FiredActions", firedActions);
 		tag.setFloat("ActiveWeight", realTimeWeight);
-		if(useNanoTime)
+		
+		if(layer.useNanoTime)
 		{
-			if(this.freezeRelativeNanoTime > 0L)
-				tag.setLong("FrozenRelativeNanoTime", this.freezeRelativeNanoTime);
 			tag.setLong("NanoRelTime", System.nanoTime() - this.activationTimeNanos);
+			if(this.gameFreezeNanos > 0L) tag.setLong("GameFreezeNano", System.nanoTime() - this.gameFreezeNanos);
 		}
+		
 		return tag;
 	}
 	
 	@Override
 	public void deserializeNBT(NBTTagCompound tag)
 	{
-		config = new ConfiguredAnimation(tag);
+		this.config = new ConfiguredAnimation(tag);
 		this.activationTime = tag.getDouble("ActivationTime");
 		this.firedActions = tag.getBoolean("FiredActions");
 		this.realTimeWeight = tag.getFloat("ActiveWeight");
-		if(useNanoTime)
+		
+		if(layer.useNanoTime)
 		{
-			if(tag.hasKey("FrozenRelativeNanoTime"))
-				this.freezeRelativeNanoTime = tag.getLong("FrozenRelativeNanoTime");
 			if(tag.hasKey("NanoRelTime")) this.activationTimeNanos = System.nanoTime() - tag.getLong("NanoRelTime");
 			else this.activationTimeNanos = System.nanoTime();
-		} else this.realTimeWeight = 1F;
+			
+			if(tag.hasKey("GameFreezeNano")) this.gameFreezeNanos = System.nanoTime() - tag.getLong("GameFreezeNano");
+			else this.gameFreezeNanos = -1L;
+		}
 	}
 	
 	public double getLengthSeconds()

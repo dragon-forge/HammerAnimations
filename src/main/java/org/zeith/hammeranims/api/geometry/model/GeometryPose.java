@@ -3,10 +3,11 @@ package org.zeith.hammeranims.api.geometry.model;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.api.animation.data.BoneAnimationInstance;
-import org.zeith.hammeranims.api.animation.interp.*;
+import org.zeith.hammeranims.api.animation.interp.BlendMode;
 import org.zeith.hammeranims.api.animsys.SerializableMask;
 import org.zeith.hammeranims.api.animsys.layer.*;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
+import org.zeith.hammeranims.core.impl.api.geometry.decoder.ModelPartInfo;
 
 import java.util.*;
 import java.util.function.*;
@@ -15,8 +16,8 @@ public class GeometryPose
 {
 	protected static final Predicate<String> ALLOW_ALL_BONES = b -> true;
 	protected final Function<String, GeometryTransforms> TRANSFORM_FACTORY = this::createTransforms;
-	protected final Map<String, GeometryTransforms> boneTransforms = new HashMap<>();
-	protected final Map<String, GeometryTransforms> boneTransformsView = Collections.unmodifiableMap(boneTransforms);
+	protected final Map<String, GeometryTransforms> boneTransforms;
+	protected final Map<String, GeometryTransforms> boneTransformsView;
 	protected final Predicate<String> availableBones;
 	
 	protected @Setter Function<String, @Nullable VertexType> boneRenderTypes;
@@ -29,6 +30,15 @@ public class GeometryPose
 	public GeometryPose(Predicate<String> availableBones)
 	{
 		this.availableBones = availableBones;
+		this.boneTransforms = new HashMap<>();
+		this.boneTransformsView = Collections.unmodifiableMap(boneTransforms);
+	}
+	
+	public GeometryPose(Predicate<String> availableBones, int prealloc)
+	{
+		this.availableBones = availableBones;
+		this.boneTransforms = new HashMap<>(prealloc);
+		this.boneTransformsView = Collections.unmodifiableMap(boneTransforms);
 	}
 	
 	public GeometryTransforms createTransforms(String bone)
@@ -53,7 +63,7 @@ public class GeometryPose
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone)) continue;
-			boneTransforms.put(bone, entry.getValue().apply(mode, weight, boneTransforms.get(bone)));
+			boneTransforms.put(bone, entry.getValue().apply(mode, weight, getTransform(bone)));
 		}
 	}
 	
@@ -65,7 +75,7 @@ public class GeometryPose
 		{
 			String bone = entry.getKey();
 			if(!availableBones.test(bone) || !mask.test(bone) || excludes.contains(bone)) continue;
-			boneTransforms.put(bone, entry.getValue().apply(mode, weight * weightFun.get(bone), boneTransforms.get(bone)));
+			boneTransforms.put(bone, entry.getValue().apply(mode, weight * weightFun.get(bone), getTransform(bone)));
 		}
 	}
 	
@@ -84,10 +94,15 @@ public class GeometryPose
 	
 	public GeometryPose copy()
 	{
-		GeometryPose c = new GeometryPose(availableBones);
+		GeometryPose copy = newInstance();
 		for(Map.Entry<String, GeometryTransforms> bone : boneTransforms.entrySet())
-			c.boneTransforms.put(bone.getKey(), bone.getValue().copy());
-		return c;
+			copy.boneTransforms.put(bone.getKey(), bone.getValue().copy());
+		return copy;
+	}
+	
+	public GeometryTransforms getRoot()
+	{
+		return boneTransforms.computeIfAbsent(ModelPartInfo.ROOT_BONE_NAME, TRANSFORM_FACTORY);
 	}
 	
 	public GeometryTransforms getTransform(String bone)

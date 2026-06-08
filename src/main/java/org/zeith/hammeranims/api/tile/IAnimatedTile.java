@@ -1,11 +1,12 @@
 package org.zeith.hammeranims.api.tile;
 
 import com.zeitheron.hammercore.utils.base.Cast;
+import lombok.var;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.zeith.hammeranims.api.animsys.IAnimatedObject;
-import org.zeith.hammerlib.abstractions.sources.*;
+import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 
 public interface IAnimatedTile
 		extends IAnimatedObject
@@ -14,7 +15,7 @@ public interface IAnimatedTile
 	default IObjectSource<?> getAnimationSource()
 	{
 		TileEntity tile = Cast.cast(this);
-		return new TileSourceType.TileSource(tile.getPos());
+		return IObjectSource.ofTile(tile).get();
 	}
 	
 	@Override
@@ -28,7 +29,7 @@ public interface IAnimatedTile
 	default Vec3d getAnimatedObjectPosition()
 	{
 		TileEntity tile = Cast.cast(this);
-		BlockPos bp = tile.getPos();
-		return new Vec3d(bp.getX() + 0.5,  bp.getY(), bp.getZ() + 0.5);
+		var bp = tile.getPos();
+		return new Vec3d(bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5);
 	}
 }

@@ -4,8 +4,9 @@ import com.zeitheron.hammercore.HammerCore;
 import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
-import org.zeith.hammeranims.api.*;
+import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.utils.IResourceProvider;
+import org.zeith.hammerlib.util.mcf.McUtil;
 
 import java.io.*;
 import java.util.Optional;

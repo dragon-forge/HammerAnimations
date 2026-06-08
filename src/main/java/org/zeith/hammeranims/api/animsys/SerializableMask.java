@@ -57,20 +57,19 @@ public class SerializableMask
 	{
 		excludes.clear();
 		var excludeNBT = nbt.getTagList("Excludes", Constants.NBT.TAG_STRING);
-		for(int i = 0; i < excludeNBT.tagCount(); i++) excludes.add(excludeNBT.getStringTagAt(i));
+		for(int i = 0; i < excludeNBT.tagCount(); i++) excludes.add(excludeNBT.getStringTagAt(i).toLowerCase(Locale.ROOT));
 		
 		if(nbt.hasKey("Weights", Constants.NBT.TAG_COMPOUND))
 		{
 			var weightNBT = nbt.getCompoundTag("Weights");
 			boneWeights = new Object2FloatOpenHashMap<>();
-			for(String key : weightNBT.getKeySet())
-				boneWeights.put(key, weightNBT.getFloat(key));
+			for(String key : weightNBT.getKeySet()) boneWeights.put(key.toLowerCase(Locale.ROOT), weightNBT.getFloat(key));
 		}
 	}
 	
 	public WeightFunction getBoneWeight()
 	{
-		return boneWeights != null ? WeightFunction.ONE : b -> boneWeights.getOrDefault(b, 1F);
+		return boneWeights == null ? WeightFunction.ONE : b -> boneWeights.getOrDefault(b, 1F);
 	}
 	
 	public interface WeightFunction
@@ -109,7 +108,25 @@ public class SerializableMask
 		public SerializableMaskBuilder boneWeight(String bone, float weight)
 		{
 			if(Math.abs(weight) < APPROX_ZERO) return exclude(bone);
-			boneWeights().put(bone, weight);
+			boneWeights().put(bone.toLowerCase(Locale.ROOT), weight);
+			return this;
+		}
+		
+		public SerializableMaskBuilder boneWeights(Object2FloatMap<String> weightMap)
+		{
+			if(weightMap == null || weightMap.isEmpty()) return this;
+			Object2FloatMap<String> bw = boneWeights();
+			for(Object2FloatMap.Entry<String> e : weightMap.object2FloatEntrySet())
+			{
+				String bone = e.getKey().toLowerCase(Locale.ROOT);
+				float weight = e.getFloatValue();
+				if(Math.abs(weight) < APPROX_ZERO)
+				{
+					exclude(bone);
+					continue;
+				}
+				bw.put(bone, weight);
+			}
 			return this;
 		}
 		
@@ -117,6 +134,11 @@ public class SerializableMask
 		{
 			if(this.boneWeights != null) return this.boneWeights;
 			return this.boneWeights = new Object2FloatOpenHashMap<>();
+		}
+		
+		private SerializableMaskBuilder excludes(Set<String> excludes)
+		{
+			return this;
 		}
 	}
 }

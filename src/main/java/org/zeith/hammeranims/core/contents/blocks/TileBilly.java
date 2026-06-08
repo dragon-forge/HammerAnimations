@@ -55,6 +55,7 @@ public class TileBilly
 		int power = world.getRedstonePowerFromNeighbors(pos);
 		
 		if(power > 0)
+		{
 			animations.startAnimationAt(CommonLayerNames.LEGS, ContainersHA.BILLY_WALK
 					.configure()
 					.speed(power / 15F)
@@ -67,6 +68,10 @@ public class TileBilly
 							.onFinish(MethodAnimAction.create(getClass(), "testCall", this))
 					)
 			);
+			animations.getLayer(CommonLayerNames.LEGS).freeze(false);
+		}else {
+			animations.getLayer(CommonLayerNames.LEGS).freeze(true);
+		}
 //		else
 //			animations.startAnimationAt(CommonLayerNames.LEGS, ConfiguredAnimation.noAnimation()
 //					.transitionTime(1F));

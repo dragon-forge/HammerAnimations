@@ -8,6 +8,7 @@ import org.zeith.hammeranims.api.particles.components.*;
 import org.zeith.hammeranims.api.particles.curve.ParticleCurve;
 import org.zeith.hammeranims.api.particles.event.CreateParticleEffectEvent;
 import org.zeith.hammeranims.core.init.ParticleComponentsHA;
+import org.zeith.hammerlib.util.mcf.Resources;
 
 import java.util.*;
 
@@ -41,7 +42,7 @@ public class ParticleEffect
 		return new Builder();
 	}
 	
-	public static final ResourceLocation LOCATION_BLOCKS_TEXTURE = new ResourceLocation("textures/atlas/blocks.png");
+	public static final ResourceLocation LOCATION_BLOCKS_TEXTURE = Resources.location("textures/atlas/blocks.png");
 	public static class Builder
 	{
 		protected final Map<IParticleComponentType, IParticleComponent> components = new HashMap<>();

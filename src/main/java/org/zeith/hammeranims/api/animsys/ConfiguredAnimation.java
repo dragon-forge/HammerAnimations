@@ -1,8 +1,7 @@
 package org.zeith.hammeranims.api.animsys;
 
-import com.zeitheron.hammercore.utils.base.Cast;
 import lombok.*;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.Constants;
 import org.zeith.hammeranims.api.animation.*;
@@ -72,20 +71,20 @@ public class ConfiguredAnimation
 	
 	public Animation getAnimation()
 	{
-		return Cast.or(animation, DefaultsHA.NULL_ANIMATION_SYNTETIC);
+		return animation != null ? animation : DefaultsHA.NULL_ANIMATION_SYNTETIC;
 	}
 	
 	public boolean same(ConfiguredAnimation other)
 	{
 		return this.speed == other.speed
-				&& this.weight == other.weight
-				&& this.loopMode == other.loopMode
-				&& this.startTime == other.startTime
-				&& this.transitionTime == other.transitionTime
-				&& this.timeFunction.equals(other.timeFunction)
-				&& Objects.equals(this.mask, other.mask)
-				&& this.reverse == other.reverse
-				&& this.animation == other.animation;
+		       && this.weight == other.weight
+		       && this.loopMode == other.loopMode
+		       && this.startTime == other.startTime
+		       && this.transitionTime == other.transitionTime
+		       && this.timeFunction.equals(other.timeFunction)
+		       && Objects.equals(this.mask, other.mask)
+		       && this.reverse == other.reverse
+		       && this.animation == other.animation;
 	}
 	
 	public void setAnimation(Animation animation)
@@ -213,7 +212,7 @@ public class ConfiguredAnimation
 	
 	public ActiveAnimation activate(AnimationLayer layer, Query query)
 	{
-		ActiveAnimation aa = new ActiveAnimation(this, query);
+		ActiveAnimation aa = new ActiveAnimation(layer, this, query);
 		aa.activationTime = layer.startTime;
 		return aa;
 	}
@@ -238,7 +237,7 @@ public class ConfiguredAnimation
 		
 		if(!this.onFinish.isEmpty())
 		{
-			NBTTagList onFinish = InstanceHelpers.newNBTList();
+			var onFinish = InstanceHelpers.newNBTList();
 			for(AnimationActionInstance finish : this.onFinish)
 				onFinish.appendTag(finish.serializeNBT());
 			tag.setTag("OnFinish", onFinish);
@@ -266,12 +265,12 @@ public class ConfiguredAnimation
 		
 		loopMode = LoopMode.values()[tag.getByte("LoopMode") % LoopMode.VALUE_COUNT];
 		
-		NBTTagList onFinish = tag.getTagList("OnFinish", Constants.NBT.TAG_COMPOUND);
+		var onFinish = tag.getTagList("OnFinish", Constants.NBT.TAG_COMPOUND);
 		this.onFinish.clear();
 		for(int i = 0; i < onFinish.tagCount(); i++)
 		{
 			AnimationActionInstance a = AnimationActionInstance.of(onFinish.getCompoundTagAt(i));
-			if(a != null && !a.isEmpty()) this.onFinish.add(a);
+			if(!a.isEmpty()) this.onFinish.add(a);
 		}
 	}
 	
