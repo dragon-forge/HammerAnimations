@@ -191,11 +191,11 @@ public class AnimationLayer
 		return new Builder(name);
 	}
 	
-	public void freeze(boolean b)
+	public void freeze(boolean shouldFreeze)
 	{
-		if(frozen != b)
+		if(frozen != shouldFreeze)
 		{
-			frozen = b;
+			frozen = shouldFreeze;
 		}
 	}
 	
@@ -291,11 +291,12 @@ public class AnimationLayer
 		
 		public AnimationLayer build(AnimationSystem sys)
 		{
-			if(query == null) query = new Query();
-			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync, persistent);
+			var q = query;
+			if(q == null) q = sys.query;
+			AnimationLayer layer = new AnimationLayer(sys, mask, q, name, blendMode, allowAutoSync, persistent);
 			layer.weight = weight;
 			layer.defaultTransitionTime = defaultTransitionTime;
-			if(initialAnimation != null) layer.currentAnimation = new ActiveAnimation(initialAnimation, query);
+			if(initialAnimation != null) layer.currentAnimation = new ActiveAnimation(layer, new ConfiguredAnimation(initialAnimation), q);
 			return layer;
 		}
 	}

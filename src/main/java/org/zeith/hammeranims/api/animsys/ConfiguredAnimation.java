@@ -13,7 +13,6 @@ import java.util.Objects;
 
 import static org.zeith.hammeranims.core.contents.time.LinearTimeFunction.FREEZE_SPEED;
 
-
 @ToString
 public class ConfiguredAnimation
 	implements IAnimationSource
@@ -70,14 +69,14 @@ public class ConfiguredAnimation
 	public boolean same(ConfiguredAnimation other)
 	{
 		return this.speed == other.speed
-			   && this.weight == other.weight
-			   && this.loopMode == other.loopMode
-			   && this.startTime == other.startTime
-			   && this.transitionTime == other.transitionTime
-			   && this.timeFunction.equals(other.timeFunction)
-			   && Objects.equals(this.mask, other.mask)
-			   && this.reverse == other.reverse
-			   && this.animation == other.animation;
+		       && this.weight == other.weight
+		       && this.loopMode == other.loopMode
+		       && this.startTime == other.startTime
+		       && this.transitionTime == other.transitionTime
+		       && this.timeFunction.equals(other.timeFunction)
+		       && Objects.equals(this.mask, other.mask)
+		       && this.reverse == other.reverse
+		       && this.animation == other.animation;
 	}
 	
 	public void setAnimation(Animation animation)
@@ -190,7 +189,7 @@ public class ConfiguredAnimation
 	
 	public ActiveAnimation activate(AnimationLayer layer, Query query)
 	{
-		ActiveAnimation aa = new ActiveAnimation(this, query);
+		ActiveAnimation aa = new ActiveAnimation(layer, this, query);
 		aa.activationTime = layer.startTime;
 		return aa;
 	}

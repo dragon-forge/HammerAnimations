@@ -11,9 +11,7 @@ import static org.zeith.hammeranims.api.HammerAnimationsApi.APPROX_ZERO;
 @NoArgsConstructor
 public class SerializableMask
 {
-	@Singular
 	protected Set<String> excludes = new HashSet<>();
-	
 	protected Object2FloatMap<String> boneWeights = null;
 	
 	@Builder
@@ -64,7 +62,25 @@ public class SerializableMask
 		public SerializableMaskBuilder boneWeight(String bone, float weight)
 		{
 			if(Math.abs(weight) < APPROX_ZERO) return exclude(bone);
-			boneWeights().put(bone, weight);
+			boneWeights().put(bone.toLowerCase(Locale.ROOT), weight);
+			return this;
+		}
+		
+		public SerializableMaskBuilder boneWeights(Object2FloatMap<String> weightMap)
+		{
+			if(weightMap == null || weightMap.isEmpty()) return this;
+			Object2FloatMap<String> bw = boneWeights();
+			for(Object2FloatMap.Entry<String> e : weightMap.object2FloatEntrySet())
+			{
+				String bone = e.getKey().toLowerCase(Locale.ROOT);
+				float weight = e.getFloatValue();
+				if(Math.abs(weight) < APPROX_ZERO)
+				{
+					exclude(bone);
+					continue;
+				}
+				bw.put(bone, weight);
+			}
 			return this;
 		}
 		
@@ -72,6 +88,11 @@ public class SerializableMask
 		{
 			if(this.boneWeights != null) return this.boneWeights;
 			return this.boneWeights = new Object2FloatOpenHashMap<>();
+		}
+		
+		private SerializableMaskBuilder excludes(Set<String> excludes)
+		{
+			return this;
 		}
 	}
 }

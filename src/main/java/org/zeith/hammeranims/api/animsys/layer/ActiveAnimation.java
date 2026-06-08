@@ -3,6 +3,7 @@ package org.zeith.hammeranims.api.animsys.layer;
 import dev.zeith.lzvm.LzVariableStore;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.data.*;
+import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 
@@ -11,12 +12,10 @@ import java.util.concurrent.TimeUnit;
 
 public class ActiveAnimation
 {
-	public double activationTime;
+	public final AnimationLayer layer;
+	public final Query query;
 	
-	// Nano time implementation
-	public boolean useNanoTime;
-	public long freezeRelativeNanoTime = -1L;
-	public long activationTimeNanos = System.nanoTime();
+	public double activationTime;
 	
 	// Properties
 	public ConfiguredAnimation config;
@@ -32,22 +31,20 @@ public class ActiveAnimation
 	
 	public ActiveAnimation(ConfiguredAnimation config, LzVariableStore vars)
 	{
+		this.layer = layer;
+		this.query = query;
 		this.config = config;
-		this.bones = instantiateBones(this.config, vars);
+		this.bones = instantiateBones(this.config, query);
 	}
 	
 	public double elapsedSeconds(double sysTime)
 	{
-		if(!useNanoTime)
-			return sysTime - activationTime;
-		
-		long now = System.nanoTime();
-		
-		long nt = now - this.activationTimeNanos;
-		
-		if(freezeRelativeNanoTime > 0) nt = freezeRelativeNanoTime;
-		
-		return TimeUnit.NANOSECONDS.toMicros(nt) / 1_000_000D;
+		return sysTime - activationTime;
+	}
+	
+	public boolean isFrozen()
+	{
+		return HammerAnimations.PROXY.isGamePaused() || layer.frozen;
 	}
 	
 	public Map<String, BoneAnimationInstance> getBoneAnimations()
@@ -58,10 +55,9 @@ public class ActiveAnimation
 	public boolean isDone(double sysTime)
 	{
 		IAnimationData data;
-		return config.animation == null
-				|| (config.loopMode == LoopMode.ONCE && (
+		return config.animation == null || (config.loopMode == LoopMode.ONCE && (
 				(data = config.animation.getData()) == null
-						|| (sysTime - activationTime) * config.speed >= getLengthSeconds()
+				|| (sysTime - activationTime) * config.speed >= getLengthSeconds()
 		));
 	}
 	

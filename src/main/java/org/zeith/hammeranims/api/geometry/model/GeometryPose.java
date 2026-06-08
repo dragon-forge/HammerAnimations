@@ -105,6 +105,11 @@ public class GeometryPose
 		return copy;
 	}
 	
+	public GeometryTransforms getRoot()
+	{
+		return boneTransforms.computeIfAbsent(ModelPartInfo.ROOT_BONE_NAME, TRANSFORM_FACTORY);
+	}
+	
 	public GeometryTransforms getTransform(String bone)
 	{
 		bone = bone.toLowerCase(Locale.ROOT);

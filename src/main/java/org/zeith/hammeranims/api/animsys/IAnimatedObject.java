@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.animsys;
 
 import lombok.val;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 import org.joml.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
@@ -42,7 +42,7 @@ public interface IAnimatedObject
 	
 	Vec3d getAnimatedObjectPosition();
 	
-	default Query createQuery()
+	default @NotNull Query createQuery()
 	{
 		return new Query();
 	}

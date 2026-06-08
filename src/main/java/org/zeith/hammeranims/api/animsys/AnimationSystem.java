@@ -19,6 +19,12 @@ public class AnimationSystem
 	@NotNull
 	public final IAnimatedObject owner;
 	
+	@NotNull
+	public final Query query;
+	
+	@Setter
+	protected double time;
+	
 	protected boolean hasTicked = false;
 	protected boolean hasReceivedTime = false;
 	
@@ -41,6 +47,7 @@ public class AnimationSystem
 		this.owner = owner;
 		this.layers = layers;
 		this.layerMap = Collections.unmodifiableMap(layerMap);
+		this.query = Objects.requireNonNull(owner.createQuery(), "owner.createQuery()");
 	}
 	
 	@Nullable
@@ -211,7 +218,6 @@ public class AnimationSystem
 		
 		public AnimationSystem build()
 		{
-			Query q = owner.createQuery();
 			AnimationLayer[] layers = new AnimationLayer[this.layers.size()];
 			Map<String, AnimationLayer> layerMap = new HashMap<>();
 			AnimationSystem sys = new AnimationSystem(owner, layers, layerMap);
@@ -220,7 +226,7 @@ public class AnimationSystem
 			sys.syncTime = syncTime;
 			for(int i = 0; i < layers.length; i++)
 			{
-				AnimationLayer al = layers[i] = this.layers.get(i).defaultQuery(q).build(sys);
+				AnimationLayer al = layers[i] = this.layers.get(i).build(sys);
 				layerMap.put(al.name, al);
 			}
 			return sys;
