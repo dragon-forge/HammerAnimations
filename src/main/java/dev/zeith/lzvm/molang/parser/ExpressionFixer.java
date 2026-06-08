@@ -11,6 +11,9 @@ public class ExpressionFixer
 	{
 		// Fix dangling math operators matching +-*/%&^|? FOLLOWED BY 0+ whitespaces FOLLOWED BY ) by replacing with just )
 		registerFix(input -> input.replaceAll("[+\\-*\\/%&^|?]+\\s*\\)", ")"));
+		
+		// Fix dangling math operators matching +-*/%&^|? FOLLOWED BY 0+ whitespaces by deleting them.
+		registerFix(input -> input.replaceAll("[+\\-*\\/%&^|?]+\\s*$", ""));
 	}
 	
 	public static void registerFix(UnaryOperator<String> fix)

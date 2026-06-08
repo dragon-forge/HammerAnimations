@@ -112,11 +112,6 @@ public class LzMath
 		return String.valueOf(a).concat(String.valueOf(b));
 	}
 	
-	public static double get(double index, LzVarOp var)
-	{
-		return  var.get(index);
-	}
-	
 	public static void set(double v, LzVarOp var)
 	{
 		var.set(v);

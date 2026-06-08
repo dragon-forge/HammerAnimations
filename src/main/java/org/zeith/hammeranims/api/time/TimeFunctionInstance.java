@@ -4,7 +4,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
-import org.zeith.hammeranims.api.animsys.layer.*;
+import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
 import org.zeith.hammeranims.api.utils.ICompoundSerializable;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
@@ -52,7 +52,7 @@ public class TimeFunctionInstance
 	
 	public CompoundTag getExtra()
 	{
-		CompoundTag i = InstanceHelpers.newNBTCompound();
+		var i = InstanceHelpers.newNBTCompound();
 		if(extra == null && !isEmpty()) extra = i;
 		return i;
 	}

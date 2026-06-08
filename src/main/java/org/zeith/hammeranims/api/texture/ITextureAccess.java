@@ -48,7 +48,7 @@ public interface ITextureAccess
 		
 		PixelFaceVisitor visitor = new PixelFaceVisitor(texture, texture.getWidth(), texture.getHeight(), color ->
 		{
-			int a = ColorHelper.getAlphai(color);
+			int a = (color >> 24) & 0xFF;
 			if(a > 0) nonTransparent[0] = true;
 			VertexType v = VertexType.ofAlpha(a);
 			type[0] = v.max(type[0]);

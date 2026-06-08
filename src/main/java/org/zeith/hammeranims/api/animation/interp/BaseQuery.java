@@ -1,11 +1,8 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import dev.zeith.lzvm.exception.LzVMOperationNotSupportedException;
-import dev.zeith.lzvm.op.*;
-import lombok.Setter;
+import dev.zeith.lzvm.op.LzVarOp;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 
 public abstract class BaseQuery
 		implements IVariableAccess
@@ -14,10 +11,10 @@ public abstract class BaseQuery
 	
 	public BaseQuery()
 	{
-		registerVariables(this::setVariable);
+		registerVariables(IVariableRegistrar.of(this));
 	}
 	
-	protected void registerVariables(BiConsumer<String, ReadonlyLzVarOp> reg)
+	protected void registerVariables(IVariableRegistrar reg)
 	{
 	}
 	
@@ -26,7 +23,7 @@ public abstract class BaseQuery
 		return (ReadWriteVariable) vars.computeIfAbsent(name, l ->
 				{
 					ReadWriteVariable v = new ReadWriteVariable();
-					v.val = v.defaultValue = defaultValue;
+					v.val = defaultValue;
 					return v;
 				}
 		);
@@ -42,41 +39,5 @@ public abstract class BaseQuery
 	public void setVariable(String name, LzVarOp value)
 	{
 		vars.put(name, value);
-	}
-	
-	public static class ReadWriteVariable
-			implements LzVarOp
-	{
-		@Setter
-		double defaultValue;
-		
-		double val;
-		
-		
-		@Override
-		public double get()
-				throws LzVMOperationNotSupportedException
-		{
-			return val;
-		}
-		
-		@Override
-		public void set(double value)
-				throws LzVMOperationNotSupportedException
-		{
-			val = value;
-		}
-		
-		@Override
-		public void reset()
-		{
-			val = defaultValue;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return "rw(" + val + ")";
-		}
 	}
 }

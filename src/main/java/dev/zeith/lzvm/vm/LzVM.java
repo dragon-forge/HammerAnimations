@@ -1,58 +1,80 @@
-package dev.zeith.lzvm;
+package dev.zeith.lzvm.vm;
 
+import dev.zeith.lzvm.LzVariableStore;
+import dev.zeith.lzvm.api.JzRuntimeProvider;
 import dev.zeith.lzvm.exception.*;
 import dev.zeith.lzvm.jvm.*;
 import dev.zeith.lzvm.op.*;
 import dev.zeith.lzvm.program.*;
+import dev.zeith.lzvm.vm.jvm.JvmJClassLoader;
+import lombok.*;
 
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class LzVM
+		implements JzRuntimeProvider<LzVM>
 {
-	protected final ClassLoader loader;
-	protected final Map<String, Map<LzCallInsn, Optional<Method>>> jvmCache = new ConcurrentHashMap<>();
-	private LzJCallShutter jcallShutter = LzJCallShutter.ALLOW_EVERYTHING;
+	protected final JClassLoader loader;
+	protected final Map<String, Map<LzCallInsn, Optional<JMethod>>> jvmCache = new ConcurrentHashMap<>();
+	
 	public boolean logInterpretSteps = false;
 	
-	public LzVM(ClassLoader loader)
+	@Getter
+	@Setter
+	private LzJCallShutter jCallShutter = LzJCallShutter.ALLOW_EVERYTHING;
+	
+	@Getter
+	@Setter
+	public boolean useSineLookupTable = true;
+	
+	public LzVM(JClassLoader loader)
 	{
 		this.loader = loader;
 	}
 	
 	public LzVM()
 	{
-		this(Thread.currentThread().getContextClassLoader());
+		this(new JvmJClassLoader(Thread.currentThread().getContextClassLoader()));
 	}
 	
-	public LzVM addJCallShutter(LzJCallShutter shutter)
+	@Override
+	public LzFactory expression(LzProgramBody body)
 	{
-		if(jcallShutter == LzJCallShutter.ALLOW_EVERYTHING)
+		LzProgramInfo info = body.computeInfo();
+		LzFactory[] fac = new LzFactory[1];
+		fac[0] = store -> new LzExpression()
 		{
-			jcallShutter = shutter;
-			return this;
-		}
-		jcallShutter = jcallShutter.or(shutter);
-		return this;
+			final LzProgramStack stack = info.mallocStack(0);
+			
+			@Override
+			public double get()
+			{
+				return interpret(store, body, stack);
+			}
+			
+			@Override
+			public double get(double... args)
+			{
+				return interpret(store, body, stack);
+			}
+			
+			@Override
+			public LzExpression instantiate(LzVariableStore store)
+			{
+				return fac[0].instantiate(store);
+			}
+		};
+		return fac[0];
 	}
 	
-	protected Method findMethod(String owner, LzCallInsn call)
+	protected JMethod findMethod(String owner, LzCallInsn call)
 	{
-		Map<LzCallInsn, Optional<Method>> map = jvmCache.computeIfAbsent(owner, k -> new ConcurrentHashMap<>());
+		Map<LzCallInsn, Optional<JMethod>> map = jvmCache.computeIfAbsent(owner, k -> new ConcurrentHashMap<>());
 		return map.computeIfAbsent(call, c ->
-				{
-					try
-					{
-						Class<?> cls = loader.loadClass(owner.replace('/', '.'));
-						Class<?>[] params = ArgType.toJavaArgs(call.argTypes);
-						return Optional.of(cls.getDeclaredMethod(call.name, params));
-					} catch(ReflectiveOperationException e)
-					{
-						return Optional.empty();
-					}
-				}
+				Optional.ofNullable(loader.loadClass(owner.replace('/', '.')))
+				        .map(cls -> cls.getDeclaredMethod(call))
 		).orElse(null);
 	}
 	
@@ -108,7 +130,9 @@ public class LzVM
 		
 		Set<String> initializedVars = new HashSet<>();
 		
+		final boolean useSineLookupTable = this.useSineLookupTable;
 		final boolean logInterpretSteps = this.logInterpretSteps;
+		
 		String vinsn = null;
 		LzCallInsn cinsn = null;
 		int i = 0, op = -1, expect = 0;
@@ -166,20 +190,14 @@ public class LzVM
 						String owner = vinsn = sConsts[insn[++i]];
 						cinsn = callTable[insn[++i]];
 						
-						if(jcallShutter != LzJCallShutter.ALLOW_EVERYTHING && !jcallShutter.permits(owner.replace('/', '.'), cinsn))
+						if(jCallShutter != LzJCallShutter.ALLOW_EVERYTHING && !jCallShutter.permits(owner.replace('/', '.'), cinsn))
 							throw new LzVMCallNotFoundException(LzOpcodes.opNameIndexed(i, op) + ": jcall to " + owner + " was not allowed by the interpreters jcall shutter.");
 						
-						Method method = findMethod(owner, cinsn);
+						JMethod method = findMethod(owner, cinsn);
 						Object[] capturedArgs = new Object[cinsn.argCount];
 						expect = capturedArgs.length;
 						for(int j = capturedArgs.length - 1; j >= 0; --j) capturedArgs[j] = stack[ptr--];
-						try
-						{
-							stack[++ptr] = method.invoke(null, capturedArgs);
-						} catch(ReflectiveOperationException e)
-						{
-							throw new LzVMCallNotFoundException(e);
-						}
+						stack[++ptr] = method.invoke(capturedArgs);
 					}
 					break;
 					
@@ -227,13 +245,13 @@ public class LzVM
 					case LzOpcodes.FSIN:
 					{
 						double onStack = coerce(stack[ptr]);
-						stack[ptr] = LzMath.sind(onStack);
+						stack[ptr] = useSineLookupTable ? LzMath.sind(onStack) : Math.sin(onStack);
 					}
 					break;
 					case LzOpcodes.FCOS:
 					{
 						double onStack = coerce(stack[ptr]);
-						stack[ptr] = LzMath.cosd(onStack);
+						stack[ptr] = useSineLookupTable ? LzMath.cosd(onStack) : Math.cos(onStack);
 					}
 					break;
 					

@@ -8,7 +8,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.animation.data.effects.*;
@@ -62,7 +62,7 @@ public interface IAnimatedObject
 	
 	Vec3 getAnimatedObjectPosition();
 	
-	default Query createQuery()
+	default @NotNull Query createQuery()
 	{
 		return new QueryWorld(getAnimatedObjectWorld());
 	}
@@ -83,7 +83,6 @@ public interface IAnimatedObject
 		val pos = getAnimatedObjectPosition();
 		if(pos == null) return null;
 		return new Matrix4d()
-				.identity()
 				.translate(pos.x, pos.y, pos.z)
 				.rotateY(getBaseAnimatedYRot(partialTicks) * Mth.DEG_TO_RAD);
 	}
@@ -124,7 +123,7 @@ public interface IAnimatedObject
 	{
 		val world = getAnimatedObjectWorld();
 		val pos = getAnimatedObjectPosition();
-		if(world == null || pos == null || !world.isClientSide()) return;
+		if(world == null || pos == null || !world.isClientSide) return;
 		val vol = getAnimationObjectVolume();
 		if(vol <= 0F) return;
 		world.playLocalSound(pos.x, pos.y, pos.z, BuiltInRegistries.SOUND_EVENT.get(effect.getEffect()), getAnimationObjectSoundCategory(), 1F, 1F, false);

@@ -29,6 +29,9 @@ public class AnimationSystem
 	@NotNull
 	public final IAnimatedObject owner;
 	
+	@NotNull
+	public final Query query;
+	
 	@Setter
 	protected double time;
 	
@@ -52,6 +55,7 @@ public class AnimationSystem
 		this.owner = owner;
 		this.layers = layers;
 		this.layerMap = Collections.unmodifiableMap(layerMap);
+		this.query = Objects.requireNonNull(owner.createQuery(), "owner.createQuery()");
 	}
 	
 	public void setWorld(Level world)
@@ -71,8 +75,7 @@ public class AnimationSystem
 		if(world.isClientSide || !canSync) // if on server
 			return;
 		var pos = BlockPos.containing(owner.getAnimatedObjectPosition());
-		if(!world.isLoaded(pos))
-			return;
+		if(!world.isLoaded(pos)) return;
 		sendPacketToTracking(createSyncPacket());
 	}
 	
@@ -85,8 +88,10 @@ public class AnimationSystem
 	{
 		var world = owner.getAnimatedObjectWorld();
 		if(world.isClientSide) return;
-		var pos = BlockPos.containing(owner.getAnimatedObjectPosition());
-		Network.sendToTracking(world.getChunkAt(pos), packet);
+		Network.sendToTracking(
+				packet,
+				world.getChunkAt(BlockPos.containing(owner.getAnimatedObjectPosition()))
+		);
 	}
 	
 	@Nullable
@@ -97,13 +102,13 @@ public class AnimationSystem
 	
 	public AnimationLocation activeAnimationLocation(String layer)
 	{
-		var l = getLayer(layer);
+		AnimationLayer l = getLayer(layer);
 		return l == null ? DefaultsHA.NULL_ANIM.getLocation() : l.activeAnimationLocation();
 	}
 	
 	public boolean isActiveAnimation(String layer, IAnimationSource source)
 	{
-		var al = activeAnimationLocation(layer);
+		AnimationLocation al = activeAnimationLocation(layer);
 		return Objects.equals(al, source.getLocation());
 	}
 	
@@ -151,7 +156,7 @@ public class AnimationSystem
 		{
 			hasTicked = true;
 			val world = owner.getAnimatedObjectWorld();
-			if(canSync && world.isClientSide()) // Request animations from server on load
+			if(canSync && world.isClientSide) // Request animations from server on load
 				Network.sendToServer(new PacketRequestAnimationSystemSync(this));
 			setWorld(world);
 		}
@@ -317,7 +322,6 @@ public class AnimationSystem
 		
 		public AnimationSystem build()
 		{
-			Query q = owner.createQuery();
 			AnimationLayer[] layers = new AnimationLayer[this.layers.size()];
 			
 			Map<String, AnimationLayer> layerMap = new HashMap<>();
@@ -330,7 +334,7 @@ public class AnimationSystem
 			
 			for(int i = 0; i < layers.length; i++)
 			{
-				AnimationLayer al = layers[i] = this.layers.get(i).defaultQuery(q).build(sys);
+				AnimationLayer al = layers[i] = this.layers.get(i).build(sys);
 				layerMap.put(al.name, al);
 			}
 			return sys;

@@ -2,7 +2,6 @@ package dev.zeith.lzvm.op;
 
 import lombok.SneakyThrows;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 public interface LzOpcodes
@@ -55,12 +54,12 @@ public interface LzOpcodes
 	
 	static String opName(int opcode)
 	{
-		return "Op(" + LzOpcodes.NAME_OF.get(opcode) + ")";
+		return "Op(" + LzOpcodes.NAME_OF.getOrDefault(opcode, Integer.toString(opcode)) + ")";
 	}
 	
 	static String opNameIndexed(int idx, int opcode)
 	{
-		return "Op[" + idx + "](" + LzOpcodes.NAME_OF.get(opcode) + ")";
+		return "Op[" + idx + "](" + LzOpcodes.NAME_OF.getOrDefault(opcode, Integer.toString(opcode)) + ")";
 	}
 	
 	@SuppressWarnings("DuplicatedCode")
@@ -128,15 +127,42 @@ public interface LzOpcodes
 		private static Map<String, Integer> computeByName()
 		{
 			Map<String, Integer> m = new HashMap<>();
-			for(Field f : LzOpcodes.class.getDeclaredFields())
-			{
-				if(f.getType().isPrimitive() && !f.getName().startsWith("I_"))
-				{
-					String name = f.getName();
-					int insn = f.getInt(null);
-					m.put(name, insn);
-				}
-			}
+			m.put("RETURN", RETURN);
+			m.put("CONST", CONST);
+			m.put("SCONST", SCONST);
+			m.put("LOAD", LOAD);
+			m.put("STORE", STORE);
+			m.put("JCALL", JCALL);
+			m.put("CALL", CALL);
+			m.put("ADD", ADD);
+			m.put("SUB", SUB);
+			m.put("MUL", MUL);
+			m.put("DIV", DIV);
+			m.put("MOD", MOD);
+			m.put("EQUALS", EQUALS);
+			m.put("NOT_EQUALS", NOT_EQUALS);
+			m.put("GREATER_THAN", GREATER_THAN);
+			m.put("GREATER_EQ_THAN", GREATER_EQ_THAN);
+			m.put("LESS_THAN", LESS_THAN);
+			m.put("LESS_EQ_THAN", LESS_EQ_THAN);
+			m.put("COALESCE", COALESCE);
+			m.put("AND", AND);
+			m.put("OR", OR);
+			m.put("NOT", NOT);
+			m.put("FSIN", FSIN);
+			m.put("FCOS", FCOS);
+			m.put("READ", READ);
+			m.put("WRITE", WRITE);
+			m.put("LABEL", LABEL);
+			m.put("JUMP", JUMP);
+			m.put("JUMP_IF_FALSE", JUMP_IF_FALSE);
+			m.put("JUMP_IF_TRUE", JUMP_IF_TRUE);
+			m.put("TO_STRING", TO_STRING);
+			m.put("POP", POP);
+			m.put("READ_INDEXED", READ_INDEXED);
+			m.put("WRITE_INDEXED", WRITE_INDEXED);
+			m.put("MIN", MIN);
+			m.put("MAX", MAX);
 			return Collections.unmodifiableMap(m);
 		}
 		
@@ -144,15 +170,42 @@ public interface LzOpcodes
 		private static Map<Integer, String> computeNameOf()
 		{
 			Map<Integer, String> m = new HashMap<>();
-			for(Field f : LzOpcodes.class.getDeclaredFields())
-			{
-				if(f.getType().isPrimitive() && !f.getName().startsWith("I_"))
-				{
-					String name = f.getName();
-					int insn = f.getInt(null);
-					m.put(insn, name);
-				}
-			}
+			m.put(RETURN, "RETURN");
+			m.put(CONST, "CONST");
+			m.put(SCONST, "SCONST");
+			m.put(LOAD, "LOAD");
+			m.put(STORE, "STORE");
+			m.put(JCALL, "JCALL");
+			m.put(CALL, "CALL");
+			m.put(ADD, "ADD");
+			m.put(SUB, "SUB");
+			m.put(MUL, "MUL");
+			m.put(DIV, "DIV");
+			m.put(MOD, "MOD");
+			m.put(EQUALS, "EQUALS");
+			m.put(NOT_EQUALS, "NOT_EQUALS");
+			m.put(GREATER_THAN, "GREATER_THAN");
+			m.put(GREATER_EQ_THAN, "GREATER_EQ_THAN");
+			m.put(LESS_THAN, "LESS_THAN");
+			m.put(LESS_EQ_THAN, "LESS_EQ_THAN");
+			m.put(COALESCE, "COALESCE");
+			m.put(AND, "AND");
+			m.put(OR, "OR");
+			m.put(NOT, "NOT");
+			m.put(FSIN, "FSIN");
+			m.put(FCOS, "FCOS");
+			m.put(READ, "READ");
+			m.put(WRITE, "WRITE");
+			m.put(LABEL, "LABEL");
+			m.put(JUMP, "JUMP");
+			m.put(JUMP_IF_FALSE, "JUMP_IF_FALSE");
+			m.put(JUMP_IF_TRUE, "JUMP_IF_TRUE");
+			m.put(TO_STRING, "TO_STRING");
+			m.put(POP, "POP");
+			m.put(READ_INDEXED, "READ_INDEXED");
+			m.put(WRITE_INDEXED, "WRITE_INDEXED");
+			m.put(MIN, "MIN");
+			m.put(MAX, "MAX");
 			return Collections.unmodifiableMap(m);
 		}
 	}

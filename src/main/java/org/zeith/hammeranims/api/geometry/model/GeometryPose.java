@@ -3,10 +3,11 @@ package org.zeith.hammeranims.api.geometry.model;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammeranims.api.animation.data.BoneAnimationInstance;
-import org.zeith.hammeranims.api.animation.interp.*;
+import org.zeith.hammeranims.api.animation.interp.BlendMode;
 import org.zeith.hammeranims.api.animsys.SerializableMask;
 import org.zeith.hammeranims.api.animsys.layer.*;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
+import org.zeith.hammeranims.core.impl.api.geometry.decoder.ModelPartInfo;
 
 import java.util.*;
 import java.util.function.*;
@@ -97,6 +98,11 @@ public class GeometryPose
 		for(Map.Entry<String, GeometryTransforms> bone : boneTransforms.entrySet())
 			copy.boneTransforms.put(bone.getKey(), bone.getValue().copy());
 		return copy;
+	}
+	
+	public GeometryTransforms getRoot()
+	{
+		return boneTransforms.computeIfAbsent(ModelPartInfo.ROOT_BONE_NAME, TRANSFORM_FACTORY);
 	}
 	
 	public GeometryTransforms getTransform(String bone)

@@ -1,12 +1,10 @@
 package org.zeith.hammeranims.api.animation.data.effects;
 
-import lombok.Value;
-import lombok.val;
+import lombok.*;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammeranims.api.particles.IParticleContainer;
 import org.zeith.hammeranims.core.utils.InstanceHelpers;
-import org.zeith.hammerlib.util.shaded.json.JSONArray;
-import org.zeith.hammerlib.util.shaded.json.JSONObject;
+import org.zeith.hammerlib.util.shaded.json.*;
 
 import java.util.*;
 
@@ -27,10 +25,8 @@ public class AnimatedParticleEffect
 		if(object instanceof JSONArray)
 		{
 			List<AnimatedParticleEffect> lst = new ArrayList<>();
-			for(Object value : (JSONArray) object)
-			{
-				lst.addAll(decode(value));
-			}
+			var arr = (JSONArray) object;
+			for(int i = 0, len = arr.size(); i < len; i++) lst.addAll(decode(arr.get(i)));
 			return Collections.unmodifiableList(lst);
 		} else if(object instanceof JSONObject)
 		{

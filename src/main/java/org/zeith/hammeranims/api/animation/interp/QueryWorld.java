@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.api.animation.interp;
 
-import dev.zeith.lzvm.op.ReadonlyLzVarOp;
 import lombok.Getter;
 import net.minecraft.world.level.Level;
 
-import java.util.function.BiConsumer;
-
+/**
+ * This is an extensible class (this gets passed to animation layers)
+ */
 public class QueryWorld
 		extends Query
 {
@@ -25,14 +25,14 @@ public class QueryWorld
 	{
 		if(world == null) return;
 		this.world = world;
-		registerWorldVariables(this, world, this::setVariable);
+		registerWorldVariables(this, world, IVariableRegistrar.of(this));
 	}
 	
-	public static void registerWorldVariables(Query q, Level world, BiConsumer<String, ReadonlyLzVarOp> reg)
+	public static void registerWorldVariables(Query q, Level world, IVariableRegistrar reg)
 	{
-		reg.accept("query.moon_brightness", () -> world.getMoonBrightness());
-		reg.accept("query.moon_phase", () -> world.getMoonPhase());
-		reg.accept("query.time_of_day", () -> world.getTimeOfDay(q.partialTicks));
-		reg.accept("query.time_stamp", () -> world.getGameTime());
+		reg.registerR("query.moon_brightness", () -> world.getMoonBrightness());
+		reg.registerR("query.moon_phase", () -> world.getMoonPhase());
+		reg.registerR("query.time_of_day", () -> world.getTimeOfDay(q.partialTicks));
+		reg.registerR("query.time_stamp", () -> world.getGameTime());
 	}
 }

@@ -39,6 +39,10 @@ public enum BlendMode
 	
 	public static Vec3 mult(Vec3 a, Vec3 b)
 	{
-		return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z);
+		return new Vec3(
+				a.x * b.x,
+				a.y * b.y,
+				a.z * b.z
+		);
 	}
 }

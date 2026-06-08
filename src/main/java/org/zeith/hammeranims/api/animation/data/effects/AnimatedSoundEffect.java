@@ -18,8 +18,8 @@ public class AnimatedSoundEffect
 		if(object instanceof JSONArray)
 		{
 			List<AnimatedSoundEffect> lst = new ArrayList<>();
-			for(Object value : (JSONArray) object)
-				lst.addAll(decode(value));
+			var arr = (JSONArray) object;
+			for(int i = 0, len = arr.size(); i < len; i++) lst.addAll(decode(arr.get(i)));
 			return Collections.unmodifiableList(lst);
 		} else if(object instanceof JSONObject)
 		{

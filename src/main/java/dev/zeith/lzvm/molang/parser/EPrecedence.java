@@ -22,11 +22,10 @@ public enum EPrecedence
 	PRODUCT,
 	EXPONENT,
 	
+	ARRAY_ACCESS,
 	PREFIX,
 	POSTFIX,
 	FUNCTION,
-	
-	ARRAY_ACCESS,
 	
 //	ARROW,
 }

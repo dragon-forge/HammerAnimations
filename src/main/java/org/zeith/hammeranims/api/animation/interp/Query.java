@@ -5,8 +5,6 @@ import net.minecraft.world.level.Level;
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
 
-import java.util.function.BiConsumer;
-
 /**
  * This is an extensible class (this gets passed to animation layers)
  */
@@ -31,14 +29,14 @@ public class Query
 	}
 	
 	@Override
-	protected void registerVariables(BiConsumer<String, ReadonlyLzVarOp> reg)
+	protected void registerVariables(IVariableRegistrar reg)
 	{
 		super.registerVariables(reg);
 		
 		ReadonlyLzVarOp animLength = () -> anim_length;
-		reg.accept("query.anim_duration", animLength);
-		reg.accept("query.anim_length", animLength);
-		reg.accept("query.anim_time", () -> anim_time);
-		reg.accept("query.frame_alpha", () -> partialTicks);
+		reg.registerR("query.anim_duration", animLength);
+		reg.registerR("query.anim_length", animLength);
+		reg.registerR("query.anim_time", () -> anim_time);
+		reg.registerR("query.frame_alpha", () -> partialTicks);
 	}
 }

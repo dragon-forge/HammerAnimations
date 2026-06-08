@@ -4,6 +4,7 @@ import dev.zeith.lzvm.jvm.LzMath;
 import dev.zeith.lzvm.molang.compiler.IMoFunctionCallTransformer;
 import dev.zeith.lzvm.molang.expression.*;
 import dev.zeith.lzvm.program.LzCallInsn;
+import dev.zeith.lzvm.util.DoubleTernaryOperator;
 
 import java.util.*;
 import java.util.function.Function;
@@ -59,7 +60,7 @@ public class MoLangEasing
 		c.put(dTernaryOperator("ease_out_sine"), argsAndExtraPure(dtOpt(MoLangEasing::easeOutSine), b -> b.addJCall(JMoEasing, dTernaryOperator("easeOutSine"))));
 	}
 	
-	private static Function<FuncCallExpression, MLExpression> dtOpt(MoMathLibrary.DoubleTernaryOperator operator)
+	private static Function<FuncCallExpression, MLExpression> dtOpt(DoubleTernaryOperator operator)
 	{
 		return call ->
 		{
