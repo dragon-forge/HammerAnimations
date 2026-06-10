@@ -1,16 +1,13 @@
 package org.zeith.hammeranims;
 
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.bus.api.*;
 import net.neoforged.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
 import org.zeith.hammeranims.core.impl.api.particles.ParticleDecoder;
-import org.zeith.hammeranims.core.js.JsFactory;
 import org.zeith.hammeranims.core.proxy.*;
 import org.zeith.hammerlib.api.proxy.IProxy;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;

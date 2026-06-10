@@ -1,5 +1,6 @@
 package org.zeith.hammeranims.net;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
@@ -22,11 +23,11 @@ public class PacketStartAnimation
 	{
 	}
 	
-	public PacketStartAnimation(AnimationLayer layer, ConfiguredAnimation animation)
+	public PacketStartAnimation(HolderLookup.Provider provider, AnimationLayer layer, ConfiguredAnimation animation)
 	{
 		this.layer = layer.name;
 		this.source = layer.system.getAnimationSource();
-		this.animation = animation.serializeNBT();
+		this.animation = animation.serializeNBT(provider);
 	}
 	
 	@Override

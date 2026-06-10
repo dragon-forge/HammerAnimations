@@ -1,6 +1,7 @@
 package org.zeith.hammeranims.core.contents.actions;
 
 import lombok.*;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.*;
@@ -9,7 +10,7 @@ import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammeranims.api.animsys.actions.*;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.annotation.ExposedToAnimAction;
-import org.zeith.hammeranims.core.init.*;
+import org.zeith.hammeranims.core.init.ContainersHA;
 import org.zeith.hammerlib.util.java.Cast;
 import org.zeith.hammerlib.util.java.reflection.SerializableMethodHandle;
 
@@ -126,18 +127,18 @@ public class MethodAnimAction
 		}
 		
 		@Override
-		public CompoundTag serializeNBT()
+		public CompoundTag serializeNBT(HolderLookup.Provider lookup)
 		{
-			CompoundTag tag = super.serializeNBT();
-			tag.put("Call", handle.serializeNBT());
+			CompoundTag tag = super.serializeNBT(lookup);
+			tag.put("Call", handle.serializeNBT(lookup));
 			return tag;
 		}
 		
 		@Override
-		public void deserializeNBT(CompoundTag nbt)
+		public void deserializeNBT(HolderLookup.Provider lookup, CompoundTag nbt)
 		{
-			super.deserializeNBT(nbt);
-			handle = new SerializableMethodHandle(nbt.getCompound("Call"));
+			super.deserializeNBT(lookup, nbt);
+			handle = new SerializableMethodHandle(lookup, nbt.getCompound("Call"));
 		}
 	}
 }

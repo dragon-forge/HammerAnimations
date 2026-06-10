@@ -1,7 +1,7 @@
 package org.zeith.hammeranims.api.animsys.layer;
 
-import net.minecraft.core.HolderLookup;
 import lombok.*;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.hammeranims.api.animation.*;
@@ -114,7 +114,7 @@ public class AnimationLayer
 		if(doSync && system.autoSync && allowAutoSync)
 		{
 			if(!system.syncTime)
-				system.sendPacketToTracking(new PacketStartAnimation(this, animation));
+				system.sendPacketToTracking(new PacketStartAnimation(system.owner.getAnimatedObjectWorld().registryAccess(), this, animation));
 			else
 				system.sync();
 		}

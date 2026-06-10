@@ -3,6 +3,8 @@ package org.zeith.hammeranims.api.geometry.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.zeith.hammeranims.api.geometry.data.FaceUV;
+import org.zeith.hammeranims.api.utils.IFaceUVPredicate;
 import org.zeith.hammeranims.core.client.render.IVertexRenderer;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 

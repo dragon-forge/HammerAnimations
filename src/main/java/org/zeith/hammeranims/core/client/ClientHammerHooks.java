@@ -7,21 +7,18 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.zeith.hammeranims.HammerAnimations;
-import org.zeith.hammeranims.api.animsys.AnimationSystem;
-import org.zeith.hammeranims.api.animsys.IAnimatedObject;
+import org.zeith.hammeranims.api.animsys.*;
 import org.zeith.hammerlib.abstractions.sources.IObjectSource;
 import org.zeith.hammerlib.util.java.Cast;
-import org.zeith.hammerlib.util.java.tuples.Tuple3;
-import org.zeith.hammerlib.util.java.tuples.Tuples;
+import org.zeith.hammerlib.util.java.tuples.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientHammerHooks
 {
-	private static final List<Tuple3.Mutable3<IObjectSource<?>, Consumer<AnimationSystem>, Integer>> QUEUED_ACTIONS = new ArrayList<>();
+	private static final List<Tuple3.Mutable3<IObjectSource<?>, BiConsumer<Level, AnimationSystem>, Integer>> QUEUED_ACTIONS = new ArrayList<>();
 	
 	public static int DEFAULT_TIMEOUT = 100;
 	
@@ -59,7 +56,7 @@ public class ClientHammerHooks
 			return;
 		}
 		
-		enqueueAction(source, timeout, sys -> sys.deserializeNBT(tag));
+		enqueueAction(source, timeout, (w, sys) -> sys.deserializeNBT(w.registryAccess(), tag));
 	}
 	
 	public static void startAnimation(IObjectSource<?> source, int timeout, String layer, CompoundTag cfgAnim)
@@ -70,15 +67,15 @@ public class ClientHammerHooks
 			return;
 		}
 		
-		enqueueAction(source, timeout, sys ->
+		enqueueAction(source, timeout, (w, sys) ->
 				{
 					var l = sys.getLayer(layer);
-					if(l != null) l.startAnimationSync(new ConfiguredAnimation(cfgAnim), false);
+					if(l != null) l.startAnimationSync(new ConfiguredAnimation(w.registryAccess(), cfgAnim), false);
 				}
 		);
 	}
 	
-	public static void enqueueAction(IObjectSource<?> source, int timeout, Consumer<AnimationSystem> action)
+	public static void enqueueAction(IObjectSource<?> source, int timeout, BiConsumer<Level, AnimationSystem> action)
 	{
 		if(source == null || action == null)
 		{
@@ -90,13 +87,13 @@ public class ClientHammerHooks
 			QUEUED_ACTIONS.add(Tuples.mutable(source, action, timeout));
 	}
 	
-	private static boolean applyAnimationSystem(Level world, IObjectSource<?> source, Consumer<AnimationSystem> handler)
+	private static boolean applyAnimationSystem(Level world, IObjectSource<?> source, BiConsumer<Level, AnimationSystem> handler)
 	{
 		var obj = Cast.cast(source.get(world), IAnimatedObject.class);
 		if(obj == null) return false;
 		AnimationSystem sys = obj.getAnimationSystem();
 		if(sys == null) return true;
-		handler.accept(sys);
+		handler.accept(world, sys);
 		return true;
 	}
 }

@@ -5,7 +5,7 @@ import dev.zeith.lzvm.molang.compiler.MoLangCompiler;
 import dev.zeith.lzvm.molang.expression.MLExpression;
 import dev.zeith.lzvm.program.LzProgramBody;
 import lombok.extern.slf4j.Slf4j;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.zeith.hammeranims.api.HammerAnimationsApi;
 import org.zeith.hammeranims.api.event.ReloadHammerAnimationsEvent;
 
