@@ -89,7 +89,14 @@ repositories {
     flatDir { dirs "libraries/${mc_version}/runtimeOnly" }
     flatDir { dirs "libraries/embedded" }
 }
-
+configurations.all {
+    resolutionStrategy {
+        force 'org.ow2.asm:asm-analysis:9.8'
+        force 'org.ow2.asm:asm:9.8'
+        force 'org.ow2.asm:asm-tree:9.8'
+        force 'org.ow2.asm:asm-util:9.8'
+    }
+}
 dependencies {
     implementation "net.neoforged:neoforge:${forge_version}"
 
