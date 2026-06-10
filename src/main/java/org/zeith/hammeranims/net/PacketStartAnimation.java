@@ -2,7 +2,7 @@ package org.zeith.hammeranims.net;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.core.client.ClientHammerHooks;
@@ -31,7 +31,7 @@ public class PacketStartAnimation
 	}
 	
 	@Override
-	public void write(FriendlyByteBuf buf)
+	public void write(RegistryFriendlyByteBuf buf)
 	{
 		buf.writeUtf(layer, 1024);
 		buf.writeNbt(IObjectSource.writeSource(source));
@@ -39,7 +39,7 @@ public class PacketStartAnimation
 	}
 	
 	@Override
-	public void read(FriendlyByteBuf buf)
+	public void read(RegistryFriendlyByteBuf buf)
 	{
 		layer = buf.readUtf(1024);
 		

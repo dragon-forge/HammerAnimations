@@ -1,11 +1,11 @@
 package org.zeith.hammeranims.api.animsys;
 
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import lombok.*;
 import net.minecraft.nbt.*;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.*;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.actions.AnimationAction;
@@ -280,10 +280,11 @@ public class ConfiguredAnimation
 		}
 	}
 	
-	public final void write(FriendlyByteBuf out)
+	public final void write(RegistryFriendlyByteBuf out)
 	{
-		out.writeNbt(mask != null ? mask.serializeNBT() : null);
-		out.writeNbt(timeFunction.serializeNBT());
+		RegistryAccess reg = out.registryAccess();
+		out.writeNbt(mask != null ? mask.serializeNBT(reg) : null);
+		out.writeNbt(timeFunction.serializeNBT(reg));
 		out.writeUtf(animation.getLocation().toString(), 2048);
 		out.writeFloat(weight);
 		out.writeBoolean(reverse);
@@ -294,7 +295,7 @@ public class ConfiguredAnimation
 		out.writeByte(loopMode.ordinal());
 		
 		out.writeVarInt(onFinish.size());
-		for(AnimationActionInstance f : onFinish) out.writeNbt(f.serializeNBT());
+		for(AnimationActionInstance f : onFinish) out.writeNbt(f.serializeNBT(reg));
 		
 		if(next != null)
 		{
@@ -306,11 +307,13 @@ public class ConfiguredAnimation
 	private static final LoopMode[] LOOP_MODES = LoopMode.values();
 	
 	@SneakyThrows
-	public static ConfiguredAnimation read(FriendlyByteBuf in)
+	public static ConfiguredAnimation read(RegistryFriendlyByteBuf in)
 	{
+		RegistryAccess reg = in.registryAccess();
+		
 		var maskTag = in.readNbt();
-		var mask = maskTag != null ? new SerializableMask(maskTag) : null;
-		var time = TimeFunctionInstance.of(Objects.requireNonNull(in.readNbt(), "network->ConfiguredAnimation.time"));
+		var mask = maskTag != null ? new SerializableMask(reg, maskTag) : null;
+		var time = TimeFunctionInstance.of(reg, Objects.requireNonNull(in.readNbt(), "network->ConfiguredAnimation.time"));
 		var anim = new AnimationLocation(in.readUtf(2048)).resolve().orElse(DefaultsHA.NULL_ANIMATION_SYNTETIC);
 		ConfiguredAnimation ca = new ConfiguredAnimation(anim);
 		ca.mask = mask;
@@ -328,7 +331,7 @@ public class ConfiguredAnimation
 		for(int i = 0; i < finishActionCount; i++)
 		{
 			var tag = in.readNbt();
-			var act = tag != null ? AnimationActionInstance.of(tag) : null;
+			var act = tag != null ? AnimationActionInstance.of(reg, tag) : null;
 			if(act != null && !act.isEmpty()) ca.onFinish.add(act);
 		}
 		
