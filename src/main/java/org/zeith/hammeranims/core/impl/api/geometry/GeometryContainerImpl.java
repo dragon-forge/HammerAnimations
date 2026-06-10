@@ -18,8 +18,7 @@ import org.zeith.hammerlib.util.shaded.json.JSONObject;
 import org.zeith.hammerlib.util.shaded.json.JSONTokener;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class GeometryContainerImpl
