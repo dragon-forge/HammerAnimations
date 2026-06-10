@@ -295,7 +295,6 @@ public class AnimationLayer
 			AnimationLayer layer = new AnimationLayer(sys, mask, query, name, blendMode, allowAutoSync, persistent);
 			layer.weight = weight;
 			layer.defaultTransitionTime = defaultTransitionTime;
-			layer.useNanoTime = useNanoTime != null ? useNanoTime : sys.isDefaultUseNanoTime();
 			if(initialAnimation != null) layer.currentAnimation = new ActiveAnimation(initialAnimation, query);
 			return layer;
 		}

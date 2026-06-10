@@ -1,12 +1,8 @@
 package org.zeith.hammeranims.api.animsys;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import lombok.*;
 import org.jetbrains.annotations.*;
-import org.zeith.hammeranims.api.animation.AnimationLocation;
-import org.zeith.hammeranims.api.animation.IAnimationSource;
+import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
 import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
@@ -16,8 +12,7 @@ import org.zeith.hammeranims.core.init.DefaultsHA;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 public class AnimationSystem
 {
@@ -163,11 +158,6 @@ public class AnimationSystem
 		public Builder(@NotNull IAnimatedObject owner)
 		{
 			this.owner = owner;
-		}
-		
-		public Builder addHeadLookLayer()
-		{
-			return addLayers(AnimationLayer.builder(CommonLayerNames.HEAD_LOOK).initialAnimation(DefaultsHA.HEAD_LOOK));
 		}
 		
 		public Builder addLayers(AnimationLayer.Builder... layers)

@@ -1,15 +1,12 @@
 package org.zeith.hammeranims.api.animsys;
 
-import lombok.*;
+import lombok.ToString;
 import org.zeith.hammeranims.api.animation.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
-import org.zeith.hammeranims.standalone.utils.Cast;
-import org.zeith.hammeranims.api.animation.*;
-import org.zeith.hammeranims.api.animsys.layer.ActiveAnimation;
-import org.zeith.hammeranims.api.animsys.layer.AnimationLayer;
-import org.zeith.hammeranims.api.time.TimeFunction;
-import org.zeith.hammeranims.api.time.TimeFunctionInstance;
+import org.zeith.hammeranims.api.animsys.layer.*;
+import org.zeith.hammeranims.api.time.*;
 import org.zeith.hammeranims.core.init.DefaultsHA;
+import org.zeith.hammeranims.standalone.utils.Cast;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -45,20 +42,24 @@ public class ConfiguredAnimation
 		setAnimation(animation);
 	}
 	
+	public ConfiguredAnimation(ConfiguredAnimation toCopy)
+	{
+		this.animation = toCopy.animation;
+		this.weight = toCopy.weight;
+		this.speed = toCopy.speed;
+		this.startTime = toCopy.startTime;
+		this.reverse = toCopy.reverse;
+		this.transitionTime = toCopy.transitionTime;
+		this.timeFunction = toCopy.timeFunction;
+		this.important = toCopy.important;
+		this.loopMode = toCopy.loopMode;
+		this.mask = toCopy.mask;
+		this.next = toCopy.next != null ? new ConfiguredAnimation(toCopy.next) : null;
+	}
+	
 	public ConfiguredAnimation copy()
 	{
-		ConfiguredAnimation copy = new ConfiguredAnimation(animation);
-		copy.weight = weight;
-		copy.speed = speed;
-		copy.startTime = startTime;
-		copy.reverse = reverse;
-		copy.transitionTime = transitionTime;
-		copy.timeFunction = timeFunction;
-		copy.important = important;
-		copy.loopMode = loopMode;
-		copy.mask = mask;
-		copy.next = next != null ? next.copy() : null;
-		return copy;
+		return new ConfiguredAnimation(this);
 	}
 	
 	public Animation getAnimation()
