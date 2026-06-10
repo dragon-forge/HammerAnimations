@@ -8,7 +8,6 @@ import org.zeith.hammeranims.api.animsys.ConfiguredAnimation;
 import org.zeith.hammeranims.core.init.DefaultsHA;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class ActiveAnimation
 {
@@ -29,10 +28,10 @@ public class ActiveAnimation
 	
 	public final Map<String, BoneAnimationInstance> bones;
 	
-	public ActiveAnimation(ConfiguredAnimation config, LzVariableStore vars)
+	public ActiveAnimation(AnimationLayer layer, ConfiguredAnimation config, LzVariableStore vars)
 	{
 		this.layer = layer;
-		this.query = query;
+		this.query = layer.query;
 		this.config = config;
 		this.bones = instantiateBones(this.config, query);
 	}
@@ -44,7 +43,7 @@ public class ActiveAnimation
 	
 	public boolean isFrozen()
 	{
-		return HammerAnimations.PROXY.isGamePaused() || layer.frozen;
+		return layer.frozen;
 	}
 	
 	public Map<String, BoneAnimationInstance> getBoneAnimations()

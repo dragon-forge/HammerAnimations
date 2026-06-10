@@ -25,12 +25,6 @@ public class AnimationSystem
 	@Setter
 	protected double time;
 	
-	protected boolean hasTicked = false;
-	protected boolean hasReceivedTime = false;
-	
-	@Setter
-	protected double time;
-	
 	public boolean canSync = true, autoSync = false, syncTime = true;
 	
 	@Getter
