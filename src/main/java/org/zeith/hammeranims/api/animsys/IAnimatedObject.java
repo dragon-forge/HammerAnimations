@@ -1,7 +1,13 @@
 package org.zeith.hammeranims.api.animsys;
 
+import lombok.val;
+import org.jetbrains.annotations.Nullable;
+import org.joml.*;
 import org.zeith.hammeranims.api.animation.interp.Query;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.api.geometry.model.IPositionalModel;
 import org.zeith.hammeranims.standalone.mc.math.Vec3d;
+import org.zeith.hammeranims.standalone.utils.MathHelper;
 
 public interface IAnimatedObject
 {
@@ -59,7 +65,7 @@ public interface IAnimatedObject
 		return new Matrix4d()
 				.identity()
 				.translate(pos.x + 0.5F, pos.y, pos.z + 0.5F)
-				.rotateY(Mth.DEG_TO_RAD * getBaseAnimatedYRot(partialTicks));
+				.rotateY(MathHelper.TO_RAD_F * getBaseAnimatedYRot(partialTicks));
 	}
 	
 	@Nullable
@@ -82,43 +88,14 @@ public interface IAnimatedObject
 		return posMod.applyBoneTransforms(mat, bone) ? mat : null;
 	}
 	
-	default Vec3 getAnimatedLocatorPosition(String locator, float partialTicks)
+	default Vec3d getAnimatedLocatorPosition(String locator, float partialTicks)
 	{
 		val mat = getAnimatedLocatorMatrix(locator, partialTicks);
 		if(mat != null)
 		{
 			Vector3d vpos = mat.transformPosition(new Vector3d(0));
-			return new Vec3(vpos.x, vpos.y, vpos.z);
+			return new Vec3d(vpos.x, vpos.y, vpos.z);
 		}
 		return null;
-	}
-	
-	default void playSound(AnimatedSoundEffect effect)
-	{
-		val world = getAnimatedObjectWorld();
-		val pos = getAnimatedObjectPosition();
-		if(world == null || pos == null || !world.isClientSide()) return;
-		val vol = getAnimationObjectVolume();
-		if(vol <= 0F) return;
-		world.playLocalSound(pos.x, pos.y, pos.z, BuiltInRegistries.SOUND_EVENT.get(effect.getEffect()), getAnimationObjectSoundCategory(), 1F, 1F, false);
-	}
-	
-	default Matrix3f getParticleEffectRotation(AnimatedParticleEffect effect)
-	{
-		val mat = getAnimatedLocatorMatrix(effect.getLocator(), 1F);
-		if(mat == null) return null;
-		Matrix3f rot = new Matrix3f();
-		rot.rotate(mat.getNormalizedRotation(new Quaternionf()));
-		return rot;
-	}
-	
-	default IParticleRotationUpdater playParticle(AnimatedParticleEffect effect)
-	{
-		val world = getAnimatedObjectWorld();
-		val mat = getAnimatedLocatorMatrix(effect.getLocator(), 1F);
-		if(world == null || mat == null || !world.isClientSide) return null;
-		Vector3d vpos = mat.transformPosition(new Vector3d(0));
-		Matrix3f rot = getParticleEffectRotation(effect);
-		return HammerAnimations.PROXY.createParticle(effect, rot, new Vec3(vpos.x, vpos.y, vpos.z));
 	}
 }

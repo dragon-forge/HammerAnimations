@@ -41,12 +41,6 @@ public class GeometricModelImpl
 	}
 	
 	@Override
-	public boolean hasBone(String bone)
-	{
-		return bones.containsKey(bone);
-	}
-	
-	@Override
 	public Set<String> getBoneNames()
 	{
 		return bones.keySet();

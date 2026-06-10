@@ -3,16 +3,15 @@ package org.zeith.hammeranims.core.impl.api.geometry.decoder;
 import lombok.val;
 import org.joml.Vector3f;
 import org.json.*;
-import org.joml.*;
 import org.zeith.hammeranims.HammerAnimations;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
-import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
 import org.zeith.hammeranims.core.impl.api.geometry.constrains.GeometryConstrainsImpl;
 import org.zeith.hammeranims.core.jomljson.GeometryConstrainsImplAdapter;
 import org.zeith.hammeranims.core.utils.GsonHelper;
 import org.zeith.hammeranims.standalone.mc.ResourceLocation;
+import org.zeith.hammeranims.standalone.utils.MoreObjects;
 
 import java.util.*;
 
