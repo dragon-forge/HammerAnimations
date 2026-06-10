@@ -99,7 +99,7 @@ dependencies {
     ///////////////////////////
 
     if (hasConfig("hl_version") && !config.hl_version.isEmpty()) {
-        implementation "org.zeith.hammerlib:HammerLib-${mc_version}:${config.hl_version}"
+        implementation "org.zeith.hammerlib:HammerLib-${config.hlmc_version}:${config.hl_version}"
     }
 	
     if (hasConfig("hammeranims_version") && !config.hammeranims_version.isEmpty()) {

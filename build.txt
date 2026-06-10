@@ -1,10 +1,11 @@
 # Mod Info
-mod_version=21.0.39
+mod_version=21.1.54
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
-hl_version=21.0.10
-jei_version=19.0.0.1
+hlmc_version=1.21
+hl_version=21.0.14
+jei_version=19.27.0.340
 
 # Persistent mod info
 mod_id=hammeranims
