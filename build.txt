@@ -1,5 +1,5 @@
 # Mod Info
-mod_version=21.1.55
+mod_version=21.1.56
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
@@ -19,7 +19,6 @@ issue_tracker_url=https://github.com/dragon-forge/HammerAnimations/issues
 
 # Maven Info
 maven_group=org.zeith.hammeranims
-maven_url=file:///R:/
 
 # MC Info
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603

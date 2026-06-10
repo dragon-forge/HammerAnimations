@@ -95,7 +95,7 @@ public class GsonGeometryDecoder
 		List<ModelPartInfo> rootChildren = new ArrayList<>();
 		for(ModelPartInfo value : parts.values())
 		{
-			if(!value.getParentName().equals("root"))
+			if(!value.getParentName().equals(ModelPartInfo.ROOT_BONE_NAME))
 			{
 				ModelPartInfo parent = parts.get(value.getParentName());
 				if(parent != null)
@@ -129,7 +129,7 @@ public class GsonGeometryDecoder
 		boolean mirror = GsonHelper.getAsBoolean(bone, "mirror", false);
 		boolean neverRender = GsonHelper.getAsBoolean(bone, "neverRender", false);
 		String name = GsonHelper.getAsString(bone, "name").toLowerCase(Locale.ROOT);
-		String parentName = MoreObjects.firstNonNull(GsonHelper.getAsString(bone, "parent", "root"), "root").toLowerCase(Locale.ROOT);
+		String parentName = MoreObjects.firstNonNull(GsonHelper.getAsString(bone, "parent", ModelPartInfo.ROOT_BONE_NAME), ModelPartInfo.ROOT_BONE_NAME).toLowerCase(Locale.ROOT);
 		VertexType boneVertexType = VertexType.byId(GsonHelper.getAsString(bone, "render_type", ""), VertexType.DEFAULT);
 		
 		List<ModelPartInfo> children = new ArrayList<>();
