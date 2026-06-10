@@ -1,17 +1,15 @@
 package org.zeith.hammeranims.core.client.model;
 
+import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.zeith.hammeranims.api.geometry.data.FaceUV;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
-import org.zeith.hammeranims.core.client.render.vertex.RenderVertex;
-import org.zeith.hammeranims.core.client.render.vertex.VertexType;
-import org.zeith.hammeranims.core.client.render.vertex.VertexType;
-import org.zeith.hammeranims.core.utils.EnumFacing;
-import org.zeith.hammeranims.core.utils.IPoseEntry;
+import org.zeith.hammeranims.core.client.render.vertex.*;
+import org.zeith.hammeranims.core.utils.*;
 
 import java.lang.Math;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Getter
 public class ModelCubeF
@@ -131,6 +129,7 @@ public class ModelCubeF
 			int l = vertices.length;
 			for(int i = 0; i < l; i++)
 			{
+				var vertex = vertices[i];
 				Vector3f pos = po.transformPosition(new Vector3f(vertex.getPos()).mul(0.0625f));
 				
 				vts[i] = new RenderVertex(
@@ -138,8 +137,7 @@ public class ModelCubeF
 						red, green, blue, alpha,
 						vertex.getU(), vertex.getV(),
 						packedOverlay, packedLight,
-						normal.x(), normal.y(), normal.z(),
-						MoreObjects.firstNonNull(forceVType, vType)
+						normal.x(), normal.y(), normal.z()
 				);
 			}
 			

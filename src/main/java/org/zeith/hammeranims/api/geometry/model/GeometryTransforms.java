@@ -5,6 +5,7 @@ import org.teavm.jso.JSObject;
 import org.teavm.jso.core.*;
 import org.teavm.jso.impl.JS;
 import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.standalone.mc.math.Vec3d;
 
 import static org.zeith.hammeranims.standalone.mc.math.Vec3d.ZERO;

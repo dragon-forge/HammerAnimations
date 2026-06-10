@@ -1,5 +1,7 @@
 package org.zeith.hammeranims.api.geometry.model;
 
+import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.core.*;
 import org.teavm.jso.impl.JS;
@@ -7,6 +9,7 @@ import org.zeith.hammeranims.api.animation.data.BoneAnimationInstance;
 import org.zeith.hammeranims.api.animation.interp.BlendMode;
 import org.zeith.hammeranims.api.animsys.SerializableMask;
 import org.zeith.hammeranims.api.animsys.layer.*;
+import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.standalone.wasm.itfs.anim.HAAnimationPose;
 
 import java.util.*;

@@ -2,7 +2,6 @@ package org.zeith.hammeranims.api.texture;
 
 import org.zeith.hammeranims.api.geometry.model.IRenderableBone;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
-import org.zeith.hammerlib.util.colors.ColorHelper;
 
 import java.util.Optional;
 
@@ -48,7 +47,7 @@ public interface ITextureAccess
 		
 		PixelFaceVisitor visitor = new PixelFaceVisitor(texture, texture.getWidth(), texture.getHeight(), color ->
 		{
-			int a = ColorHelper.getAlphai(color);
+			int a = (color >> 24) & 0xFF;
 			if(a > 0) nonTransparent[0] = true;
 			VertexType v = VertexType.ofAlpha(a);
 			type[0] = v.max(type[0]);

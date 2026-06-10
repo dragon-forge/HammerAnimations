@@ -1,6 +1,5 @@
 package org.zeith.hammeranims.core.client.render.vertex;
 
-import com.google.common.base.Suppliers;
 import lombok.Getter;
 import org.zeith.hammeranims.standalone.utils.Suppliers;
 

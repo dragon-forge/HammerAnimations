@@ -1,7 +1,9 @@
 package org.zeith.hammeranims.core.client.model;
 
 import org.joml.*;
+import org.zeith.hammeranims.api.geometry.data.FaceUV;
 import org.zeith.hammeranims.api.geometry.model.*;
+import org.zeith.hammeranims.api.utils.IFaceUVPredicate;
 import org.zeith.hammeranims.core.client.render.IVertexOutput;
 import org.zeith.hammeranims.core.client.render.vertex.VertexType;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryLocator;

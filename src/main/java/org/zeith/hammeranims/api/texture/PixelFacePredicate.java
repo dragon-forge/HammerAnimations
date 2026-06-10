@@ -3,7 +3,6 @@ package org.zeith.hammeranims.api.texture;
 import lombok.AllArgsConstructor;
 import org.zeith.hammeranims.api.geometry.data.FaceUV;
 import org.zeith.hammeranims.api.utils.IFaceUVPredicate;
-import org.zeith.hammerlib.util.colors.ColorHelper;
 
 import java.util.function.IntPredicate;
 
@@ -11,11 +10,11 @@ import java.util.function.IntPredicate;
 public class PixelFacePredicate
 		implements IFaceUVPredicate
 {
-	public static final IntPredicate FULL_OPACITY = argb -> ColorHelper.getAlphai(argb) == 0xFF;
-	public static final IntPredicate ZERO_OPACITY = argb -> ColorHelper.getAlphai(argb) == 0;
+	public static final IntPredicate FULL_OPACITY = argb -> ((argb >> 24) & 0xFF) == 0xFF;
+	public static final IntPredicate ZERO_OPACITY = argb -> ((argb >> 24) & 0xFF) == 0;
 	public static final IntPredicate PARTIAL_OPACITY = argb ->
 	{
-		int a = ColorHelper.getAlphai(argb);
+		int a = (argb >> 24) & 0xFF;
 		return a > 0 && a < 0xFF;
 	};
 	
