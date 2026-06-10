@@ -54,7 +54,7 @@ public class MolangExpressionParser
 	}
 	
 	@SubscribeEvent
-	public static void reload(ReloadHammerAnimationsEvent e)
+	public static void reload(ReloadHammerAnimationsEvent.EnqueueReloads e)
 	{
 		CLASS_LOADER = new LzJVM.LzClassLoader();
 		CACHE.clear();
