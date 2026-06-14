@@ -63,6 +63,11 @@ public interface IGeometryContainer
 		return getGeometry().createModel();
 	}
 	
+	default IPositionalModel createPositionalModel()
+	{
+		return getGeometry().createPositionalModel();
+	}
+	
 	default IPositionalModel getPositionalModel()
 	{
 		return getGeometry().getPositionalModel();
