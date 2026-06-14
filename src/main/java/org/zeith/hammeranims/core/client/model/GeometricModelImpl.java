@@ -6,6 +6,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 import org.zeith.hammeranims.api.geometry.constrains.*;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
@@ -16,6 +17,7 @@ public class GeometricModelImpl
 		implements IGeometricModel
 {
 	protected final ModelBoneF root;
+	protected final IGeometryContainer container;
 	protected final IGeometryConstraints constraints;
 	protected final Map<String, ModelBoneF> bones = new HashMap<>();
 	protected final Map<String, IBoneConstraints> boneConstraints = new HashMap<>();
@@ -23,6 +25,7 @@ public class GeometricModelImpl
 	
 	public GeometricModelImpl(GeometryDataImpl root)
 	{
+		this.container = root.getContainer();
 		this.root = root.bakeRoot();
 		this.constraints = root.getContainer().getConstraints();
 		registerBone(this.root);
@@ -41,6 +44,12 @@ public class GeometricModelImpl
 	public Set<String> getBoneNames()
 	{
 		return bones.keySet();
+	}
+	
+	@Override
+	public IGeometryContainer getContainer()
+	{
+		return container;
 	}
 	
 	@Override

@@ -51,6 +51,12 @@ public class PositionalModelImpl
 	}
 	
 	@Override
+	public IGeometryContainer getContainer()
+	{
+		return container;
+	}
+	
+	@Override
 	public IBone getRoot()
 	{
 		return root;
