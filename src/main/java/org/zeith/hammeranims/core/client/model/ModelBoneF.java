@@ -58,6 +58,15 @@ public class ModelBoneF
 	}
 	
 	@Override
+	public void postRender(float scale) {}
+	
+	@Override
+	public void renderWithRotation(float scale) {}
+	
+	@Override
+	public void render(float scale) {}
+	
+	@Override
 	public IRenderableBone getParent()
 	{
 		return parent;

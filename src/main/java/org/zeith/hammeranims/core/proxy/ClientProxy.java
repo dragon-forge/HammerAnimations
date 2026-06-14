@@ -48,9 +48,6 @@ import java.util.stream.Collectors;
 public class ClientProxy
 		extends CommonProxy
 {
-	protected static final List<IGeometricModel> createdModels = new ArrayList<>();
-	protected static final List<IGeometricModel> disposeModels = new ArrayList<>();
-	
 	protected static ExtraParticleEffects extraEffects;
 	
 	@Override
@@ -92,14 +89,6 @@ public class ClientProxy
 	{
 		if(e.phase != TickEvent.Phase.END) return;
 		
-		if(!disposeModels.isEmpty())
-		{
-			HammerAnimations.LOG.info("Disposing {} OpenGL models.", disposeModels.size());
-			while(!disposeModels.isEmpty())
-				disposeModels.remove(0).dispose();
-			HammerAnimations.LOG.info("All previous models disposed.");
-		}
-		
 		Minecraft mc = Minecraft.getMinecraft();
 		boolean inWorldRN = mc.world != null && mc.getConnection() != null;
 		if(inWorldRN != inWorld)
@@ -113,7 +102,6 @@ public class ClientProxy
 	public IGeometricModel createGeometryData(GeometryDataImpl def)
 	{
 		GeometricModelImpl model = new GeometricModelImpl(def);
-		createdModels.add(model);
 		return model;
 	}
 	
@@ -206,9 +194,6 @@ public class ClientProxy
 	
 	public static CompletableFuture<?> performReload()
 	{
-		disposeModels.addAll(createdModels);
-		createdModels.clear();
-		
 		IExtendedResourceProvider res = wrapVanillaResources(Minecraft.getMinecraft().getResourceManager());
 		
 		return CompletableFuture.allOf(
