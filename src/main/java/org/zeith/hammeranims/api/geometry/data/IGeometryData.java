@@ -42,6 +42,12 @@ public interface IGeometryData
 			}
 			
 			@Override
+			public IPositionalModel createPositionalModel()
+			{
+				return IPositionalModel.EMPTY;
+			}
+			
+			@Override
 			public IGeometryContainer getContainer()
 			{
 				return container;
@@ -64,6 +70,8 @@ public interface IGeometryData
 	IGeometricModel createModel();
 	
 	IPositionalModel getPositionalModel();
+	
+	IPositionalModel createPositionalModel();
 	
 	IGeometryContainer getContainer();
 }

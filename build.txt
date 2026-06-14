@@ -11,7 +11,7 @@ jei_version=4.16.1.302
 mod_id=hammeranims
 mod_id_fancy=HammerAnimations
 mod_name=HammerAnimations
-mod_version=12.2.56
+mod_version=12.2.57
 
 # Project ID on CurseForge
 modrinth_project=C7cTlgwS

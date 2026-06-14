@@ -1,7 +1,8 @@
 package org.zeith.hammeranims.api.geometry.model;
 
 import net.minecraftforge.fml.relauncher.*;
-import org.zeith.hammeranims.api.animsys.AnimationSystem;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.core.init.DefaultsHA;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -10,11 +11,17 @@ import java.util.*;
  * Interface for defining a geometric model with pose manipulation and rendering capabilities.
  */
 public interface IGeometricModel
-		extends IGenericModel
+		extends IGenericModel, AutoCloseable
 {
 	IGeometricModel EMPTY = new IGeometricModel()
 	{
 		private final GeometryPose pose = new GeometryPose(s -> false);
+		
+		@Override
+		public IGeometryContainer getContainer()
+		{
+			return DefaultsHA.NULL_GEOMETRY;
+		}
 		
 		@Override
 		public IRenderableBone getRoot()
@@ -102,8 +109,14 @@ public interface IGeometricModel
 	void renderModel(RenderData data);
 	
 	/**
-	 * Disposes this model and it's used GPU/memory resources.
+	 * Disposes this model, and it's used GPU/memory resources.
 	 * This will be only called on render thread.
 	 */
 	void dispose();
+	
+	@Override
+	default void close()
+	{
+		dispose();
+	}
 }

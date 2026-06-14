@@ -2,6 +2,7 @@ package org.zeith.hammeranims.api.geometry.model;
 
 import org.zeith.hammeranims.api.animsys.AnimationSystem;
 import org.zeith.hammeranims.api.animsys.layer.*;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -26,6 +27,8 @@ public interface IGenericModel
 		}
 		return expanded::contains;
 	}
+	
+	IGeometryContainer getContainer();
 	
 	IBone getRoot();
 	

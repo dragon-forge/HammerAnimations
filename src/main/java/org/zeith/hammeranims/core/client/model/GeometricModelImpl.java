@@ -5,12 +5,10 @@ import lombok.val;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.*;
 import org.lwjgl.opengl.GL11;
 import org.zeith.hammeranims.api.geometry.IGeometryContainer;
-import org.zeith.hammeranims.api.geometry.constrains.IBoneConstraints;
-import org.zeith.hammeranims.api.geometry.constrains.IGeometryConstraints;
+import org.zeith.hammeranims.api.geometry.constrains.*;
 import org.zeith.hammeranims.api.geometry.model.*;
 import org.zeith.hammeranims.core.client.render.*;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDataImpl;
@@ -59,6 +57,12 @@ public class GeometricModelImpl
 	}
 	
 	@Override
+	public IGeometryContainer getContainer()
+	{
+		return container;
+	}
+	
+	@Override
 	public IRenderableBone getRoot()
 	{
 		return root;
@@ -90,13 +94,10 @@ public class GeometricModelImpl
 			s.reset();
 	}
 	
-	GeometryPose emptyPose = new GeometryPose(this::hasBone);
-	
 	@Override
 	public GeometryPose emptyPose()
 	{
-		emptyPose.reset();
-		return emptyPose;
+		return new GeometryPose(this::hasBone);
 	}
 	
 	@Override

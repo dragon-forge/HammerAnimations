@@ -80,6 +80,12 @@ public class GeometryDataImpl
 	}
 	
 	@Override
+	public IPositionalModel createPositionalModel()
+	{
+		return PositionalModelImpl.create(container, mesh);
+	}
+	
+	@Override
 	public IGeometryContainer getContainer()
 	{
 		return container;

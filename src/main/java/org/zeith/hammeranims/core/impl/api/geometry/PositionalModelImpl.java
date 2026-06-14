@@ -53,6 +53,12 @@ public class PositionalModelImpl
 	}
 	
 	@Override
+	public IGeometryContainer getContainer()
+	{
+		return container;
+	}
+	
+	@Override
 	public IBone getRoot()
 	{
 		return root;
@@ -90,13 +96,10 @@ public class PositionalModelImpl
 			s.reset();
 	}
 	
-	GeometryPose emptyPose = new GeometryPose(this::hasBone);
-	
 	@Override
 	public GeometryPose emptyPose()
 	{
-		emptyPose.reset();
-		return emptyPose;
+		return new GeometryPose(this::hasBone);
 	}
 	
 	@Override

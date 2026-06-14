@@ -1,8 +1,9 @@
 package org.zeith.hammeranims.api.geometry.model;
 
 import org.jetbrains.annotations.NotNull;
-import org.zeith.hammeranims.joml.Matrix4d;
-import org.zeith.hammeranims.joml.Matrix4f;
+import org.zeith.hammeranims.api.geometry.IGeometryContainer;
+import org.zeith.hammeranims.core.init.DefaultsHA;
+import org.zeith.hammeranims.joml.*;
 
 import javax.annotation.*;
 import java.util.*;
@@ -12,7 +13,13 @@ public interface IPositionalModel
 {
 	IPositionalModel EMPTY = new IPositionalModel()
 	{
-		final GeometryPose emptyPose = new GeometryPose(this::hasBone);
+		final GeometryPose emptyPose = new GeometryPose(s -> false);
+		
+		@Override
+		public IGeometryContainer getContainer()
+		{
+			return DefaultsHA.NULL_GEOMETRY;
+		}
 		
 		@Override
 		public void resetPose()
