@@ -436,7 +436,7 @@ tasks.register('buildAndUploadMod') {
 }
 
 afterEvaluate {
-    if (!config.maven_url.isEmpty()) {
+    if (System.env.MAVEN_URL != null && !System.env.MAVEN_URL.isEmpty()) {
         tasks["curseforge${config.cf_project}"].dependsOn.add(publish)
         tasks["modrinth"].dependsOn.add(publish)
     }
@@ -452,7 +452,7 @@ publishing {
     }
     repositories {
         maven {
-            url config.maven_url
+            url System.env.MAVEN_URL
         }
     }
 }
