@@ -25,6 +25,11 @@ public class AccumulatingVertexConsumer
 		return this;
 	}
 	
+	public boolean isEmpty()
+	{
+		return accumulator.isEmpty();
+	}
+	
 	@Override
 	public VertexConsumer addVertex(float x, float y, float z)
 	{
