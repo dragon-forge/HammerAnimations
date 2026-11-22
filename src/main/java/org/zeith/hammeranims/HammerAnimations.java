@@ -3,7 +3,6 @@ package org.zeith.hammeranims;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.*;
 import net.neoforged.fml.common.Mod;
-import org.apache.logging.log4j.LogManager;
 import org.slf4j.*;
 import org.zeith.hammeranims.core.impl.api.animation.AnimationDecoder;
 import org.zeith.hammeranims.core.impl.api.geometry.GeometryDecoder;
@@ -12,7 +11,6 @@ import org.zeith.hammeranims.core.proxy.*;
 import org.zeith.hammerlib.api.proxy.IProxy;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.event.fml.FMLFingerprintCheckEvent;
-import org.zeith.hammerlib.util.CommonMessages;
 import org.zeith.hammerlib.util.mcf.Resources;
 
 @Mod(HammerAnimations.MOD_ID)
@@ -28,9 +26,7 @@ public class HammerAnimations
 	
 	public HammerAnimations(IEventBus modBus)
 	{
-		CommonMessages.printMessageOnIllegalRedistribution(HammerAnimations.class,
-				LogManager.getLogger(MOD_NAME), "HammerAnimations", "https://www.curseforge.com/minecraft/mc-mods/hammer-animations"
-		);
+		GradleBuild.construct(getClass());
 		
 		modBus.register(this);
 		AnimationDecoder.init();
@@ -46,9 +42,7 @@ public class HammerAnimations
 	@SubscribeEvent
 	public void checkFingerprint(FMLFingerprintCheckEvent e)
 	{
-		CommonMessages.printMessageOnFingerprintViolation(e, "97e852e9b3f01b83574e8315f7e77651c6605f2b455919a7319e9869564f013c",
-				LogManager.getLogger(MOD_NAME), "HammerAnimations", "https://www.curseforge.com/minecraft/mc-mods/hammer-animations"
-		);
+		GradleBuild.fingerprint(e);
 	}
 	
 	public static ResourceLocation id(String path)

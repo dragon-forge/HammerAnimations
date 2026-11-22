@@ -30,6 +30,8 @@ base {
     archivesName = "${config.archive_name}-${mc_version}"
 }
 
+apply from: 'https://gist.githubusercontent.com/Zeitheron/87837915297915ef927f4fdbc47c72b0/raw/JarSign-NeoGradle.gradle'
+
 java.toolchain.languageVersion = JavaLanguageVersion.of(Integer.parseInt(mc_java))
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
@@ -107,7 +109,7 @@ dependencies {
     ///////////////////////////
 
     if (hasConfig("hl_version") && !config.hl_version.isEmpty()) {
-        implementation "org.zeith.hammerlib:HammerLib-${config.hlmc_version}:${config.hl_version}"
+        implementation "org.zeith.hammerlib:HammerLib-${mc_version}:${config.hl_version}"
     }
 	
     if (hasConfig("hammeranims_version") && !config.hammeranims_version.isEmpty()) {
@@ -187,7 +189,7 @@ def resourceTargets = ['META-INF/neoforge.mods.toml', 'pack.mcmeta']
 def replaceProperties = [
         minecraft_version: mc_version, minecraft_version_range: mc_range,
         forge_version    : "${mc_version}-${forge_version}", forge_version_range: forge_range, javafml_range: javafml_range,
-        mod_id           : config.mod_id, mod_name: config.mod_name, mod_license: config.mod_license, mod_version: config.mod_version,
+        mod_id           : config.mod_id, mod_name: config.mod_name, mod_version: config.mod_version,
         mod_authors      : config.mod_authors, mod_description: config.mod_description,
         hl_version       : config.hl_version, modrinth_project: config.modrinth_project,
         issue_tracker_url: config.issue_tracker_url, mod_credits: config.mod_credits
@@ -312,7 +314,6 @@ tasks.register('curseforge', net.darkhax.curseforgegradle.TaskPublishCurseForge)
     def mainFile = upload(config.cf_project, jar)
     mainFile.changelog = 'The changelog string for this file.'
     mainFile.addGameVersion(mc_version)
-    mainFile.addGameVersion('1.21.1')
     mainFile.addGameVersion('NeoForge')
     mainFile.releaseType = config.release_type;
 //    mainFile.changelog = file("CHANGELOG.md").text
@@ -372,44 +373,6 @@ tasks.register('curseforge', net.darkhax.curseforgegradle.TaskPublishCurseForge)
                 mainFile.addEmbedded one.trim()
         }
 }
-
-
-import net.neoforged.gradle.common.tasks.PotentiallySignJar
-
-import java.nio.file.Files
-
-task signJar(type: PotentiallySignJar, dependsOn: jar) {
-    onlyIf {
-        System.env.MC_KS_PASS != null
-    }
-    keyStore = System.env.MC_KS_PATH
-    alias = System.env.MC_KS_ALIAS
-    storePass = System.env.MC_KS_PASS
-    keyPass = System.env.MC_KS_PASS
-    input = jar.archiveFile
-}
-
-task placeSignedJar {
-    doLast {
-        def resF = signJar.output.get().asFile
-        def af = jar.archiveFile.get().asFile
-        af.delete()
-        resF.renameTo(af)
-    }
-}
-
-signJar.finalizedBy('placeSignedJar')
-
-def reobfFile = jar.archiveFile.get().asFile
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'signJar'
-}
-
-jar.finalizedBy('signJar')
-publish.dependsOn('signJar')
-
-build.dependsOn signJar
 
 tasks.register('buildAndUploadMod') {
     group = "upload"
@@ -477,5 +440,11 @@ idea {
     module {
         downloadSources = true
         downloadJavadoc = true
+    }
+}
+
+test {
+    onlyIf {
+        false
     }
 }

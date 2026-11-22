@@ -3,8 +3,7 @@ mod_version=21.1.57.2
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
-hlmc_version=1.21
-hl_version=21.0.14
+hl_version=21.1.21
 jei_version=19.27.0.340
 
 # Persistent mod info
@@ -12,8 +11,8 @@ mod_id=hammeranims
 archive_name=HammerAnimations
 mod_name=HammerAnimations
 mod_description=Library mod for Minecraft: Java Edition. Brings Bedrock model and animation as a compact and easy-to-use API layer with hotswapping.\nTo perform hot-reload, run \"/hammeranims reload\"
+mod_sources=https://www.curseforge.com/minecraft/mc-mods/hammer-animations https://modrinth.com/mod/hammer-animations
 mod_authors=Zeitheron
-mod_license=All Rights Reserved
 mod_credits=Mojang (creation of model & animation standard)
 issue_tracker_url=https://github.com/dragon-forge/HammerAnimations/issues
 
